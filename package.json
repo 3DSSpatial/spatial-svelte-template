@@ -1,7 +1,9 @@
 {
   "name": "zea-template-collab",
   "version": "0.0.1",
-  "dependencies": {},
+  "dependencies": {
+    "@zeainc/zea-web-components": "^3.0.3"
+  },
   "devDependencies": {
     "@rollup/plugin-commonjs": "^13.0.0",
     "@rollup/plugin-node-resolve": "^8.1.0",
