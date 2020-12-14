@@ -12,7 +12,7 @@
 
 <div class="flex items-center w-full h-full px-2">
   <div class="logo flex items-center h-full mr-4">
-    <img src="./images/logo-zea.svg" alt="logo">
+    <img src="/images/logo-zea.svg" alt="logo">
   </div>
   <zea-user-chip-set id="zea-user-chip-set"></zea-user-chip-set>
   <div class="divider"></div>
