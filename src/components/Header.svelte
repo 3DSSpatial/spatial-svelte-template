@@ -3,13 +3,39 @@
 
   let userChipSet
   let userChip
+  let tauntBtn
 
   auth.getUserData().then((userData) => {
     if (!userData) return
 
     userChip.userData = userData
-    const { session } = setupCollab(userData, $APP_DATA)
+    const { session, sessionSync } = setupCollab(userData, $APP_DATA)
     userChipSet.session = session
+
+    { 
+      // SessionSync interations
+      tauntBtn.addEventListener('click', (event) => {
+        const { renderer } = $APP_DATA
+        const camera = renderer.getViewport().getCamera()
+        const xfo = camera.getParameter('GlobalXfo').getValue()
+        const target = camera.getTargetPosition()
+        sessionSync.directAttention(xfo.tr, target, 1, 1000)
+      })
+
+      window.addEventListener('zeaUserClicked', (event) => {
+        const userData = sessionSync.userDatas[event.detail.id]
+        if (userData) {
+          const avatar = userData.avatar
+          const viewXfo = avatar.viewXfo
+          const focalDistance = avatar.focalDistance || 1.0
+          const target = viewXfo.tr.add(viewXfo.ori.getZaxis().scale(-focalDistance))
+
+          const viewport = renderer.getViewport()
+          const cameraManipulator = viewport.getManipulator()
+          cameraManipulator.orientPointOfView(viewport.getCamera(), viewXfo.tr, target, 1.0, 1000)
+        }
+      })
+    }
   })
 </script>
 
@@ -45,7 +71,9 @@
   <div class="panel-container mx-1 user-set-container">
     <zea-user-chip-set bind:this={userChipSet} showImages />
   </div>
-
+  <div class="">
+    <zea-button bind:this={tauntBtn}>Taunt</zea-button>
+  </div>
   <div class="divider" />
   <div class="user-container pl-2">
     <zea-user-chip bind:this={userChip} />

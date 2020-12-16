@@ -9,9 +9,10 @@
 
   let treeViewItems
   let appData
+  let progressBar
 
   onMount(() => {
-    const { GLRenderer, Scene } = window.zeaEngine
+    const { GLRenderer, Scene, resourceLoader } = window.zeaEngine
 
     const renderer = new GLRenderer(canvas)
     const scene = new Scene()
@@ -21,7 +22,16 @@
     treeViewItems = [scene.getRoot()]
     APP_DATA.set({ renderer, scene })
 
+    /** PROGRESSBAR START */
+    progressBar.percent = 0
+    resourceLoader.on('progressIncremented', (event) => {
+      const { percent } = event
+      progressBar.percent = percent 
+    })
+    /** PROGRESSBAR END */
+
     {
+      // FPS display configuration
       const fpsDisplay = document.createElement('fps-display')
       fpsDisplay.renderer = renderer
       fpsContainer.appendChild(fpsDisplay)
@@ -42,6 +52,9 @@
   </div>
   <div slot="B" class="panel-container">
     <canvas id="renderer" bind:this={canvas} />
+    <div class="relative">
+      <zea-progress-bar bind:this={progressBar} />
+    </div>
     <div bind:this={fpsContainer}></div>
   </div>
 </zea-layout>

@@ -12,9 +12,9 @@ export class FPSDisplay extends HTMLElement {
       document.createTextNode(`
       .fps-display {
         position: fixed;
-        bottom: 40px;
-        right: 20px;
-        color: var(--color-warning-2);
+        bottom: 10px;
+        right: 10px;
+        color: #000000;
       }
     `)
     )
