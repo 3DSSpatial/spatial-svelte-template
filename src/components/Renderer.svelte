@@ -11,10 +11,21 @@
   let appData
 
   onMount(() => {
-    const { GLRenderer, Scene } = window.zeaEngine
+    const { GLRenderer, Scene, SystemDesc, EnvMap } = window.zeaEngine
 
     const renderer = new GLRenderer(canvas)
     const scene = new Scene()
+
+    // Assigning an Environment Map enables PBR lighting for niceer shiny surfaces.
+    if (!SystemDesc.isMobileDevice) {
+      const envMap = new EnvMap('envMap')
+      envMap
+        .getParameter('FilePath')
+        .setValue(`/assets/HDR_029_Sky_Cloudy_Ref.vlenv`)
+      envMap.getParameter('HeadLightMode').setValue(true)
+      scene.getSettings().getParameter('EnvMap').setValue(envMap)
+    }
+
     scene.setupGrid(10, 10)
     renderer.setScene(scene)
 
@@ -42,6 +53,6 @@
   </div>
   <div slot="B" class="panel-container">
     <canvas id="renderer" bind:this={canvas} />
-    <div bind:this={fpsContainer}></div>
+    <div bind:this={fpsContainer} />
   </div>
 </zea-layout>
