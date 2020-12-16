@@ -2,6 +2,7 @@
   height: 100vh;
 }
 
+/** DARK THEME START **/
 :root {
   --ion-color-primary: #f9ce03;
   --ion-color-primary-tint: #fbe167;
@@ -34,6 +35,43 @@
   --color-disabled-2: #424242;
   --color-shadow: #00000026;
 }
+/** DARK THEME START **/
+
+/** LIGHT THEME START **/
+/* :root {
+  --ion-color-primary: #f9ce03;
+  --ion-color-primary-tint: #fbe167;
+  --theme-font-family: 'Roboto', sans-serif;
+
+  --color-primary-1: #f9ce03;
+  --color-primary-2: #fbe167;
+  --color-primary-3: #594f1f;
+  --color-secondary-1: #8b52af;
+  --color-secondary-2: #b892ce;
+  --color-secondary-3: #f2ebf7;
+  --color-warning-1: #e52011;
+  --color-warning-2: #ef7970;
+  --color-warning-3: #fad2cf;
+  --color-success-1: #8bc34a;
+  --color-success-2: #b9db92;
+  --color-success-3: #e8f3db;
+  --color-background-1: #ffffff;
+  --color-background-2: #ffffff;
+  --color-background-3: #f5f5f5;
+  --color-background-4: #ffffff;
+  --color-foreground-1: #333333;
+  --color-foreground-2: #7a7a7a;
+  --color-foreground-3: #989898;
+  --color-grey-1: #f5f5f5;
+  --color-grey-2: #eaeaea;
+  --color-grey-3: #d6d6d6;
+  --color-button-text-1: #ffffff;
+  --color-button-text-2: #333333;
+  --color-disabled-1: #b8b8b8;
+  --color-disabled-2: #e8e8e8;
+  --color-shadow: #00000026;
+} */
+/** LIGHT THEME END **/
 
 .panel-container {
   height: 100%;

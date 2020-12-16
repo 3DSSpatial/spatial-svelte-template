@@ -17,7 +17,7 @@ Our recommended way to clone this template is by using [degit](https://github.co
 1. Run this command on your terminal:
 
 ```bash
-npx degit zeainc/zea-template-collab#main my-awesome-app
+npx degit zeainc/zea-svelte-template#main my-awesome-app
 ```
 
 2. The above command will create the `my-awesome-app` directory for you. Go into it:

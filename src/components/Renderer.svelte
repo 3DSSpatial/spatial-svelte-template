@@ -1,24 +1,31 @@
 <script>
   import { onMount } from 'svelte'
   import { APP_DATA } from '../helpers'
+  import '../helpers/fps-display'
   import Sidebar from '../components/Sidebar.svelte'
-  import FPSCounter from './FPSCounter.svelte'
 
   let canvas
+  let fpsContainer
+
   let treeViewItems
   let appData
-  let renderer
 
   onMount(() => {
     const { GLRenderer, Scene } = window.zeaEngine
 
-    renderer = new GLRenderer(canvas)
+    const renderer = new GLRenderer(canvas)
     const scene = new Scene()
     scene.setupGrid(10, 10)
     renderer.setScene(scene)
 
     treeViewItems = [scene.getRoot()]
     APP_DATA.set({ renderer, scene })
+
+    {
+      const fpsDisplay = document.createElement('fps-display')
+      fpsDisplay.renderer = renderer
+      fpsContainer.appendChild(fpsDisplay)
+    }
   })
 </script>
 
@@ -35,6 +42,6 @@
   </div>
   <div slot="B" class="panel-container">
     <canvas id="renderer" bind:this={canvas} />
-    <FPSCounter />
+    <div bind:this={fpsContainer}></div>
   </div>
 </zea-layout>
