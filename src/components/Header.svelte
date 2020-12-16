@@ -12,7 +12,7 @@
     const { session, sessionSync } = setupCollab(userData, $APP_DATA)
     userChipSet.session = session
 
-    { 
+    {
       // SessionSync interations
       tauntBtn.addEventListener('click', (event) => {
         const { renderer } = $APP_DATA
@@ -28,11 +28,19 @@
           const avatar = userData.avatar
           const viewXfo = avatar.viewXfo
           const focalDistance = avatar.focalDistance || 1.0
-          const target = viewXfo.tr.add(viewXfo.ori.getZaxis().scale(-focalDistance))
+          const target = viewXfo.tr.add(
+            viewXfo.ori.getZaxis().scale(-focalDistance)
+          )
 
           const viewport = renderer.getViewport()
           const cameraManipulator = viewport.getManipulator()
-          cameraManipulator.orientPointOfView(viewport.getCamera(), viewXfo.tr, target, 1.0, 1000)
+          cameraManipulator.orientPointOfView(
+            viewport.getCamera(),
+            viewXfo.tr,
+            target,
+            1.0,
+            1000
+          )
         }
       })
     }
@@ -68,7 +76,7 @@
     <img src="/images/logo-zea.svg" alt="logo" />
   </div>
 
-  <div class="panel-container mx-1 user-set-container">
+  <div class="h-full w-full mx-1 user-set-container">
     <zea-user-chip-set bind:this={userChipSet} showImages />
   </div>
   <div class="">

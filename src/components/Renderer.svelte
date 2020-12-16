@@ -26,7 +26,7 @@
     progressBar.percent = 0
     resourceLoader.on('progressIncremented', (event) => {
       const { percent } = event
-      progressBar.percent = percent 
+      progressBar.percent = percent
     })
     /** PROGRESSBAR END */
 
@@ -47,14 +47,14 @@
 </style>
 
 <zea-layout add-cells="AB" borders cell-a-size="250" show-resize-handles="A">
-  <div slot="A" class="panel-container">
+  <div slot="A" class="h-full w-full">
     <Sidebar rootItems={treeViewItems} {appData} />
   </div>
-  <div slot="B" class="panel-container">
+  <div slot="B" class="h-full w-full">
     <canvas id="renderer" bind:this={canvas} />
     <div class="relative">
       <zea-progress-bar bind:this={progressBar} />
     </div>
-    <div bind:this={fpsContainer}></div>
+    <div bind:this={fpsContainer} />
   </div>
 </zea-layout>
