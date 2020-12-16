@@ -1,9 +1,8 @@
 <script>
   import { redirect } from '@roxi/routify'
-
   import { auth } from '../../helpers/auth.js'
-
-  const { Session, SessionSync } = window.zeaCollab
+  import { getRandomString } from '../../helpers/misc.js'
+  const { Color } = window.zeaEngine
 
   let submitted
   let username
@@ -11,8 +10,14 @@
   const handleSubmit = async () => {
     submitted = true
 
-    await auth.setUsername(username)
+    const userData = {
+      firstName: username,
+      lastName: '',
+      color: Color.random().toHex(),
+      id: getRandomString(),
+    }
 
+    await auth.setUserData(userData)
     $redirect('/')
   }
 </script>
