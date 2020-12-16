@@ -1,6 +1,6 @@
 <script>
   import { redirect } from '@roxi/routify'
-  import { onMount, setContext } from 'svelte'
+  import { onMount } from 'svelte'
 
   import Header from '../components/Header.svelte'
   import Renderer from '../components/Renderer.svelte'
