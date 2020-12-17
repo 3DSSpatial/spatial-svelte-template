@@ -1,7 +1,9 @@
 <script>
   import { redirect } from '@roxi/routify'
+
   import { auth } from '../../helpers/auth.js'
   import { getRandomString } from '../../helpers/misc.js'
+
   const { Color } = window.zeaEngine
 
   let submitted

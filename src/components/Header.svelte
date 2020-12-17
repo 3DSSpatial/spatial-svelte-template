@@ -1,4 +1,6 @@
 <script>
+  import { redirect } from '@roxi/routify'
+
   import { auth, setupCollab, APP_DATA } from '../helpers'
 
   let userChipSet
@@ -6,15 +8,17 @@
   let tauntBtn
 
   auth.getUserData().then((userData) => {
-    if (!userData) return
+    if (!userData) {
+      return
+    }
 
     userChip.userData = userData
     const { session, sessionSync } = setupCollab(userData, $APP_DATA)
     userChipSet.session = session
     const { renderer } = $APP_DATA
 
-    { 
-      // SessionSync interations
+    {
+      // SessionSync interactions.
       tauntBtn.addEventListener('click', (event) => {
         const camera = renderer.getViewport().getCamera()
         const xfo = camera.getParameter('GlobalXfo').getValue()
@@ -28,11 +32,19 @@
           const avatar = userData.avatar
           const viewXfo = avatar.viewXfo
           const focalDistance = avatar.focalDistance || 1.0
-          const target = viewXfo.tr.add(viewXfo.ori.getZaxis().scale(-focalDistance))
+          const target = viewXfo.tr.add(
+            viewXfo.ori.getZaxis().scale(-focalDistance)
+          )
 
           const viewport = renderer.getViewport()
           const cameraManipulator = viewport.getManipulator()
-          cameraManipulator.orientPointOfView(viewport.getCamera(), viewXfo.tr, target, 1.0, 1000)
+          cameraManipulator.orientPointOfView(
+            viewport.getCamera(),
+            viewXfo.tr,
+            target,
+            1.0,
+            1000
+          )
         }
       })
     }
@@ -63,6 +75,11 @@
     .catch(reason => {
       console.warn("Unable to setup XR:" + reason);
     });
+  }
+
+  const handleSignOut = async () => {
+    await auth.signOut()
+    $redirect('/login')
   }
 </script>
 
@@ -123,8 +140,11 @@
   <div class="panel-container mx-2 user-set-container">
     <zea-user-chip-set bind:this={userChipSet} showImages />
   </div>
-  <div>
+  <div class="mr-2">
     <zea-button bind:this={tauntBtn}>Look</zea-button>
+  </div>
+  <div class="mr-2">
+    <zea-button on:click={handleSignOut}>Sign out</zea-button>
   </div>
   <div class="divider ml-2" />
   <div class="user-container pl-2">
