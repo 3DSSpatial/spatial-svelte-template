@@ -1,27 +1,19 @@
 class Auth {
   async isAuthenticated() {
-    const { zeaUserData } = window.localStorage
-    
-    return (zeaUserData != undefined && zeaUserData != null)
-  }
-
-  async getUsername() {
-    const { username } = window.localStorage
-
-    return username
+    return this.getUserData()
   }
 
   async getUserData() {
     const { zeaUserData } = window.localStorage
-    return JSON.parse(zeaUserData)
-  }
-
-  async setUsername(username) {
-    window.localStorage.username = username
+    return zeaUserData && JSON.parse(zeaUserData)
   }
 
   async setUserData(userData) {
     window.localStorage.zeaUserData = JSON.stringify(userData)
+  }
+
+  async signOut() {
+    localStorage.removeItem('zeaUserData')
   }
 }
 

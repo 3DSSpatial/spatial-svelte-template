@@ -1,4 +1,6 @@
 <script>
+  import { redirect } from '@roxi/routify'
+
   import { auth, setupCollab, APP_DATA } from '../helpers'
 
   let userChipSet
@@ -6,14 +8,16 @@
   let tauntBtn
 
   auth.getUserData().then((userData) => {
-    if (!userData) return
+    if (!userData) {
+      return
+    }
 
     userChip.userData = userData
     const { session, sessionSync } = setupCollab(userData, $APP_DATA)
     userChipSet.session = session
 
     {
-      // SessionSync interations
+      // SessionSync interactions.
       tauntBtn.addEventListener('click', (event) => {
         const { renderer } = $APP_DATA
         const camera = renderer.getViewport().getCamera()
@@ -45,17 +49,16 @@
       })
     }
   })
+
+  const handleSignOut = async () => {
+    await auth.signOut()
+    $redirect('/login')
+  }
 </script>
 
 <style>
   .logo {
     width: 5em;
-  }
-
-  .divider {
-    border-right: 2px solid var(--color-grey-1);
-    height: calc(100% - 2px);
-    flex-grow: 1;
   }
 
   .user-container {
@@ -79,10 +82,12 @@
   <div class="h-full w-full mx-1 user-set-container">
     <zea-user-chip-set bind:this={userChipSet} showImages />
   </div>
-  <div class="">
+  <div class="mr-2">
     <zea-button bind:this={tauntBtn}>Taunt</zea-button>
   </div>
-  <div class="divider" />
+  <div class="mr-2">
+    <zea-button on:click={handleSignOut}>Sign out</zea-button>
+  </div>
   <div class="user-container pl-2">
     <zea-user-chip bind:this={userChip} />
   </div>
