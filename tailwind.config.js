@@ -1,11 +1,15 @@
-const defaultTheme = require('tailwindcss/defaultTheme')
+const production = !process.env.ROLLUP_WATCH
 
 module.exports = {
   future: {
     removeDeprecatedGapUtilities: true,
     purgeLayersByDefault: true,
   },
-  purge: ['./src/**/*.svelte'],
+  plugins: [],
+  purge: {
+    content: ['./src/**/*.svelte'],
+    enabled: production,
+  },
   theme: {
     extend: {
       colors: {
@@ -26,11 +30,6 @@ module.exports = {
           DEFAULT: '#e0e0e0',
         },
       },
-      fontFamily: {
-        sans: [...defaultTheme.fontFamily.sans],
-      },
     },
   },
-  variants: {},
-  plugins: [],
 }
