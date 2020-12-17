@@ -13,6 +13,7 @@
 
   onMount(() => {
     const { GLRenderer, Scene, resourceLoader } = window.zeaEngine
+    const { SelectionManager, UndoRedoManager} = window.zeaUx
 
     const renderer = new GLRenderer(canvas)
     const scene = new Scene()
@@ -20,7 +21,13 @@
     renderer.setScene(scene)
 
     treeViewItems = [scene.getRoot()]
-    APP_DATA.set({ renderer, scene })
+
+    const undoRedoManager = UndoRedoManager.getInstance()
+    const appData = { renderer, scene, undoRedoManager }
+    const selectionManager = new SelectionManager(appData)
+
+    appData.selectionManager = selectionManager
+    APP_DATA.set(appData)
 
     /** PROGRESSBAR START */
     progressBar.percent = 0
