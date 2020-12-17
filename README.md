@@ -1,4 +1,4 @@
-# Zea Template
+# Zea Svelte Template
 
 ## Features
 
@@ -44,13 +44,11 @@ npm run dev
 
 ### npm scripts
 
-| Syntax        | Description                                                      |
-| ------------- | ---------------------------------------------------------------- |
-| `build`       | Build a bundled app with SSR + prerendering and dynamic imports  |
-| `dev`         | Development (port 5000)                                          |
-| `dev:dynamic` | Development with dynamic imports                                 |
-| `dev:nollup`  | Development with crazy fast rebuilds (port 5000)                 |
-| `serve`       | Run after a build to preview. Serves SPA on 5000 and SSR on 5005 |
+| Syntax  | Description                                                      |
+| ------- | ---------------------------------------------------------------- |
+| `build` | Build a bundled app with SSR + prerendering and dynamic imports  |
+| `dev`   | Development (port 5000)                                          |
+| `serve` | Run after a build to preview. Serves SPA on 5000 and SSR on 5005 |
 
 ## Issues?
 

@@ -72,22 +72,3 @@
   --color-shadow: #00000026;
 } */
 /** LIGHT THEME END **/
-
-.panel-container {
-  height: 100%;
-  width: 100%;
-}
-
-.wrap {
-  overflow: hidden;
-}
-
-.app-logo {
-  height: 36px;
-  pointer-events: none;
-  margin-right: 20px;
-}
-
-.UserChipSetHolder {
-  flex-grow: 1;
-}

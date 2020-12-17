@@ -1,11 +1,11 @@
-const cssnano = require('cssnano')({ preset: 'default' });
-
-const production = process.env.NODE_ENV === 'production';
+const production = !process.env.ROLLUP_WATCH;
 
 module.exports = {
   plugins: [
-    require('tailwindcss'),
-    require('autoprefixer'),
-    ...(production ? [cssnano] : []),
+    require("tailwindcss"),
+    require("postcss-import"),
+    ...(production
+      ? [require("autoprefixer"), require("cssnano")({ preset: "default" })]
+      : []),
   ],
 };
