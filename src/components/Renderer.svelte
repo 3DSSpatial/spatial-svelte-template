@@ -12,11 +12,22 @@
   let progressBar
 
   onMount(() => {
-    const { GLRenderer, Scene, resourceLoader } = window.zeaEngine
+    const { GLRenderer, Scene, resourceLoader, SystemDesc, EnvMap } = window.zeaEngine
     const { SelectionManager, UndoRedoManager} = window.zeaUx
 
     const renderer = new GLRenderer(canvas)
     const scene = new Scene()
+
+    // Assigning an Environment Map enables PBR lighting for niceer shiny surfaces.
+    if (!SystemDesc.isMobileDevice) {
+      const envMap = new EnvMap('envMap')
+      envMap
+        .getParameter('FilePath')
+        .setValue(`/assets/HDR_029_Sky_Cloudy_Ref.vlenv`)
+      envMap.getParameter('HeadLightMode').setValue(true)
+      scene.getSettings().getParameter('EnvMap').setValue(envMap)
+    }
+
     scene.setupGrid(10, 10)
     renderer.setScene(scene)
 
