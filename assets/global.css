@@ -1,7 +1,3 @@
-#routify-app {
-  height: 100vh;
-}
-
 /** DARK THEME START **/
 :root {
   --ion-color-primary: #f9ce03;
