@@ -105,6 +105,11 @@
     align-items: center;
     width: 250px;
   }
+
+  .menu-item {
+    display: flex;
+    align-items: center;
+  }
 </style>
 
 <div class="flex items-center w-full h-full px-2">
@@ -116,21 +121,21 @@
       <zea-menu-item>
         Edit
         <zea-menu-subitems>
-          <zea-menu-item class="MenuItem" hotkey="ctrl+Z" onclick={handleUndo}>
-            <zea-icon name="arrow-undo"></zea-icon>
+          <zea-menu-item class="menu-item" hotkey="ctrl+Z" onclick={handleUndo}>
+            <zea-icon icon="arrow-undo" size="16"></zea-icon>
             Undo
           </zea-menu-item>
-          <zea-menu-item class="MenuItem" hotkey="ctrl+Y" onclick={handleRedo}>
-            <zea-icon name="arrow-redo"></zea-icon>
+          <zea-menu-item class="menu-item" hotkey="ctrl+Y" onclick={handleRedo}>
+            <zea-icon icon="arrow-redo" size="16"></zea-icon>
             Redo
           </zea-menu-item>
         </zea-menu-subitems>
       </zea-menu-item>
       <zea-menu-item>
-        Viewports
+        Extras
         <zea-menu-subitems>
-          <zea-menu-item class="MenuItem" hotkey="ctrl+N" onclick={handleVR}>
-            <zea-icon name="square"></zea-icon>
+          <zea-menu-item class="menu-item" hotkey="ctrl+N" onclick={handleVR}>
+            <zea-icon icon="recording-outline" size="16"></zea-icon>
             Launch VR
           </zea-menu-item>
         </zea-menu-subitems>
@@ -148,6 +153,6 @@
   </div>
   <div class="divider ml-2" />
   <div class="user-container pl-2">
-    <zea-user-chip bind:this={userChip} />
+    <zea-user-chip bind:this={userChip} profile-card-align="right"/>
   </div>
 </div>
