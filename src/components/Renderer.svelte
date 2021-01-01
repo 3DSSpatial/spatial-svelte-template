@@ -77,6 +77,21 @@
     })
     /** COLLAB END */
 
+    /** CAD START */
+
+    const { GLCADPass, CADAsset } = window.zeaCad
+    renderer.addPass(new GLCADPass())
+    const asset = new CADAsset()
+    asset.on('loaded', () => {
+      renderer.frameAll()
+    })
+    asset.getGeometryLibrary().on('loaded', () => {
+      renderer.frameAll()
+    })
+    scene.getRoot().addChild(asset)
+    asset.getParameter('FilePath').setValue('/assets/HC_SRO4.zcad')
+    /** CAD END */
+
     APP_DATA.set(appData)
   })
 </script>
