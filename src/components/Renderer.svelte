@@ -81,8 +81,15 @@
 
     const { GLCADPass, CADAsset } = window.zeaCad
     renderer.addPass(new GLCADPass())
+
     const asset = new CADAsset()
     asset.on('loaded', () => {
+      const materials = asset.getMaterialLibrary().getMaterials()
+      materials.forEach((material) => {
+        if (material.getShaderName() == 'SimpleSurfaceShader') {
+          material.setShaderName('StandardSurfaceShader')
+        }
+      })
       renderer.frameAll()
     })
     asset.getGeometryLibrary().on('loaded', () => {
