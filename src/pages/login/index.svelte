@@ -24,15 +24,18 @@
       id: getRandomString(),
     }
 
-    auth.setUserData(userData)
+    auth
+      .setUserData(userData)
       .then(() => {
         submitted = true
         $redirect('/')
       })
-      .catch(e => {
-        passwordErrorContainer.classList.remove('hidden')
-        passwordErrorContainer.textContent = e.message
-        passwordEl.classList.add('border-red-500')
+      .catch((e) => {
+        if (passwordErrorContainer) {
+          passwordErrorContainer.classList.remove('hidden')
+          passwordErrorContainer.textContent = e.message
+          passwordEl.classList.add('border-red-500')
+        }
       })
   }
 </script>
@@ -40,11 +43,11 @@
 <div
   class="bg-background min-h-screen flex items-center justify-center py-12 px-4 text-foreground sm:px-6 lg:px-8">
   <div class="max-w-md w-full space-y-8">
-    <h2 class="mt-6 text-center text-3xl font-extrabold">
-      Zea Demo
-    </h2>
+    <h2 class="mt-6 text-center text-3xl font-extrabold">Zea Demo</h2>
 
-    <form class="mt-8 space-y-6" on:submit|preventDefault|stopPropagation={handleSubmit}>
+    <form
+      class="mt-8 space-y-6"
+      on:submit|preventDefault|stopPropagation={handleSubmit}>
       <div class="rounded-md shadow-sm -space-y-px">
         <div class="mb-2">
           <!-- svelte-ignore a11y-autofocus -->
@@ -58,8 +61,7 @@
             class="appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-yellow-500 focus:border-yellow-500 focus:z-10 sm:text-sm"
             placeholder="My name is..." />
         </div>
-         <div>
-          <!-- svelte-ignore a11y-autofocus -->
+        <div>
           <input
             bind:this={passwordEl}
             bind:value={password}
@@ -69,7 +71,9 @@
             required
             class="appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-yellow-500 focus:border-yellow-500 focus:z-10 sm:text-sm"
             placeholder="Password" />
-          <span bind:this={passwordErrorContainer} class="flex items-center font-medium tracking-wide text-red-500 text-xs mt-1 ml-1 hidden"></span>
+          <span
+            bind:this={passwordErrorContainer}
+            class="flex items-center font-medium tracking-wide text-red-500 text-xs mt-1 ml-1 hidden" />
         </div>
       </div>
 
