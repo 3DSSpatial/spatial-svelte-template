@@ -51,11 +51,13 @@
     /** SELECTION END */
 
     /** PROGRESSBAR START */
-    progressBar.percent = 0
-    resourceLoader.on('progressIncremented', (event) => {
-      const { percent } = event
-      progressBar.percent = percent
-    })
+    if (progressBar) {
+      progressBar.percent = 0
+      resourceLoader.on('progressIncremented', (event) => {
+        const { percent } = event
+        if (progressBar) progressBar.percent = percent
+      })
+    }
     /** PROGRESSBAR END */
 
     /** FPS DISPLAY START */

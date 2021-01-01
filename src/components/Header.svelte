@@ -1,5 +1,6 @@
 <script>
   import { redirect } from '@roxi/routify'
+  import { onMount } from 'svelte'
 
   import { auth, APP_DATA } from '../helpers'
 
@@ -7,46 +8,48 @@
   let userChip
   let tauntBtn
 
-  auth.getUserData().then((userData) => {
-    if (!userData) {
-      return
-    }
+  onMount(() => {
+    auth.getUserData().then((userData) => {
+      if (!userData) {
+        return
+      }
 
-    const { renderer, session, sessionSync } = $APP_DATA
-    userChip.userData = userData
-    userChipSet.session = session
+      const { renderer, session, sessionSync } = $APP_DATA
+      userChip.userData = userData
+      userChipSet.session = session
 
-    {
-      // SessionSync interactions.
-      tauntBtn.addEventListener('click', (event) => {
-        const camera = renderer.getViewport().getCamera()
-        const xfo = camera.getParameter('GlobalXfo').getValue()
-        const target = camera.getTargetPosition()
-        sessionSync.directAttention(xfo.tr, target, 1, 1000)
-      })
+      {
+        // SessionSync interactions.
+        tauntBtn.addEventListener('click', (event) => {
+          const camera = renderer.getViewport().getCamera()
+          const xfo = camera.getParameter('GlobalXfo').getValue()
+          const target = camera.getTargetPosition()
+          sessionSync.directAttention(xfo.tr, target, 1, 1000)
+        })
 
-      window.addEventListener('zeaUserClicked', (event) => {
-        const userData = sessionSync.userDatas[event.detail.id]
-        if (userData) {
-          const avatar = userData.avatar
-          const viewXfo = avatar.viewXfo
-          const focalDistance = avatar.focalDistance || 1.0
-          const target = viewXfo.tr.add(
-            viewXfo.ori.getZaxis().scale(-focalDistance)
-          )
+        window.addEventListener('zeaUserClicked', (event) => {
+          const userData = sessionSync.userDatas[event.detail.id]
+          if (userData) {
+            const avatar = userData.avatar
+            const viewXfo = avatar.viewXfo
+            const focalDistance = avatar.focalDistance || 1.0
+            const target = viewXfo.tr.add(
+              viewXfo.ori.getZaxis().scale(-focalDistance)
+            )
 
-          const viewport = renderer.getViewport()
-          const cameraManipulator = viewport.getManipulator()
-          cameraManipulator.orientPointOfView(
-            viewport.getCamera(),
-            viewXfo.tr,
-            target,
-            1.0,
-            1000
-          )
-        }
-      })
-    }
+            const viewport = renderer.getViewport()
+            const cameraManipulator = viewport.getManipulator()
+            cameraManipulator.orientPointOfView(
+              viewport.getCamera(),
+              viewXfo.tr,
+              target,
+              1.0,
+              1000
+            )
+          }
+        })
+      }
+    })
   })
 
   function handleUndo() {
@@ -77,8 +80,8 @@
   }
 
   const handleSignOut = async () => {
-    await auth.signOut()
-    $redirect('/login')
+    // await auth.signOut()
+    // $redirect('/login')
   }
 </script>
 
