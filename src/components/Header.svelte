@@ -1,7 +1,7 @@
 <script>
   import { redirect } from '@roxi/routify'
 
-  import { auth, setupCollab, APP_DATA } from '../helpers'
+  import { auth, APP_DATA } from '../helpers'
 
   let userChipSet
   let userChip
@@ -12,10 +12,9 @@
       return
     }
 
+    const { renderer, session, sessionSync } = $APP_DATA
     userChip.userData = userData
-    const { session, sessionSync } = setupCollab(userData, $APP_DATA)
     userChipSet.session = session
-    const { renderer } = $APP_DATA
 
     {
       // SessionSync interactions.
@@ -62,19 +61,19 @@
 
   function handleVR() {
     const { renderer } = $APP_DATA
-    
+
     renderer
-    .getXRViewport()
-    .then(xrViewport => {
-      xrViewport.startPresenting().then(() => {
-        xrViewport.on('presentingChanged', () => {
-          console.log('VR Activated')
-        });
-      });
-    })
-    .catch(reason => {
-      console.warn("Unable to setup XR:" + reason);
-    });
+      .getXRViewport()
+      .then((xrViewport) => {
+        xrViewport.startPresenting().then(() => {
+          xrViewport.on('presentingChanged', () => {
+            console.log('VR Activated')
+          })
+        })
+      })
+      .catch((reason) => {
+        console.warn('Unable to setup XR:' + reason)
+      })
   }
 
   const handleSignOut = async () => {
@@ -122,11 +121,11 @@
         Edit
         <zea-menu-subitems>
           <zea-menu-item class="menu-item" hotkey="ctrl+Z" onclick={handleUndo}>
-            <zea-icon icon="arrow-undo" size="16"></zea-icon>
+            <zea-icon icon="arrow-undo" size="16" />
             Undo
           </zea-menu-item>
           <zea-menu-item class="menu-item" hotkey="ctrl+Y" onclick={handleRedo}>
-            <zea-icon icon="arrow-redo" size="16"></zea-icon>
+            <zea-icon icon="arrow-redo" size="16" />
             Redo
           </zea-menu-item>
         </zea-menu-subitems>
@@ -135,7 +134,7 @@
         Extras
         <zea-menu-subitems>
           <zea-menu-item class="menu-item" hotkey="ctrl+N" onclick={handleVR}>
-            <zea-icon icon="recording-outline" size="16"></zea-icon>
+            <zea-icon icon="recording-outline" size="16" />
             Launch VR
           </zea-menu-item>
         </zea-menu-subitems>
@@ -153,6 +152,6 @@
   </div>
   <div class="divider ml-2" />
   <div class="user-container pl-2">
-    <zea-user-chip bind:this={userChip} profile-card-align="right"/>
+    <zea-user-chip bind:this={userChip} profile-card-align="right" />
   </div>
 </div>

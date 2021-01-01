@@ -1,6 +1,6 @@
 <script>
   import { onMount } from 'svelte'
-  import { APP_DATA } from '../helpers'
+  import { auth, APP_DATA, setupCollab } from '../helpers'
   import '../helpers/fps-display'
   import Sidebar from '../components/Sidebar.svelte'
 
@@ -12,8 +12,14 @@
   let progressBar
 
   onMount(() => {
-    const { GLRenderer, Scene, resourceLoader, SystemDesc, EnvMap } = window.zeaEngine
-    const { SelectionManager, UndoRedoManager} = window.zeaUx
+    const {
+      GLRenderer,
+      Scene,
+      resourceLoader,
+      SystemDesc,
+      EnvMap,
+    } = window.zeaEngine
+    const { SelectionManager, UndoRedoManager } = window.zeaUx
 
     const renderer = new GLRenderer(canvas)
     const scene = new Scene()
@@ -30,15 +36,19 @@
 
     scene.setupGrid(10, 10)
     renderer.setScene(scene)
+    const appData = { renderer, scene }
 
     treeViewItems = [scene.getRoot()]
 
+    /** UNDO START */
     const undoRedoManager = UndoRedoManager.getInstance()
-    const appData = { renderer, scene, undoRedoManager }
-    const selectionManager = new SelectionManager(appData)
+    appData.undoRedoManager = undoRedoManager
+    /** UNDO END */
 
+    /** SELECTION START */
+    const selectionManager = new SelectionManager(appData)
     appData.selectionManager = selectionManager
-    APP_DATA.set(appData)
+    /** SELECTION END */
 
     /** PROGRESSBAR START */
     progressBar.percent = 0
@@ -48,12 +58,24 @@
     })
     /** PROGRESSBAR END */
 
+    /** FPS DISPLAY START */
     {
-      // FPS display configuration
       const fpsDisplay = document.createElement('fps-display')
       fpsDisplay.renderer = renderer
       fpsContainer.appendChild(fpsDisplay)
     }
+    /** FPS DISPLAY END */
+
+    /** COLLAB START */
+    auth.getUserData().then((userData) => {
+      const { session, sessionSync } = setupCollab(userData, $APP_DATA)
+      appData.userData = userData
+      appData.session = session
+      appData.sessionSync = sessionSync
+    })
+    /** COLLAB END */
+
+    APP_DATA.set(appData)
   })
 </script>
 
