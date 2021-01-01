@@ -52,6 +52,10 @@
     })
   })
 
+  function handleFrameAll() {
+    const { renderer } = $APP_DATA
+    renderer.frameAll()
+  }
   function handleUndo() {
     const { undoRedoManager } = $APP_DATA
     undoRedoManager.undo()
@@ -80,8 +84,8 @@
   }
 
   const handleSignOut = async () => {
-    // await auth.signOut()
-    // $redirect('/login')
+    await auth.signOut()
+    $redirect('/login')
   }
 </script>
 
@@ -120,6 +124,14 @@
   </div>
   <div class="flex-grow">
     <zea-menu type="dropdown" show-anchor="true">
+      <zea-menu-item>
+        View
+        <zea-menu-subitems>
+          <zea-menu-item class="menu-item" hotkey="f" onclick={handleFrameAll}>
+            Frame All
+          </zea-menu-item>
+        </zea-menu-subitems>
+      </zea-menu-item>
       <zea-menu-item>
         Edit
         <zea-menu-subitems>
