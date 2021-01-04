@@ -6,7 +6,6 @@
 
   let userChipSet
   let userChip
-  let tauntBtn
 
   onMount(() => {
     auth.getUserData().then((userData) => {
@@ -20,13 +19,6 @@
 
       {
         // SessionSync interactions.
-        tauntBtn.addEventListener('click', (event) => {
-          const camera = renderer.getViewport().getCamera()
-          const xfo = camera.getParameter('GlobalXfo').getValue()
-          const target = camera.getTargetPosition()
-          sessionSync.directAttention(xfo.tr, target, 1, 1000)
-        })
-
         window.addEventListener('zeaUserClicked', (event) => {
           const userData = sessionSync.userDatas[event.detail.id]
           if (userData) {
@@ -64,6 +56,34 @@
   function handleRedo() {
     const { undoRedoManager } = $APP_DATA
     undoRedoManager.redo()
+  }
+
+  let selectionEnabled = false
+  function toggleSelectMode() {
+    const { toolManager } = $APP_DATA
+    if (!selectionEnabled) {
+      toolManager.pushTool('SelectionTool')
+      selectionEnabled = true
+    } else {
+      toolManager.popTool()
+      selectionEnabled = false
+    }
+  }
+
+  function handleDA() {
+    auth.getUserData().then((userData) => {
+      if (!userData) {
+        return
+      }
+      const { renderer, sessionSync } = $APP_DATA
+      {
+        // SessionSync interactions.
+        const camera = renderer.getViewport().getCamera()
+        const xfo = camera.getParameter('GlobalXfo').getValue()
+        const target = camera.getTargetPosition()
+        sessionSync.directAttention(xfo.tr, target, 1, 1000)
+      }
+    })
   }
 
   function handleVR() {
@@ -143,12 +163,24 @@
             <zea-icon icon="arrow-redo" size="16" />
             Redo
           </zea-menu-item>
+          <zea-menu-item class="menu-item" onclick={toggleSelectMode}>
+            <zea-icon icon="select" size="16" />
+            Toggle Selection
+          </zea-menu-item>
         </zea-menu-subitems>
       </zea-menu-item>
       <zea-menu-item>
-        Extras
+        Collab
         <zea-menu-subitems>
-          <zea-menu-item class="menu-item" hotkey="ctrl+N" onclick={handleVR}>
+          <zea-menu-item class="menu-item" hotkey="ctrl+N" onclick={handleDA}>
+            Direct Attention
+          </zea-menu-item>
+        </zea-menu-subitems>
+      </zea-menu-item>
+      <zea-menu-item>
+        VR
+        <zea-menu-subitems>
+          <zea-menu-item class="menu-item" onclick={handleVR}>
             <zea-icon icon="recording-outline" size="16" />
             Launch VR
           </zea-menu-item>
@@ -158,9 +190,6 @@
   </div>
   <div class="panel-container mx-2 user-set-container">
     <zea-user-chip-set bind:this={userChipSet} showImages />
-  </div>
-  <div class="mr-2">
-    <zea-button bind:this={tauntBtn}>Look</zea-button>
   </div>
   <div class="mr-2">
     <zea-button on:click={handleSignOut}>Sign out</zea-button>

@@ -13,13 +13,13 @@
 
   onMount(() => {
     const {
+      Color,
       GLRenderer,
       Scene,
       resourceLoader,
       SystemDesc,
       EnvMap,
     } = window.zeaEngine
-    const { SelectionManager, UndoRedoManager } = window.zeaUx
 
     const renderer = new GLRenderer(canvas)
     const scene = new Scene()
@@ -40,14 +40,43 @@
 
     treeViewItems = [scene.getRoot()]
 
+    const {
+      SelectionManager,
+      UndoRedoManager,
+      ToolManager,
+      SelectionTool,
+    } = window.zeaUx
+
     /** UNDO START */
     const undoRedoManager = UndoRedoManager.getInstance()
     appData.undoRedoManager = undoRedoManager
     /** UNDO END */
 
     /** SELECTION START */
+    const cameraManipulator = renderer.getViewport().getManipulator()
+    const toolManager = new ToolManager(appData)
     const selectionManager = new SelectionManager(appData)
     appData.selectionManager = selectionManager
+    const selectionTool = new SelectionTool(appData)
+    toolManager.registerTool('SelectionTool', selectionTool)
+    toolManager.registerTool('CameraManipulator', cameraManipulator)
+
+    renderer.getViewport().setManipulator(toolManager)
+    toolManager.pushTool('CameraManipulator')
+    // toolManager.pushTool('SelectionTool')
+    appData.toolManager = toolManager
+
+    // // Note: the alpha value determines  the fill of the highlight.
+    // const selectionColor = new Color('#00436D')
+    // selectionColor.a = 0.1
+    // const subtreeColor = selectionColor.lerp(new Color(1, 1, 1, 0), 0.5)
+    // selectionManager.selectionGroup
+    //   .getParameter('HighlightColor')
+    //   .setValue(selectionColor)
+    // selectionManager.selectionGroup
+    //   .getParameter('SubtreeHighlightColor')
+    //   .setValue(subtreeColor)
+
     /** SELECTION END */
 
     /** PROGRESSBAR START */
@@ -70,6 +99,7 @@
 
     /** COLLAB START */
     auth.getUserData().then((userData) => {
+      if (!userData) return
       const { session, sessionSync } = setupCollab(userData, $APP_DATA)
       appData.userData = userData
       appData.session = session
@@ -78,7 +108,6 @@
     /** COLLAB END */
 
     /** CAD START */
-
     const { GLCADPass, CADAsset } = window.zeaCad
     renderer.addPass(new GLCADPass())
 
