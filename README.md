@@ -106,6 +106,17 @@ the Zea CAD library comes pre-integrated and a sample zcad file is loaded.
 
 > https://docs.zea.live/zea-cad/
 
+```javascript
+const asset = new CADAsset()
+asset.getGeometryLibrary().on('loaded', () => {
+  renderer.frameAll()
+})
+scene.getRoot().addChild(asset)
+asset.getParameter('FilePath').setValue('/assets/HC_SRO4.zcad')
+```
+
+The code above loads the sample cad file.
+
 ## Issues?
 
 File it on Github: https://github.com/ZeaInc/zea-template-collab
