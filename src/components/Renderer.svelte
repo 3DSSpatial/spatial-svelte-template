@@ -56,6 +56,7 @@
     const cameraManipulator = renderer.getViewport().getManipulator()
     const toolManager = new ToolManager(appData)
     const selectionManager = new SelectionManager(appData)
+    selectionManager.showHandles()
     appData.selectionManager = selectionManager
     const selectionTool = new SelectionTool(appData)
     toolManager.registerTool('SelectionTool', selectionTool)

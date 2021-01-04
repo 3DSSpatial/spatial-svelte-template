@@ -50,6 +50,62 @@ npm run dev
 | `dev`   | Development (port 5000)                                          |
 | `serve` | Run after a build to preview. Serves SPA on 5000 and SSR on 5005 |
 
+# Features
+
+## UI
+
+The template app leverages the Zea UI library for all its User interface components.
+
+> http://web-components.zea.live/
+
+The UI library is built using the new 'web components' technology supported in all modern browsers.
+
+## UX
+
+The template leverages the Zea UX library to provide Undo, Redo and tools such as selection manager, transform tools.
+
+> https://docs.zea.live/zea-ux
+
+## User Identification and Authentication
+
+This template app comes with a simple user identification and authentication system. Users enter their name and an optional password to gain access to the app.
+
+```javascript
+onMount(async () => {
+  const isAuthenticated = await auth.isAuthenticated()
+  if (!isAuthenticated) {
+    $redirect('/login')
+  }
+})
+```
+
+The Authentication can be disabled by commenting out the $redirect('/login') line in the index.svelte file.
+
+> Note: the 'auth.js' file is designed to support integrating other authentication systems provided by frameworks such as Firebase or Auth0.
+
+## Collaboration
+
+If a user is identified, then the app integrates the powerful collaboration framework refrred to as 'Collab.
+
+> https://docs.zea.live/zea-collab/
+
+```javascript
+const SOCKET_URL = 'https://websocket-staging.zea.live'
+const ROOM_ID = 'zea-template-collab'
+```
+
+```javascript
+const session = new Session(userData, SOCKET_URL)
+session.joinRoom(ROOM_ID)
+const sessionSync = new SessionSync(session, appData, userData, {})
+```
+
+## CAD
+
+the Zea CAD library comes pre-integrated and a sample zcad file is loaded.
+
+> https://docs.zea.live/zea-cad/
+
 ## Issues?
 
 File it on Github: https://github.com/ZeaInc/zea-template-collab
