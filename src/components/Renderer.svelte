@@ -1,8 +1,25 @@
 <script>
   import { onMount } from 'svelte'
-  import { auth, APP_DATA, setupCollab } from '../helpers'
+  import { auth, APP_DATA } from '../helpers'
   import '../helpers/fps-display'
   import Sidebar from '../components/Sidebar.svelte'
+
+  const {
+    Color,
+    GLRenderer,
+    Scene,
+    resourceLoader,
+    SystemDesc,
+    EnvMap,
+  } = window.zeaEngine
+  const {
+    SelectionManager,
+    UndoRedoManager,
+    ToolManager,
+    SelectionTool,
+  } = window.zeaUx
+
+  const { Session, SessionSync } = window.zeaCollab
 
   let canvas
   let fpsContainer
@@ -12,15 +29,6 @@
   let progressBar
 
   onMount(() => {
-    const {
-      Color,
-      GLRenderer,
-      Scene,
-      resourceLoader,
-      SystemDesc,
-      EnvMap,
-    } = window.zeaEngine
-
     const renderer = new GLRenderer(canvas)
     const scene = new Scene()
 
@@ -36,16 +44,13 @@
 
     scene.setupGrid(10, 10)
     renderer.setScene(scene)
-    const appData = { renderer, scene }
+
+    const appData = {}
+
+    appData.renderer = renderer
+    appData.scene = scene
 
     treeViewItems = [scene.getRoot()]
-
-    const {
-      SelectionManager,
-      UndoRedoManager,
-      ToolManager,
-      SelectionTool,
-    } = window.zeaUx
 
     /** UNDO START */
     const undoRedoManager = UndoRedoManager.getInstance()
@@ -119,13 +124,18 @@
     }
     /** FPS DISPLAY END */
 
-    /** COLLAB START */
+    /** COLLAB START*/
+    const SOCKET_URL = 'https://websocket-staging.zea.live'
+    const ROOM_ID = 'zea-template-collab'
     auth.getUserData().then((userData) => {
       if (!userData) return
-      const { session, sessionSync } = setupCollab(userData, $APP_DATA)
+      const session = new Session(userData, SOCKET_URL)
+      session.joinRoom(ROOM_ID)
+      const sessionSync = new SessionSync(session, appData, userData, {})
       appData.userData = userData
       appData.session = session
       appData.sessionSync = sessionSync
+      APP_DATA.set(appData)
     })
     /** COLLAB END */
 
