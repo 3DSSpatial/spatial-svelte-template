@@ -141,6 +141,8 @@
 
     /** CAD START */
     const { GLCADPass, CADAsset } = window.zeaCad
+
+    const url = '/assets/Fidget-Spinner-2.zcad'
     renderer.addPass(new GLCADPass())
 
     const asset = new CADAsset()
@@ -157,7 +159,7 @@
       renderer.frameAll()
     })
     scene.getRoot().addChild(asset)
-    asset.getParameter('FilePath').setValue('/assets/HC_SRO4.zcad')
+    asset.getParameter('FilePath').setValue(url)
     /** CAD END */
 
     APP_DATA.set(appData)

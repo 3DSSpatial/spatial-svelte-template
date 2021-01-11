@@ -46,7 +46,7 @@ npm run dev
 
 | Syntax  | Description                                                      |
 | ------- | ---------------------------------------------------------------- |
-| `build` | Build a bundled app with SSR + prerendering and dynamic imports  |
+| `build` | Build a bundled app with SSR + pre-rendering and dynamic imports |
 | `dev`   | Development (port 5000)                                          |
 | `serve` | Run after a build to preview. Serves SPA on 5000 and SSR on 5005 |
 

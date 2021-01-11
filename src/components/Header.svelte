@@ -194,7 +194,7 @@
             Redo
           </zea-menu-item>
           <zea-menu-item class="menu-item" onclick={toggleSelectMode}>
-            <zea-icon icon="select" size="16" />
+            <zea-icon size="16" />
             Toggle Selection
           </zea-menu-item>
         </zea-menu-subitems>
