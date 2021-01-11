@@ -6,14 +6,41 @@
 
   let userChipSet
   let userChip
+  let vrToggleMenuItem
+  let vrSpectatorMenuItem
 
   onMount(() => {
+    vrToggleMenuItem.textContent = 'VR Device Not Detected'
+    vrToggleMenuItem.disabled = true
+
     auth.getUserData().then((userData) => {
       if (!userData) {
         return
       }
 
+      {
+        const { renderer } = $APP_DATA
+        renderer
+          .getXRViewport()
+          .then((xrViewport) => {
+            xrViewport.spectatorMode = false // disable by default.
+            if (vrToggleMenuItem) vrToggleMenuItem.textContent = 'Launch VR'
+            xrViewport.on('presentingChanged', (event) => {
+              const { state } = event
+              if (state) {
+                vrToggleMenuItem.textContent = 'Exit VR'
+              } else {
+                vrToggleMenuItem.textContent = 'Launch VR'
+              }
+            })
+          })
+          .catch((reason) => {
+            console.warn('Unable to setup XR:' + reason)
+          })
+      }
+
       const { renderer, session, sessionSync } = $APP_DATA
+
       userChip.userData = userData
       userChipSet.session = session
 
@@ -86,21 +113,24 @@
     })
   }
 
-  function handleVR() {
+  function handleLaunchVR() {
     const { renderer } = $APP_DATA
 
     renderer
       .getXRViewport()
       .then((xrViewport) => {
-        xrViewport.startPresenting().then(() => {
-          xrViewport.on('presentingChanged', () => {
-            console.log('VR Activated')
-          })
-        })
+        xrViewport.togglePresenting()
       })
       .catch((reason) => {
         console.warn('Unable to setup XR:' + reason)
       })
+  }
+
+  function handleToggleVRSpatatorMode() {
+    const { renderer } = $APP_DATA
+    renderer.getXRViewport().then((xrViewport) => {
+      xrViewport.spectatorMode = !xrViewport.spectatorMode
+    })
   }
 
   const handleSignOut = async () => {
@@ -180,9 +210,19 @@
       <zea-menu-item>
         VR
         <zea-menu-subitems>
-          <zea-menu-item class="menu-item" onclick={handleVR}>
+          <zea-menu-item
+            class="menu-item"
+            bind:this={vrToggleMenuItem}
+            onclick={handleLaunchVR}
+            switch="true">
             <zea-icon icon="recording-outline" size="16" />
             Launch VR
+          </zea-menu-item>
+          <zea-menu-item
+            switch="true"
+            onclick={handleToggleVRSpatatorMode}
+            bind:this={vrSpectatorMenuItem}>
+            Spectator Mode
           </zea-menu-item>
         </zea-menu-subitems>
       </zea-menu-item>
