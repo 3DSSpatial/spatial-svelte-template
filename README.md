@@ -121,6 +121,6 @@ The code above loads the sample cad file.
 
 ## Issues?
 
-File it on Github: https://github.com/ZeaInc/zea-template-collab
+File it on Github: https://github.com/ZeaInc/zea-svelte-template
 
-Start a discussion: https://github.com/ZeaInc/zea-template-collab/discussions
+Start a discussion: https://github.com/ZeaInc/zea-svelte-template/discussions
