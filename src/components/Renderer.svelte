@@ -83,9 +83,30 @@
     /** PROGRESSBAR START */
     if (progressBar) {
       progressBar.percent = 0
+      progressBar.style.visibility = 'hidden'
+      let visible = false
+      let visibleTimeoutId = 0
       resourceLoader.on('progressIncremented', (event) => {
-        const { percent } = event
-        if (progressBar) progressBar.percent = percent
+        if (progressBar) {
+          if (!visible) {
+            // Display the progress bar if hidden
+            progressBar.style.visibility = 'visible'
+            visible = true
+          } else if (visibleTimeoutId > 0) {
+            // Prevent the progress bar from hiding if a timer is running.
+            clearTimeout(visibleTimeoutId)
+          }
+          const { percent } = event
+          progressBar.percent = percent
+          if (percent >= 100) {
+            // Hide the progress bar after one second.
+            visibleTimeoutId = setTimeout(() => {
+              progressBar.style.visibility = 'hidden'
+              visibleTimeoutId = 0
+              visible = false
+            }, 1000)
+          }
+        }
       })
     }
     /** PROGRESSBAR END */
