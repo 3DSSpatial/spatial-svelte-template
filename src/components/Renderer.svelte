@@ -11,6 +11,7 @@
     resourceLoader,
     SystemDesc,
     EnvMap,
+      CameraManipulator
   } = window.zeaEngine
   const {
     SelectionManager,
@@ -59,6 +60,7 @@
 
     /** SELECTION START */
     const cameraManipulator = renderer.getViewport().getManipulator()
+    cameraManipulator.setDefaultManipulationMode(CameraManipulator.MANIPULATION_MODES.trackball);
     const toolManager = new ToolManager(appData)
     const selectionManager = new SelectionManager(appData)
     selectionManager.showHandles()
