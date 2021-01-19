@@ -170,7 +170,7 @@
 
 <div class="flex items-center w-full h-full px-2">
   <div class="logo flex items-center h-full mr-4">
-    <img src="/images/logo-zea.svg" alt="logo" />
+    <img src="/images/SpatialLogo_White NO TAGLINE.webp" alt="logo" />
   </div>
   <div class="flex-grow">
     <zea-menu type="dropdown" show-anchor="true">
