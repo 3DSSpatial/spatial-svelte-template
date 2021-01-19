@@ -14,7 +14,7 @@ To get this template working, you're going to need [Node.js](https://nodejs.org/
 
 Our recommended way to clone this template is by using [degit](https://github.com/Rich-Harris/degit), a project scaffolding tool.
 
-1. Run this command on your terminal:
+* Run this command on your terminal:
 
 ```bash
 npx degit 3DSSpatial/spatial-svelte-template#main my-awesome-app
