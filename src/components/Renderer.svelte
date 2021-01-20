@@ -69,7 +69,6 @@
 
     renderer.getViewport().setManipulator(toolManager)
     toolManager.pushTool('CameraManipulator')
-    // toolManager.pushTool('SelectionTool')
     appData.toolManager = toolManager
 
     // // Note: the alpha value determines  the fill of the highlight.
@@ -124,21 +123,6 @@
     }
     /** FPS DISPLAY END */
 
-    /** COLLAB START*/
-    const SOCKET_URL = 'https://websocket-staging.zea.live'
-    const ROOM_ID = 'zea-template-collab'
-    auth.getUserData().then((userData) => {
-      if (!userData) return
-      const session = new Session(userData, SOCKET_URL)
-      session.joinRoom(ROOM_ID)
-      const sessionSync = new SessionSync(session, appData, userData, {})
-      appData.userData = userData
-      appData.session = session
-      appData.sessionSync = sessionSync
-      APP_DATA.set(appData)
-    })
-    /** COLLAB END */
-
     /** CAD START */
     const { GLCADPass, CADAsset } = window.zeaCad
 
@@ -161,6 +145,21 @@
     scene.getRoot().addChild(asset)
     asset.getParameter('FilePath').setValue(url)
     /** CAD END */
+
+    /** COLLAB START*/
+    const SOCKET_URL = 'https://websocket-staging.zea.live'
+    const ROOM_ID = url
+    auth.getUserData().then((userData) => {
+      if (!userData) return
+      const session = new Session(userData, SOCKET_URL)
+      session.joinRoom(ROOM_ID)
+      const sessionSync = new SessionSync(session, appData, userData, {})
+      appData.userData = userData
+      appData.session = session
+      appData.sessionSync = sessionSync
+      APP_DATA.update(() => appData)
+    })
+    /** COLLAB END */
 
     APP_DATA.set(appData)
   })

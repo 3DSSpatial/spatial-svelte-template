@@ -9,14 +9,25 @@
   let vrToggleMenuItem
   let vrSpectatorMenuItem
 
+  let renderer
+  let toolManager
+  let userData
+  let session
+  let sessionSync
+
   onMount(() => {
+    if (session) {
+      session.leaveRoom()
+    }
+
     vrToggleMenuItem.textContent = 'VR Device Not Detected'
     vrToggleMenuItem.disabled = true
 
-    auth.getUserData().then((userData) => {
-      if (!userData) {
-        return
-      }
+    APP_DATA.subscribe((appData) => {
+      if (!appData || renderer) return
+
+      renderer = appData.renderer
+      toolManager = appData.toolManager
 
       {
         const { renderer } = $APP_DATA
@@ -38,8 +49,15 @@
             console.warn('Unable to setup XR:' + reason)
           })
       }
+    })
 
-      const { renderer, session, sessionSync } = $APP_DATA
+    APP_DATA.subscribe((appData) => {
+      if (!appData || session || !appData.session || !appData.sessionSync) {
+        return
+      }
+      session = appData.session
+      userData = appData.userData
+      sessionSync = appData.sessionSync
 
       userChip.userData = userData
       userChipSet.session = session
@@ -87,7 +105,6 @@
 
   let selectionEnabled = false
   function toggleSelectMode() {
-    const { toolManager } = $APP_DATA
     if (!selectionEnabled) {
       toolManager.pushTool('SelectionTool')
       selectionEnabled = true
@@ -134,6 +151,7 @@
   }
 
   const handleSignOut = async () => {
+    if (session) session.leaveRoom()
     await auth.signOut()
     $redirect('/login')
   }
