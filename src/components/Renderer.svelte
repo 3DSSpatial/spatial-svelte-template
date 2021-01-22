@@ -7,12 +7,15 @@
 
   const {
     Color,
+    Vec3,
+    Xfo,
     GLRenderer,
     Scene,
     resourceLoader,
     SystemDesc,
     EnvMap,
   } = window.zeaEngine
+  const { GLCADPass, CADAsset } = window.zeaCad
   const {
     SelectionManager,
     UndoRedoManager,
@@ -44,7 +47,7 @@
     scene
       .getSettings()
       .getParameter('BackgroundColor')
-      .setValue(new Color(0.2, 0.2, 0.2, 1))
+      .setValue(new Color(0.35, 0.35, 0.35, 1))
     renderer.setScene(scene)
 
     const appData = {}
@@ -76,6 +79,7 @@
 
     // Note: the alpha value determines  the fill of the highlight.
     const selectionColor = new Color('#F9CE03')
+
     selectionColor.a = 0.1
     const subtreeColor = selectionColor.lerp(new Color(1, 1, 1, 0), 0.5)
     appData.selectionManager.selectionGroup
@@ -84,6 +88,15 @@
     appData.selectionManager.selectionGroup
       .getParameter('SubtreeHighlightColor')
       .setValue(subtreeColor)
+
+    // Color the selection rect.
+    const selectionRectColor = selectionColor.clone()
+    selectionRectColor.a = 1
+    selectionTool.rectItem
+      .getParameter('Material')
+      .getValue()
+      .getParameter('BaseColor')
+      .setValue(selectionRectColor)
 
     /** SELECTION END */
 

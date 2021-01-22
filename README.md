@@ -119,6 +119,10 @@ asset.getParameter('FilePath').setValue('/assets/HC_SRO4.zcad')
 
 The code above loads the sample cad file.
 
+# Deploying
+
+https://vercel.com/
+
 ## Issues?
 
 File it on Github: https://github.com/ZeaInc/zea-svelte-template
