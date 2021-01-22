@@ -3,6 +3,7 @@
   import { auth, APP_DATA } from '../helpers'
   import '../helpers/fps-display'
   import Sidebar from '../components/Sidebar.svelte'
+  // import { get } from 'http'
 
   const {
     Color,
@@ -23,9 +24,6 @@
 
   let canvas
   let fpsContainer
-
-  let treeViewItems
-  let appData
   let progressBar
 
   onMount(() => {
@@ -43,14 +41,16 @@
     }
 
     scene.setupGrid(10, 10)
+    scene
+      .getSettings()
+      .getParameter('BackgroundColor')
+      .setValue(new Color(0.2, 0.2, 0.2, 1))
     renderer.setScene(scene)
 
     const appData = {}
 
     appData.renderer = renderer
     appData.scene = scene
-
-    treeViewItems = [scene.getRoot()]
 
     /** UNDO START */
     const undoRedoManager = UndoRedoManager.getInstance()
@@ -59,8 +59,11 @@
 
     /** SELECTION START */
     const cameraManipulator = renderer.getViewport().getManipulator()
+    appData.cameraManipulator = cameraManipulator
     const toolManager = new ToolManager(appData)
-    const selectionManager = new SelectionManager(appData)
+    const selectionManager = new SelectionManager(appData, {
+      enableXfoHandles: true,
+    })
     selectionManager.showHandles()
     appData.selectionManager = selectionManager
     const selectionTool = new SelectionTool(appData)
@@ -71,16 +74,16 @@
     toolManager.pushTool('CameraManipulator')
     appData.toolManager = toolManager
 
-    // // Note: the alpha value determines  the fill of the highlight.
-    // const selectionColor = new Color('#00436D')
-    // selectionColor.a = 0.1
-    // const subtreeColor = selectionColor.lerp(new Color(1, 1, 1, 0), 0.5)
-    // selectionManager.selectionGroup
-    //   .getParameter('HighlightColor')
-    //   .setValue(selectionColor)
-    // selectionManager.selectionGroup
-    //   .getParameter('SubtreeHighlightColor')
-    //   .setValue(subtreeColor)
+    // Note: the alpha value determines  the fill of the highlight.
+    const selectionColor = new Color('#F9CE03')
+    selectionColor.a = 0.1
+    const subtreeColor = selectionColor.lerp(new Color(1, 1, 1, 0), 0.5)
+    appData.selectionManager.selectionGroup
+      .getParameter('HighlightColor')
+      .setValue(selectionColor)
+    appData.selectionManager.selectionGroup
+      .getParameter('SubtreeHighlightColor')
+      .setValue(subtreeColor)
 
     /** SELECTION END */
 
@@ -174,7 +177,7 @@
 
 <zea-layout add-cells="AB" borders cell-a-size="250" show-resize-handles="A">
   <div slot="A" class="h-full w-full">
-    <Sidebar rootItems={treeViewItems} {appData} />
+    <Sidebar />
   </div>
   <div slot="B" class="h-full w-full">
     <canvas id="renderer" bind:this={canvas} />
