@@ -100,6 +100,20 @@
 
     /** SELECTION END */
 
+    /** UX START */
+    renderer.getViewport().on('pointerDownOnGeom', (event) => {
+      // Detect a right click
+      if (event.button == 2) {
+        console.log(event)
+        // stop propagation to prevent the camera manipulator from handling the event.
+        event.stopPropagation()
+      }
+    })
+    renderer.getViewport().on('pointerDoublePressed', (event) => {
+      console.log(event)
+    })
+    /** UX END */
+
     /** PROGRESSBAR START */
     if (progressBar) {
       progressBar.percent = 0
