@@ -121,7 +121,29 @@ The code above loads the sample cad file.
 
 # Deploying
 
+Varcel is a great platform for quickly deploying SPAs (Single Page Applications) without needing to setup your own infrastructure.
+
+In a few clicks you can connected Varcel to your GitHub repository, at which point Varcel will update your published web app on every push to your main branch.
+
 https://vercel.com/
+
+1. The first step is to sign up to Varcel using your GitHub account, or whatever Git platform you can use.
+   ![Step1](docs/images/Varcel-Step1.png)
+
+2. Connect Varcel to the github repo containing the app built using this template
+   ![Step2](docs/images/Varcel-Step2.png)
+
+3. ...
+   ![Step3](docs/images/Varcel-Step3.png)
+
+4. ...
+   ![Step4](docs/images/Varcel-Step4.png)
+
+5. ...
+   ![Step5](docs/images/Varcel-Step5.png)
+
+6. ...
+   ![Step6](docs/images/Varcel-Step6.png)
 
 ## Issues?
 
