@@ -2,15 +2,20 @@
   import { redirect } from '@roxi/routify'
   import { onMount } from 'svelte'
 
+  const { CameraManipulator } = window.zeaEngine
+  const { ToolManager } = window.zeaUx
+
   import { auth, APP_DATA } from '../helpers'
 
   let userChipSet
   let userChip
   let vrToggleMenuItem
   let vrSpectatorMenuItem
+  let toggleSelectModeMenuItem
 
   let renderer
   let toolManager
+  let cameraManipulator
   let userData
   let session
   let sessionSync
@@ -28,6 +33,29 @@
 
       renderer = appData.renderer
       toolManager = appData.toolManager
+      cameraManipulator = appData.cameraManipulator
+
+      document.addEventListener('keydown', (event) => {
+        switch (event.key.toLowerCase()) {
+          case 'f':
+            renderer.frameAll()
+            break
+          case 's':
+            toggleSelectMode()
+            toggleSelectModeMenuItem.checked = selectionEnabled
+            break
+          case 'z':
+            if (event.ctrlKey) {
+              appData.undoRedoManager.undo()
+            }
+            break
+          case 'y':
+            if (event.ctrlKey) {
+              appData.undoRedoManager.redo()
+            }
+            break
+        }
+      })
 
       {
         const { renderer } = $APP_DATA
@@ -74,20 +102,22 @@
               viewXfo.ori.getZaxis().scale(-focalDistance)
             )
 
-            const viewport = renderer.getViewport()
-            const cameraManipulator = viewport.getManipulator()
-            cameraManipulator.orientPointOfView(
-              viewport.getCamera(),
-              viewXfo.tr,
-              target,
-              1.0,
-              1000
-            )
+            if (cameraManipulator)
+              cameraManipulator.orientPointOfView(
+                viewport.getCamera(),
+                viewXfo.tr,
+                target,
+                1.0,
+                1000
+              )
           }
         })
       }
     })
   })
+
+  // ////////////////////////////////////
+  // UX
 
   function handleFrameAll() {
     const { renderer } = $APP_DATA
@@ -114,6 +144,15 @@
     }
   }
 
+  let wasdEnabled = false
+  function toggleWASDWalkMode() {
+    wasdEnabled = !wasdEnabled
+    cameraManipulator.enabledWASDWalkMode = wasdEnabled
+  }
+
+  // ////////////////////////////////////
+  // Collab
+
   function handleDA() {
     auth.getUserData().then((userData) => {
       if (!userData) {
@@ -129,6 +168,9 @@
       }
     })
   }
+
+  // ////////////////////////////////////
+  // VR
 
   function handleLaunchVR() {
     const { renderer } = $APP_DATA
@@ -211,9 +253,21 @@
             <zea-icon icon="arrow-redo" size="16" />
             Redo
           </zea-menu-item>
-          <zea-menu-item class="menu-item" onclick={toggleSelectMode}>
+          <zea-menu-item
+            class="menu-item"
+            switch="true"
+            hotkey="s"
+            bind:this={toggleSelectModeMenuItem}
+            onclick={toggleSelectMode}>
             <zea-icon size="16" />
             Toggle Selection
+          </zea-menu-item>
+          <zea-menu-item
+            class="menu-item"
+            switch="true"
+            onclick={toggleWASDWalkMode}>
+            <zea-icon size="16" />
+            WASD Walk Mode
           </zea-menu-item>
         </zea-menu-subitems>
       </zea-menu-item>
@@ -231,8 +285,8 @@
           <zea-menu-item
             class="menu-item"
             bind:this={vrToggleMenuItem}
-            onclick={handleLaunchVR}
-            switch="true">
+            switch="true"
+            onclick={handleLaunchVR}>
             <zea-icon icon="recording-outline" size="16" />
             Launch VR
           </zea-menu-item>
