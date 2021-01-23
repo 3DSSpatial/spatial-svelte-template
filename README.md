@@ -133,17 +133,13 @@ https://vercel.com/
 2. Connect Varcel to the github repo containing the app built using this template
    ![Step2](docs/images/Varcel-Step2.png)
 
-3. ...
-   ![Step3](docs/images/Varcel-Step3.png)
+3. ![Step3](docs/images/Varcel-Step3.png)
 
-4. ...
-   ![Step4](docs/images/Varcel-Step4.png)
+4. ![Step4](docs/images/Varcel-Step4.png)
 
-5. ...
-   ![Step5](docs/images/Varcel-Step5.png)
+5. ![Step5](docs/images/Varcel-Step5.png)
 
-6. ...
-   ![Step6](docs/images/Varcel-Step6.png)
+6. ![Step6](docs/images/Varcel-Step6.png)
 
 ## Issues?
 
