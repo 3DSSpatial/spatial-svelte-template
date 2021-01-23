@@ -154,12 +154,13 @@
     /** FPS DISPLAY END */
 
     /** CAD START */
-    const { GLCADPass, CADAsset } = window.zeaCad
-
-    const url = '/assets/Fidget-Spinner-2.zcad'
     renderer.addPass(new GLCADPass())
 
+    const url = '/assets/gear_box_final_asm-visu.zcad'
     const asset = new CADAsset()
+    asset.on('error', (event) => {
+      console.warn('Error' + event)
+    })
     asset.on('loaded', () => {
       const materials = asset.getMaterialLibrary().getMaterials()
       materials.forEach((material) => {
