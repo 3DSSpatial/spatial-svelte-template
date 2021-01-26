@@ -28,7 +28,8 @@
       .setUserData(userData)
       .then(() => {
         submitted = true
-        $redirect('/')
+        const params = new URLSearchParams(location.search)
+        $redirect('/?' + params.toString())
       })
       .catch((e) => {
         if (passwordErrorContainer) {

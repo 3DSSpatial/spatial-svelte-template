@@ -12,7 +12,8 @@
   onMount(async () => {
     const isAuthenticated = await auth.isAuthenticated()
     if (!isAuthenticated) {
-      $redirect('/login')
+      const params = new URLSearchParams(location.search)
+      $redirect('/login?' + params.toString())
     }
   })
 </script>
