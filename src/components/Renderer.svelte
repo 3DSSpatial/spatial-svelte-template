@@ -29,7 +29,7 @@
   let canvas
   let fpsContainer
   let progressBar
-  let showMenu = false
+  let isMenuVisible = false
   let pos = { x: 0, y: 0 }
 
   onMount(() => {
@@ -214,11 +214,11 @@
 
   const openMenu = (e) => {
     pos = { x: e.clientX, y: e.clientY }
-    showMenu = true
+    isMenuVisible = true
   }
 
   const closeMenu = () => {
-    showMenu = false
+    isMenuVisible = false
   }
 </script>
 
@@ -238,7 +238,7 @@
   </div>
 </zea-layout>
 
-{#if showMenu}
+{#if isMenuVisible}
   <Menu {...pos} on:click={closeMenu} on:clickoutside={closeMenu}>
     <MenuOption
       text="Say Foo"
