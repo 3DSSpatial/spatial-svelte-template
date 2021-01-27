@@ -1,13 +1,13 @@
 <script>
   import { onMount, getContext } from 'svelte'
-  import { key } from './menu.js'
+  import { menuKey } from './menuKey.js'
 
   export let text = ''
 
   import { createEventDispatcher } from 'svelte'
   const dispatch = createEventDispatcher()
 
-  const { dispatchClick } = getContext(key)
+  const { dispatchClick } = getContext(menuKey)
 
   const handleClick = (e) => {
     dispatch('click')
