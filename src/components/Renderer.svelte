@@ -241,9 +241,14 @@
 {#if showMenu}
   <Menu {...pos} on:click={closeMenu} on:clickoutside={closeMenu}>
     <MenuOption
-      text="Say hello"
+      text="Say Foo"
       on:click={() => {
-        alert('Hello')
+        alert('Foo')
+      }} />
+    <MenuOption
+      text="Say Bar"
+      on:click={() => {
+        alert('Bar')
       }} />
   </Menu>
 {/if}
