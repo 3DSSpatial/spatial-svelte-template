@@ -3,7 +3,8 @@
   import { auth, APP_DATA } from '../helpers'
   import '../helpers/fps-display'
   import Sidebar from '../components/Sidebar.svelte'
-  // import { get } from 'http'
+  import Menu from '../components/ContextMenu/Menu.svelte'
+  import MenuOption from '../components/ContextMenu/MenuOption.svelte'
 
   const {
     Color,
@@ -28,6 +29,8 @@
   let canvas
   let fpsContainer
   let progressBar
+  let showMenu = false
+  let pos = { x: 0, y: 0 }
 
   onMount(() => {
     const urlParams = new URLSearchParams(window.location.search)
@@ -208,24 +211,39 @@
 
     APP_DATA.set(appData)
   })
-</script>
 
-<style>
-  #renderer {
-    height: 100%;
-    width: 100%;
+  const openMenu = (e) => {
+    pos = { x: e.clientX, y: e.clientY }
+    showMenu = true
   }
-</style>
+
+  const closeMenu = () => {
+    showMenu = false
+  }
+</script>
 
 <zea-layout add-cells="AB" borders cell-a-size="250" show-resize-handles="A">
   <div slot="A" class="h-full w-full">
     <Sidebar />
   </div>
   <div slot="B" class="h-full w-full">
-    <canvas id="renderer" bind:this={canvas} />
+    <canvas
+      class="h-full w-full"
+      bind:this={canvas}
+      on:contextmenu|preventDefault={openMenu} />
     <div class="relative">
       <zea-progress-bar bind:this={progressBar} />
     </div>
     <div bind:this={fpsContainer} />
   </div>
 </zea-layout>
+
+{#if showMenu}
+  <Menu {...pos} on:click={closeMenu} on:clickoutside={closeMenu}>
+    <MenuOption
+      text="Say hello"
+      on:click={() => {
+        alert('Hello')
+      }} />
+  </Menu>
+{/if}
