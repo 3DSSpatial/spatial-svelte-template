@@ -5,6 +5,7 @@
   import Sidebar from '../components/Sidebar.svelte'
   import Menu from '../components/ContextMenu/Menu.svelte'
   import MenuOption from '../components/ContextMenu/MenuOption.svelte'
+  import Dialog from '../components/Dialog.svelte'
 
   const {
     Color,
@@ -129,6 +130,20 @@
         event.stopPropagation()
       }
     })
+
+    let highlightedItem
+    renderer.getViewport().on('pointerOverGeom', (event) => {
+      highlightedItem = filterItemSelection(event.intersectionData.geomItem)
+      highlightedItem.addHighlight(
+        'pointerOverGeom',
+        new Color(0.8, 0.8, 0.8, 0.1),
+        true
+      )
+    })
+    renderer.getViewport().on('pointerLeaveGeom', (event) => {
+      highlightedItem.removeHighlight('pointerOverGeom', true)
+      highlightedItem = null
+    })
     renderer.getViewport().on('pointerDoublePressed', (event) => {
       console.log(event)
     })
@@ -223,9 +238,12 @@
     pos = { x: event.clientX, y: event.clientY }
     isMenuVisible = true
   }
-
   const closeMenu = () => {
     isMenuVisible = false
+  }
+  let isDialogOpen = false
+  const closeDialog = () => {
+    isDialogOpen = false
   }
 </script>
 
@@ -242,6 +260,8 @@
   </div>
 </zea-layout>
 
+<Dialog isOpen={isDialogOpen} close={closeDialog} {contextItem} />
+
 {#if isMenuVisible}
   <Menu {...pos} on:click={closeMenu} on:clickoutside={closeMenu}>
     <MenuOption
@@ -249,6 +269,14 @@
       on:click={() => {
         contextItem.getParameter('Visible').setValue(false)
       }} />
-    <MenuOption text="Properties" on:click={() => {}} />
+    <MenuOption
+      text="Properties"
+      on:click={() => {
+        if (contextItem) {
+          console.log('CurrentSelected Item :', contextItem.rivianAttributes)
+          isDialogOpen = true
+          closeMenu()
+        }
+      }} />
   </Menu>
 {/if}
