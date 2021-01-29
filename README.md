@@ -166,7 +166,7 @@ https://vercel.com/
 
 The Svelte App id designed to support embedding in other web applications. For more information on embedding the svelte app in your own application consult the Embed guide.
 
-Embed Guide: https://github.com/ZeaInc/zea-svelte-template/README-EMBEDDING.md
+Embed Guide: https://github.com/ZeaInc/zea-svelte-template/blob/main/docs/README-EMBEDDING.md
 
 ## Issues?
 
