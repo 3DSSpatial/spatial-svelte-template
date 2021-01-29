@@ -6,6 +6,21 @@
 - Includes the latest stable versions of the Zea tools: [Zea Engine](https://docs.zea.live/zea-engine/), [Zea UI](https://web-components.zea.live/), [Zea UX](https://docs.zea.live/zea-ux/), and [Zea Collab](https://docs.zea.live/zea-collab/).
 - Supports [SSR](https://en.wikipedia.org/wiki/Server-side_scripting).
 
+## Live Demo
+
+This template has been deployed to Vercel for a live demo.
+Password: zea
+You can change the password in your own deployments, or connect to an authentication service.
+See below.
+
+https://zea-svelte-template.vercel.app/
+
+The default asset provided is the GearBox.
+![GearBox](docs/images/GearBox.jpg)
+
+You can also modify the app to load parts of the hospital.
+![Hosptial-Structural](docs/images/Hosptial-Structural.jpg)
+
 ## Prerequisites
 
 To get this template working, you're going to need [Node.js](https://nodejs.org/en/download/) (preferably the latest LTS version).
