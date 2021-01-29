@@ -22,6 +22,7 @@
   let sessionSync
 
   document.addEventListener('keydown', (event) => {
+    if (!event.target.contains(renderer.getGLCanvas())) return
     switch (event.key.toLowerCase()) {
       case 'f':
         if (renderer) renderer.frameAll()

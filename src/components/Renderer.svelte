@@ -6,6 +6,7 @@
   import Menu from '../components/ContextMenu/Menu.svelte'
   import MenuOption from '../components/ContextMenu/MenuOption.svelte'
   import Dialog from '../components/Dialog.svelte'
+  import SearchTool from '../components/SearchTool.svelte'
 
   const {
     Color,
@@ -249,7 +250,17 @@
 
 <zea-layout add-cells="AB" borders cell-a-size="250" show-resize-handles="A">
   <div slot="A" class="h-full w-full">
-    <Sidebar />
+    <zea-tabs slot="a" orientation="horizontal">
+      <div slot="tab-bar">Assembly</div>
+      <div class="tab-content">
+        <Sidebar />
+      </div>
+
+      <div slot="tab-bar">Search</div>
+      <div class="tab-content">
+        <SearchTool />
+      </div>
+    </zea-tabs>
   </div>
   <div slot="B" class="h-full w-full">
     <canvas class="h-full w-full" bind:this={canvas} />
