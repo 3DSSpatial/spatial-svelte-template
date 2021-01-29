@@ -23,6 +23,10 @@ The default asset provided is the GearBox.
 You can also modify the app to load parts of the hospital.
 ![Hosptial-Structural](docs/images/Hosptial-Structural.jpg)
 
+https://zea-svelte-template.vercel.app/?zcad=/assets/Hospital/Autodesk_Hospital_Structural.zcad
+
+https://zea-svelte-template.vercel.app/?zcad=/assets/Hospital/Autodesk_Hospital_HVAC.zcad
+
 ## Prerequisites
 
 To get this template working, you're going to need [Node.js](https://nodejs.org/en/download/) (preferably the latest LTS version).
@@ -157,6 +161,12 @@ https://vercel.com/
 5. ![Step5](docs/images/Varcel-Step5.png)
 
 6. ![Step6](docs/images/Varcel-Step6.png)
+
+# Embedding
+
+The Svelte App id designed to support embedding in other web applications. For more information on embedding the svelte app in your own application consult the Embed guide.
+
+Embed Guide: https://github.com/ZeaInc/zea-svelte-template/README-EMBEDDING.md
 
 ## Issues?
 

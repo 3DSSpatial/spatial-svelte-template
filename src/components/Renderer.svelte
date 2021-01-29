@@ -8,10 +8,14 @@
   import Dialog from '../components/Dialog.svelte'
   import SearchTool from '../components/SearchTool.svelte'
 
+  import { ChannelMessenger } from '../ChannelMessenger.js'
+  import buildTree from '../helpers/buildTree'
+
   const {
     Color,
     Vec3,
     Xfo,
+    TreeItem,
     GLRenderer,
     Scene,
     resourceLoader,
@@ -32,6 +36,9 @@
   let fpsContainer
   let progressBar
 
+  const urlParams = new URLSearchParams(window.location.search)
+  const embeddedMode = urlParams.has('embedded')
+
   const filterItemSelection = (item) => {
     // Propagate selections deep in the tree up to the part body.
     while (
@@ -44,10 +51,8 @@
   }
 
   onMount(() => {
-    const urlParams = new URLSearchParams(window.location.search)
-
     const renderer = new GLRenderer(canvas, {
-      debugGeomIds: false,
+      debugGeomIds: urlParams.has('debugGeomIds'),
       xrCompatible: false,
     })
     const scene = new Scene()
@@ -74,6 +79,10 @@
     appData.renderer = renderer
     appData.scene = scene
 
+    const assets = new TreeItem('Assets')
+    scene.getRoot().addChild(assets)
+    appData.assets = assets
+
     /** UNDO START */
     const undoRedoManager = UndoRedoManager.getInstance()
     appData.undoRedoManager = undoRedoManager
@@ -84,7 +93,7 @@
     appData.cameraManipulator = cameraManipulator
     const toolManager = new ToolManager(appData)
     const selectionManager = new SelectionManager(appData, {
-      enableXfoHandles: true,
+      enableXfoHandles: false,
     })
     selectionManager.showHandles(true)
 
@@ -122,9 +131,12 @@
     /** SELECTION END */
 
     /** UX START */
-    renderer.getViewport().on('pointerDown', (event) => {
+    renderer.getViewport().on('pointerUp', (event) => {
       // Detect a right click
-      if (event.button == 2 && event.intersectionData) {
+      if (event.button == 0 && event.intersectionData) {
+        const item = filterItemSelection(event.intersectionData.geomItem)
+        appData.selectionManager.toggleItemSelection(item)
+      } else if (event.button == 2 && event.intersectionData) {
         const item = filterItemSelection(event.intersectionData.geomItem)
         openMenu(event, item)
         // stop propagation to prevent the camera manipulator from handling the event.
@@ -192,30 +204,37 @@
     /** CAD START */
     renderer.addPass(new GLCADPass())
 
-    let url = '/assets/gear_box_final_asm-visu.zcad'
+    let url = embeddedMode ? null : '/assets/gear_box_final_asm-visu.zcad'
     // let url = '/assets/Hospital/Autodesk_Hospital_Structural.zcad'
     // let url = '/assets/Hospital/Autodesk_Hospital_HVAC.zcad'
 
-    if (urlParams.has('ps')) {
-      url = urlParams.get('ps')
-    }
-    const asset = new CADAsset()
-    asset.on('error', (event) => {
-      console.warn('Error' + event)
-    })
-    asset.on('loaded', () => {
-      const materials = asset.getMaterialLibrary().getMaterials()
-      materials.forEach((material) => {
-        const baseColor = material.getParameter('BaseColor')
-        if (baseColor) baseColor.setValue(baseColor.getValue().toGamma())
+    const loadAsset = (url) => {
+      const asset = new CADAsset()
+      asset.on('error', (event) => {
+        console.warn('Error' + event)
       })
-      renderer.frameAll()
-    })
-    asset.getGeometryLibrary().on('loaded', () => {
-      renderer.frameAll()
-    })
-    scene.getRoot().addChild(asset)
-    asset.getParameter('FilePath').setValue(url)
+      asset.on('loaded', () => {
+        const materials = asset.getMaterialLibrary().getMaterials()
+        materials.forEach((material) => {
+          const baseColor = material.getParameter('BaseColor')
+          if (baseColor) baseColor.setValue(baseColor.getValue().toGamma())
+        })
+        renderer.frameAll()
+      })
+      asset.getGeometryLibrary().on('loaded', () => {
+        renderer.frameAll()
+      })
+      assets.addChild(asset)
+      asset.getParameter('FilePath').setValue(url)
+      return asset
+    }
+
+    if (urlParams.has('zcad')) {
+      url = urlParams.get('zcad')
+    }
+    if (url) {
+      loadAsset(url)
+    }
     /** CAD END */
 
     /** COLLAB START*/
@@ -232,6 +251,56 @@
       APP_DATA.update(() => appData)
     })
     /** COLLAB END */
+
+    /** EMBED MESSAGING START*/
+    const client = new ChannelMessenger()
+
+    client.on('setBackgroundColor', (data) => {
+      const color = new Color(data.color)
+      scene.getSettings().getParameter('BackgroundColor').setValue(color)
+
+      if (data._id) {
+        client.send(data._id, { done: true })
+      }
+    })
+
+    client.on('loadCADFile', (data) => {
+      if (!data.keep) {
+        assets.removeAllChildren()
+      }
+
+      const asset = loadAsset(data.zcad)
+      asset.once('loaded', () => {
+        if (data._id) {
+          const tree = buildTree(asset)
+          client.send(data._id, { modelStructure: tree })
+        }
+      })
+    })
+    client.on('getModelStructure', (data) => {
+      if (data._id) {
+        const tree = buildTree(assets)
+        client.send(data._id, { modelStructure: tree })
+      }
+    })
+
+    client.on('unloadCADFile', (data) => {
+      console.log('unloadCADFile', data)
+
+      assets.removeChildByName(data.name)
+
+      if (data._id) {
+        client.send(data._id, { done: true })
+      }
+    })
+
+    selectionManager.on('selectionChanged', (event) => {
+      const { selection } = event
+      const selectionPaths = []
+      selection.forEach((item) => selectionPaths.push(item.getPath().slice(2)))
+      client.send('selectionChanged', { selection: selectionPaths })
+    })
+    /** EMBED MESSAGING END */
 
     APP_DATA.set(appData)
   })

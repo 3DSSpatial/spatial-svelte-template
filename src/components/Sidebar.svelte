@@ -8,7 +8,7 @@
     APP_DATA.subscribe((appData) => {
       if (!appData || !treeView) return
       treeView.selectionManager = appData.selectionManager
-      treeView.items = [appData.scene.getRoot()]
+      treeView.items = [appData.assets]
     })
   })
 </script>
