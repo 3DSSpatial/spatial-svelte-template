@@ -192,7 +192,13 @@
     /** CAD START */
     renderer.addPass(new GLCADPass())
 
-    const url = '/assets/gear_box_final_asm-visu.zcad'
+    let url = '/assets/gear_box_final_asm-visu.zcad'
+    // let url = '/assets/Hospital/Autodesk_Hospital_Structural.zcad'
+    // let url = '/assets/Hospital/Autodesk_Hospital_HVAC.zcad'
+
+    if (urlParams.has('ps')) {
+      url = urlParams.get('ps')
+    }
     const asset = new CADAsset()
     asset.on('error', (event) => {
       console.warn('Error' + event)
@@ -200,9 +206,8 @@
     asset.on('loaded', () => {
       const materials = asset.getMaterialLibrary().getMaterials()
       materials.forEach((material) => {
-        if (material.getShaderName() == 'SimpleSurfaceShader') {
-          material.setShaderName('StandardSurfaceShader')
-        }
+        const baseColor = material.getParameter('BaseColor')
+        if (baseColor) baseColor.setValue(baseColor.getValue().toGamma())
       })
       renderer.frameAll()
     })
