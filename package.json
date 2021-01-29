@@ -2,7 +2,8 @@
   "name": "zea-svelte-template",
   "version": "1.0.0",
   "dependencies": {
-    "sha256": "^0.2.0"
+    "sha256": "^0.2.0",
+    "svelte-accessible-dialog": "^2.1.2"
   },
   "devDependencies": {
     "@rollup/plugin-commonjs": "^15.0.0",

@@ -3,7 +3,10 @@
   import { auth, APP_DATA } from '../helpers'
   import '../helpers/fps-display'
   import Sidebar from '../components/Sidebar.svelte'
-  // import { get } from 'http'
+  import Menu from '../components/ContextMenu/Menu.svelte'
+  import MenuOption from '../components/ContextMenu/MenuOption.svelte'
+  import Dialog from '../components/Dialog.svelte'
+  import SearchTool from '../components/SearchTool.svelte'
 
   const {
     Color,
@@ -29,11 +32,23 @@
   let fpsContainer
   let progressBar
 
+  const filterItemSelection = (item) => {
+    // Propagate selections deep in the tree up to the part body.
+    while (
+      item.getName().startsWith('Mesh') ||
+      item.getName().startsWith('Edge') ||
+      item.getName().startsWith('TreeItem')
+    )
+      item = item.getOwner()
+    return item
+  }
+
   onMount(() => {
     const urlParams = new URLSearchParams(window.location.search)
 
     const renderer = new GLRenderer(canvas, {
       debugGeomIds: false,
+      xrCompatible: false,
     })
     const scene = new Scene()
 
@@ -75,15 +90,7 @@
 
     appData.selectionManager = selectionManager
     const selectionTool = new SelectionTool(appData)
-    selectionTool.setSelectionFilter((item) => {
-      while (
-        item.getName().startsWith('Mesh') ||
-        item.getName().startsWith('Edge') ||
-        item.getName().startsWith('TreeItem')
-      )
-        item = item.getOwner()
-      return item
-    })
+    selectionTool.setSelectionFilter(filterItemSelection)
     toolManager.registerTool('SelectionTool', selectionTool)
     toolManager.registerTool('CameraManipulator', cameraManipulator)
 
@@ -115,13 +122,28 @@
     /** SELECTION END */
 
     /** UX START */
-    renderer.getViewport().on('pointerDownOnGeom', (event) => {
+    renderer.getViewport().on('pointerDown', (event) => {
       // Detect a right click
-      if (event.button == 2) {
-        console.log(event)
+      if (event.button == 2 && event.intersectionData) {
+        const item = filterItemSelection(event.intersectionData.geomItem)
+        openMenu(event, item)
         // stop propagation to prevent the camera manipulator from handling the event.
         event.stopPropagation()
       }
+    })
+
+    let highlightedItem
+    renderer.getViewport().on('pointerOverGeom', (event) => {
+      highlightedItem = filterItemSelection(event.intersectionData.geomItem)
+      highlightedItem.addHighlight(
+        'pointerOverGeom',
+        new Color(0.8, 0.8, 0.8, 0.1),
+        true
+      )
+    })
+    renderer.getViewport().on('pointerLeaveGeom', (event) => {
+      highlightedItem.removeHighlight('pointerOverGeom', true)
+      highlightedItem = null
     })
     renderer.getViewport().on('pointerDoublePressed', (event) => {
       console.log(event)
@@ -170,7 +192,13 @@
     /** CAD START */
     renderer.addPass(new GLCADPass())
 
-    const url = '/assets/gear_box_final_asm-visu.zcad'
+    let url = '/assets/gear_box_final_asm-visu.zcad'
+    // let url = '/assets/Hospital/Autodesk_Hospital_Structural.zcad'
+    // let url = '/assets/Hospital/Autodesk_Hospital_HVAC.zcad'
+
+    if (urlParams.has('ps')) {
+      url = urlParams.get('ps')
+    }
     const asset = new CADAsset()
     asset.on('error', (event) => {
       console.warn('Error' + event)
@@ -178,9 +206,8 @@
     asset.on('loaded', () => {
       const materials = asset.getMaterialLibrary().getMaterials()
       materials.forEach((material) => {
-        if (material.getShaderName() == 'SimpleSurfaceShader') {
-          material.setShaderName('StandardSurfaceShader')
-        }
+        const baseColor = material.getParameter('BaseColor')
+        if (baseColor) baseColor.setValue(baseColor.getValue().toGamma())
       })
       renderer.frameAll()
     })
@@ -208,24 +235,64 @@
 
     APP_DATA.set(appData)
   })
-</script>
 
-<style>
-  #renderer {
-    height: 100%;
-    width: 100%;
+  let isMenuVisible = false
+  let pos = { x: 0, y: 0 }
+  let contextItem
+  const openMenu = (event, item) => {
+    contextItem = item
+    pos = { x: event.clientX, y: event.clientY }
+    isMenuVisible = true
   }
-</style>
+  const closeMenu = () => {
+    isMenuVisible = false
+  }
+  let isDialogOpen = false
+  const closeDialog = () => {
+    isDialogOpen = false
+  }
+</script>
 
 <zea-layout add-cells="AB" borders cell-a-size="250" show-resize-handles="A">
   <div slot="A" class="h-full w-full">
-    <Sidebar />
+    <zea-tabs slot="a" orientation="horizontal">
+      <div slot="tab-bar">Assembly</div>
+      <div class="tab-content">
+        <Sidebar />
+      </div>
+
+      <div slot="tab-bar">Search</div>
+      <div class="tab-content">
+        <SearchTool />
+      </div>
+    </zea-tabs>
   </div>
   <div slot="B" class="h-full w-full">
-    <canvas id="renderer" bind:this={canvas} />
+    <canvas class="h-full w-full" bind:this={canvas} />
     <div class="relative">
       <zea-progress-bar bind:this={progressBar} />
     </div>
     <div bind:this={fpsContainer} />
   </div>
 </zea-layout>
+
+<Dialog isOpen={isDialogOpen} close={closeDialog} {contextItem} />
+
+{#if isMenuVisible}
+  <Menu {...pos} on:click={closeMenu} on:clickoutside={closeMenu}>
+    <MenuOption
+      text="Hide"
+      on:click={() => {
+        contextItem.getParameter('Visible').setValue(false)
+      }} />
+    <MenuOption
+      text="Properties"
+      on:click={() => {
+        if (contextItem) {
+          console.log('CurrentSelected Item :', contextItem.rivianAttributes)
+          isDialogOpen = true
+          closeMenu()
+        }
+      }} />
+  </Menu>
+{/if}
