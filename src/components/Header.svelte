@@ -16,9 +16,30 @@
   let renderer
   let toolManager
   let cameraManipulator
+  let undoRedoManager
   let userData
   let session
   let sessionSync
+
+  document.addEventListener('keydown', (event) => {
+    switch (event.key.toLowerCase()) {
+      case 'f':
+        if (renderer) renderer.frameAll()
+        break
+      case 's':
+        if (toolManager) {
+          toggleSelectMode()
+          toggleSelectModeMenuItem.checked = selectionEnabled
+        }
+        break
+      case 'z':
+        if (event.ctrlKey && undoRedoManager) undoRedoManager.undo()
+        break
+      case 'y':
+        if (event.ctrlKey && undoRedoManager) undoRedoManager.redo()
+        break
+    }
+  })
 
   onMount(() => {
     if (session) {
@@ -34,29 +55,7 @@
       renderer = appData.renderer
       toolManager = appData.toolManager
       cameraManipulator = appData.cameraManipulator
-
-      document.addEventListener('keydown', (event) => {
-        switch (event.key.toLowerCase()) {
-          case 'f':
-            renderer.frameAll()
-            break
-          case 's':
-            toggleSelectMode()
-            toggleSelectModeMenuItem.checked = selectionEnabled
-            break
-          case 'z':
-            if (event.ctrlKey) {
-              appData.undoRedoManager.undo()
-            }
-            break
-          case 'y':
-            if (event.ctrlKey) {
-              appData.undoRedoManager.redo()
-            }
-            break
-        }
-      })
-
+      undoRedoManager = appData.undoRedoManager
       {
         const { renderer } = $APP_DATA
         renderer

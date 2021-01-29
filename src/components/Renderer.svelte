@@ -29,14 +29,24 @@
   let canvas
   let fpsContainer
   let progressBar
-  let isMenuVisible = false
-  let pos = { x: 0, y: 0 }
+
+  const filterItemSelection = (item) => {
+    // Propagate selections deep in the tree up to the part body.
+    while (
+      item.getName().startsWith('Mesh') ||
+      item.getName().startsWith('Edge') ||
+      item.getName().startsWith('TreeItem')
+    )
+      item = item.getOwner()
+    return item
+  }
 
   onMount(() => {
     const urlParams = new URLSearchParams(window.location.search)
 
     const renderer = new GLRenderer(canvas, {
       debugGeomIds: false,
+      xrCompatible: false,
     })
     const scene = new Scene()
 
@@ -78,15 +88,7 @@
 
     appData.selectionManager = selectionManager
     const selectionTool = new SelectionTool(appData)
-    selectionTool.setSelectionFilter((item) => {
-      while (
-        item.getName().startsWith('Mesh') ||
-        item.getName().startsWith('Edge') ||
-        item.getName().startsWith('TreeItem')
-      )
-        item = item.getOwner()
-      return item
-    })
+    selectionTool.setSelectionFilter(filterItemSelection)
     toolManager.registerTool('SelectionTool', selectionTool)
     toolManager.registerTool('CameraManipulator', cameraManipulator)
 
@@ -118,10 +120,11 @@
     /** SELECTION END */
 
     /** UX START */
-    renderer.getViewport().on('pointerDownOnGeom', (event) => {
+    renderer.getViewport().on('pointerDown', (event) => {
       // Detect a right click
-      if (event.button == 2) {
-        console.log(event)
+      if (event.button == 2 && event.intersectionData) {
+        const item = filterItemSelection(event.intersectionData.geomItem)
+        openMenu(event, item)
         // stop propagation to prevent the camera manipulator from handling the event.
         event.stopPropagation()
       }
@@ -212,8 +215,12 @@
     APP_DATA.set(appData)
   })
 
-  const openMenu = (e) => {
-    pos = { x: e.clientX, y: e.clientY }
+  let isMenuVisible = false
+  let pos = { x: 0, y: 0 }
+  let contextItem
+  const openMenu = (event, item) => {
+    contextItem = item
+    pos = { x: event.clientX, y: event.clientY }
     isMenuVisible = true
   }
 
@@ -227,10 +234,7 @@
     <Sidebar />
   </div>
   <div slot="B" class="h-full w-full">
-    <canvas
-      class="h-full w-full"
-      bind:this={canvas}
-      on:contextmenu|preventDefault={openMenu} />
+    <canvas class="h-full w-full" bind:this={canvas} />
     <div class="relative">
       <zea-progress-bar bind:this={progressBar} />
     </div>
@@ -241,14 +245,10 @@
 {#if isMenuVisible}
   <Menu {...pos} on:click={closeMenu} on:clickoutside={closeMenu}>
     <MenuOption
-      text="Say Foo"
+      text="Hide"
       on:click={() => {
-        alert('Foo')
+        contextItem.getParameter('Visible').setValue(false)
       }} />
-    <MenuOption
-      text="Say Bar"
-      on:click={() => {
-        alert('Bar')
-      }} />
+    <MenuOption text="Properties" on:click={() => {}} />
   </Menu>
 {/if}

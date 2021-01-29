@@ -34,7 +34,12 @@
     display: grid;
     border: 1px solid #0003;
     box-shadow: 2px 2px 5px 0px #0002;
-    background: white;
+    background: var(--color-background-1);
+
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
   }
 </style>
 

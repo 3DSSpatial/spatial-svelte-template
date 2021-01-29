@@ -17,6 +17,8 @@
 
 <style>
   div {
+    background: var(--color-background-1);
+    color: var(--color-foreground-1);
     padding: 4px 15px;
     cursor: default;
     font-size: 14px;
@@ -25,7 +27,7 @@
     grid-gap: 5px;
   }
   div:hover {
-    background: #0002;
+    background: var(--color-background-2);
   }
 </style>
 
