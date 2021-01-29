@@ -9,7 +9,9 @@
 ## Live Demo
 
 This template has been deployed to Vercel for a live demo.
-Password: zea
+
+> Password: zea
+
 You can change the password in your own deployments, or connect to an authentication service.
 See below.
 
