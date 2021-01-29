@@ -2,13 +2,13 @@
 
 ## Embed View
 
-> http://docs.zea.live/ZeaComposer-Builds/embed.html
+> http://docs.zea.live/zea-svelte-template/embed.html
 
 The Embed view shows how Web Composer would be displayed within the context of another application. The host application can then control the embedded Web Composer via the JSON API and the Channel Messenger classes.
 
 # Getting Started
 
-To test zea-svelt-template embedded on your system, clone this repository and run a static http server in the root directory of the project.
+To test zea-svelt-template embedded on your system, clone this repository and run a static http server in the docs directory of the project.
 
 You may need to install a static server on your system. The http-server npm package is a good basic server.
 
