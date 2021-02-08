@@ -131,7 +131,7 @@ the Zea CAD library comes pre-integrated and a sample zcad file is loaded.
 
 ```javascript
 const asset = new CADAsset()
-asset.getGeometryLibrary().on('loaded', () => {
+asset.on('loaded', () => {
   renderer.frameAll()
 })
 scene.getRoot().addChild(asset)
@@ -139,6 +139,43 @@ asset.getParameter('FilePath').setValue('/assets/HC_SRO4.zcad')
 ```
 
 The code above loads the sample cad file.
+
+# Installing your own plugins
+
+If you have developed a plugin using the zea-plugin-template, and you wish to install it into the zea svelte template you have a couple of options.
+
+1. Copy the built plugin file into the svelte template assets folder.
+   - ./assets
+2. Create a symlink between your plugin/dist folder and a the assets folder so you can keep iterating on the plugin.
+   e.g. on Windows.
+
+```cmd
+(Windows Command script)
+mklink /J "assets/my-plugin " "path/to/my-plugin/dist"
+```
+
+3. Publish your plugin to npm.
+
+- Use on of the package servers, such as unpkg, or jsdeliver to access your plugin
+- install your plugin into the svelte app using npm install, and then copy the plugin into the build folder using the [rollup-plugin-copy](https://www.npmjs.com/package/rollup-plugin-copy)
+
+Then add a script tag to the \_\_app.html file to load your plugin.
+
+```html
+<script crossorigin src="my-plugin/index.umd.js"></script>
+```
+
+# Script tags instead of esm imports
+
+> Why don't we use esm imports to load the engine and its plugins?
+
+Yes we would like to do that eventually, but there are a few issues holding us back.
+
+1. Bundlers like webpack and rollup have a terrible time at understanding diamond shaped dependency trees. I will explain by example. Package B depends on package A and package C depends on both package A and B. If we import B and C, A should be imported. however, if in the package.json, the version dependency is even slightly different, even with valid version rules that should mean both B and C should be compatible with the same version of A, we find that the bundler will often try to load multiple different versions of A. e.g. A version 2.3.1, and A version 2.3.0. When A is our engine, this causes all sorts of obscure problems. For now, until we can guarantee that the bundler will load exactly one copy of our engine, we have to stick with script tags.
+
+2. Bundlers and WASM don't mix. We leverage WASM in our engine, and wasm requires a fetch of the wasm file which is included in our package. Currently the bundlers are unable to include the wasm file and so we have to fallback to fetching the wasm file from some predefined location, instead of the package location in your node_modules folder. Not ideal, but we hope this issue to be resolved soon as wasm imports are included in the spec.
+
+We hope that these issues are resolved over time. If you have any suggestions on alternative methods to what we have presented, please feel free to reach out and let us know your thoughts.
 
 # Deploying
 
