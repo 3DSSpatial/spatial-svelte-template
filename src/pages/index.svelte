@@ -4,25 +4,30 @@
 
   import Header from '../components/Header.svelte'
   import Renderer from '../components/Renderer.svelte'
-  import { auth } from '../helpers'
 
-  let userData
-  let session
+  import { auth } from '../helpers/auth'
+
+  let shouldShowLayout
 
   onMount(async () => {
     const isAuthenticated = await auth.isAuthenticated()
-    if (!isAuthenticated) {
+
+    if (isAuthenticated) {
+      shouldShowLayout = true
+    } else {
       const params = new URLSearchParams(location.search)
       $redirect('/login?' + params.toString())
     }
   })
 </script>
 
-<zea-layout orientation="vertical" cell-a-size="50" add-cells="AB" borders>
-  <div slot="A" class="h-full w-full">
-    <Header />
-  </div>
-  <div slot="B" class="h-full w-full">
-    <Renderer />
-  </div>
-</zea-layout>
+{#if shouldShowLayout}
+  <zea-layout orientation="vertical" cell-a-size="50" add-cells="AB" borders>
+    <div slot="A" class="h-full w-full">
+      <Header />
+    </div>
+    <div slot="B" class="h-full w-full">
+      <Renderer />
+    </div>
+  </zea-layout>
+{/if}

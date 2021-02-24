@@ -8,7 +8,6 @@ import { copySync, removeSync } from 'fs-extra'
 import { spassr } from 'spassr'
 import getConfig from '@roxi/routify/lib/utils/config'
 import autoPreprocess from 'svelte-preprocess'
-import postcssImport from 'postcss-import'
 import { injectManifest } from 'rollup-plugin-workbox'
 
 const { distDir } = getConfig() // use Routify's distDir for SSOT
@@ -30,7 +29,12 @@ const serve = () => ({
       script: `${buildDir}/main.js`,
     }
     spassr({ ...options, port: 5000 })
-    spassr({ ...options, ssr: true, port: 5005, ssrOptions: { inlineDynamicImports: true, dev: true } })
+    spassr({
+      ...options,
+      ssr: true,
+      port: 5005,
+      ssrOptions: { inlineDynamicImports: true, dev: true },
+    })
   },
 })
 const copyToDist = () => ({

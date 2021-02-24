@@ -5,7 +5,8 @@
   const { CameraManipulator } = window.zeaEngine
   const { ToolManager } = window.zeaUx
 
-  import { auth, APP_DATA } from '../helpers'
+  import { auth } from '../helpers/auth'
+  import { APP_DATA } from '../stores/appData'
 
   let userChipSet
   let userChip
@@ -119,22 +120,23 @@
   // ////////////////////////////////////
   // UX
 
-  function handleFrameAll() {
+  const handleFrameAll = () => {
     const { renderer } = $APP_DATA
     renderer.frameAll()
   }
-  function handleUndo() {
+
+  const handleUndo = () => {
     const { undoRedoManager } = $APP_DATA
     undoRedoManager.undo()
   }
 
-  function handleRedo() {
+  const handleRedo = () => {
     const { undoRedoManager } = $APP_DATA
     undoRedoManager.redo()
   }
 
   let selectionEnabled = false
-  function toggleSelectMode() {
+  const toggleSelectMode = () => {
     if (!selectionEnabled) {
       toolManager.pushTool('SelectionTool')
       selectionEnabled = true
@@ -145,7 +147,7 @@
   }
 
   let wasdEnabled = false
-  function toggleWASDWalkMode() {
+  const toggleWASDWalkMode = () => {
     wasdEnabled = !wasdEnabled
     cameraManipulator.enabledWASDWalkMode = wasdEnabled
   }
@@ -153,7 +155,7 @@
   // ////////////////////////////////////
   // Collab
 
-  function handleDA() {
+  const handleDA = () => {
     auth.getUserData().then((userData) => {
       if (!userData) {
         return
@@ -172,7 +174,7 @@
   // ////////////////////////////////////
   // VR
 
-  function handleLaunchVR() {
+  const handleLaunchVR = () => {
     const { renderer } = $APP_DATA
 
     renderer
@@ -185,7 +187,7 @@
       })
   }
 
-  function handleToggleVRSpatatorMode() {
+  const handleToggleVRSpatatorMode = () => {
     const { renderer } = $APP_DATA
     renderer.getXRViewport().then((xrViewport) => {
       xrViewport.spectatorMode = !xrViewport.spectatorMode
@@ -193,40 +195,14 @@
   }
 
   const handleSignOut = async () => {
-    if (session) session.leaveRoom()
+    if (session) {
+      session.leaveRoom()
+    }
+
     await auth.signOut()
     $redirect('/login')
   }
 </script>
-
-<style>
-  .logo {
-    width: 5em;
-  }
-
-  .divider {
-    border-right: 2px solid var(--color-grey-1);
-    height: calc(100% - 2px);
-  }
-
-  .user-container {
-    height: 100%;
-    width: 50px;
-    display: flex;
-    align-items: center;
-  }
-
-  .user-set-container {
-    display: flex;
-    align-items: center;
-    width: 250px;
-  }
-
-  .menu-item {
-    display: flex;
-    align-items: center;
-  }
-</style>
 
 <div class="flex items-center w-full h-full px-2">
   <div class="logo flex items-center h-full mr-4">
@@ -258,14 +234,16 @@
             switch="true"
             hotkey="s"
             bind:this={toggleSelectModeMenuItem}
-            onclick={toggleSelectMode}>
+            onclick={toggleSelectMode}
+          >
             <zea-icon size="16" />
             Toggle Selection
           </zea-menu-item>
           <zea-menu-item
             class="menu-item"
             switch="true"
-            onclick={toggleWASDWalkMode}>
+            onclick={toggleWASDWalkMode}
+          >
             <zea-icon size="16" />
             WASD Walk Mode
           </zea-menu-item>
@@ -286,14 +264,16 @@
             class="menu-item"
             bind:this={vrToggleMenuItem}
             switch="true"
-            onclick={handleLaunchVR}>
+            onclick={handleLaunchVR}
+          >
             <zea-icon icon="recording-outline" size="16" />
             Launch VR
           </zea-menu-item>
           <zea-menu-item
             switch="true"
             onclick={handleToggleVRSpatatorMode}
-            bind:this={vrSpectatorMenuItem}>
+            bind:this={vrSpectatorMenuItem}
+          >
             Spectator Mode
           </zea-menu-item>
         </zea-menu-subitems>
@@ -311,3 +291,32 @@
     <zea-user-chip bind:this={userChip} profile-card-align="right" />
   </div>
 </div>
+
+<style>
+  .logo {
+    width: 5em;
+  }
+
+  .divider {
+    border-right: 2px solid var(--color-grey-1);
+    height: calc(100% - 2px);
+  }
+
+  .user-container {
+    height: 100%;
+    width: 50px;
+    display: flex;
+    align-items: center;
+  }
+
+  .user-set-container {
+    display: flex;
+    align-items: center;
+    width: 250px;
+  }
+
+  .menu-item {
+    display: flex;
+    align-items: center;
+  }
+</style>

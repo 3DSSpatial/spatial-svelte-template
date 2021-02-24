@@ -1,6 +1,8 @@
 <script>
   import { onMount } from 'svelte'
-  import { APP_DATA } from '../helpers'
+
+  import { APP_DATA } from '../stores/appData'
+
   const { AssetItem, Color } = window.zeaEngine
 
   let searchInput

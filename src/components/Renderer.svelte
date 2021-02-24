@@ -1,12 +1,15 @@
 <script>
   import { onMount } from 'svelte'
-  import { auth, APP_DATA } from '../helpers'
+
   import '../helpers/fps-display'
   import Sidebar from '../components/Sidebar.svelte'
   import Menu from '../components/ContextMenu/Menu.svelte'
   import MenuOption from '../components/ContextMenu/MenuOption.svelte'
   import Dialog from '../components/Dialog.svelte'
   import SearchTool from '../components/SearchTool.svelte'
+
+  import { auth } from '../helpers/auth'
+  import { APP_DATA } from '../stores/appData'
 
   import { ChannelMessenger } from '../ChannelMessenger.js'
   import buildTree from '../helpers/buildTree'
@@ -353,7 +356,8 @@
       text="Hide"
       on:click={() => {
         contextItem.getParameter('Visible').setValue(false)
-      }} />
+      }}
+    />
     <MenuOption
       text="Properties"
       on:click={() => {
@@ -362,6 +366,7 @@
           isDialogOpen = true
           closeMenu()
         }
-      }} />
+      }}
+    />
   </Menu>
 {/if}
