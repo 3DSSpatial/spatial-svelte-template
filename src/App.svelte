@@ -1,8 +1,9 @@
 <script>
   import { Router } from '@roxi/routify'
   import { routes } from '../.routify/routes'
-  import Serviceworker from './Serviceworker.svelte'
 </script>
+
+<Router {routes} />
 
 <style global>
   @import '../assets/global.css';
@@ -11,7 +12,3 @@
   @tailwind components;
   @tailwind utilities;
 </style>
-
-<Router {routes} />
-
-<Serviceworker />

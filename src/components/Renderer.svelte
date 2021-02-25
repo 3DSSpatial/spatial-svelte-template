@@ -39,9 +39,6 @@
   let fpsContainer
   let progressBar
 
-  const urlParams = new URLSearchParams(window.location.search)
-  const embeddedMode = urlParams.has('embedded')
-
   const filterItemSelection = (item) => {
     // Propagate selections deep in the tree up to the part body.
     while (
@@ -54,6 +51,8 @@
   }
 
   onMount(() => {
+    const urlParams = new URLSearchParams(window.location.search)
+
     const renderer = new GLRenderer(canvas, {
       debugGeomIds: urlParams.has('debugGeomIds'),
       xrCompatible: false,
@@ -207,14 +206,10 @@
     /** CAD START */
     renderer.addPass(new GLCADPass())
 
-    let url = embeddedMode ? null : '/assets/gear_box_final_asm-visu.zcad'
-    // let url = '/assets/Hospital/Autodesk_Hospital_Structural.zcad'
-    // let url = '/assets/Hospital/Autodesk_Hospital_HVAC.zcad'
-
     const loadAsset = (url) => {
       const asset = new CADAsset()
       asset.on('error', (event) => {
-        console.warn('Error' + event)
+        console.warn('Error:', event)
       })
       asset.on('loaded', () => {
         const materials = asset.getMaterialLibrary().getMaterials()
@@ -232,12 +227,11 @@
       return asset
     }
 
-    if (urlParams.has('zcad')) {
-      url = urlParams.get('zcad')
-    }
-    if (url) {
-      loadAsset(url)
-    }
+    const url = urlParams.has('zcad')
+      ? urlParams.get('zcad')
+      : '/assets/gear_box_final_asm-visu.zcad'
+
+    loadAsset(url)
     /** CAD END */
 
     /** COLLAB START*/
