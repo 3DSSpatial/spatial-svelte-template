@@ -1,21 +1,14 @@
 <script>
-  import { onMount } from 'svelte'
+  import TreeView from '../components/TreeView.svelte'
 
-  import { APP_DATA } from '../stores/appData'
+  import { assets } from '../stores/assets.js'
+  import { selectionManager } from '../stores/selectionManager.js'
 
-  let treeViewEl
-
-  onMount(() => {
-    APP_DATA.subscribe((appData) => {
-      if (!appData || !treeViewEl) return
-      treeViewEl.selectionManager = appData.selectionManager
-      treeViewEl.items = [appData.assets]
-    })
-  })
+  $: treeItems = [$assets]
 </script>
 
 <div class="h-full w-full">
   <zea-scroll-pane>
-    <zea-tree-view id="zea-tree-view" bind:this={treeViewEl} />
+    <TreeView items={treeItems} selectionManager={$selectionManager} />
   </zea-scroll-pane>
 </div>

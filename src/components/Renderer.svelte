@@ -9,7 +9,11 @@
   import SearchTool from '../components/SearchTool.svelte'
 
   import { auth } from '../helpers/auth'
+
   import { APP_DATA } from '../stores/appData'
+  import { assets } from '../stores/assets.js'
+  import { selectionManager } from '../stores/selectionManager.js'
+  import { scene } from '../stores/scene.js'
 
   import { ChannelMessenger } from '../ChannelMessenger.js'
   import buildTree from '../helpers/buildTree'
@@ -57,7 +61,8 @@
       debugGeomIds: urlParams.has('debugGeomIds'),
       xrCompatible: false,
     })
-    const scene = new Scene()
+
+    $scene = new Scene()
 
     // Assigning an Environment Map enables PBR lighting for niceer shiny surfaces.
     if (!SystemDesc.isMobileDevice) {
@@ -66,24 +71,25 @@
         .getParameter('FilePath')
         .setValue(`/assets/HDR_029_Sky_Cloudy_Ref.vlenv`)
       envMap.getParameter('HeadLightMode').setValue(true)
-      scene.getSettings().getParameter('EnvMap').setValue(envMap)
+      $scene.getSettings().getParameter('EnvMap').setValue(envMap)
     }
 
-    scene.setupGrid(10, 10)
-    scene
+    $scene.setupGrid(10, 10)
+    $scene
       .getSettings()
       .getParameter('BackgroundColor')
       .setValue(new Color(0.35, 0.35, 0.35, 1))
-    renderer.setScene(scene)
+    renderer.setScene($scene)
 
     const appData = {}
 
     appData.renderer = renderer
-    appData.scene = scene
+    appData.scene = $scene
 
-    const assets = new TreeItem('Assets')
-    scene.getRoot().addChild(assets)
-    appData.assets = assets
+    $assets = new TreeItem('Assets')
+    appData.assets = $assets
+
+    $scene.getRoot().addChild($assets)
 
     /** UNDO START */
     const undoRedoManager = UndoRedoManager.getInstance()
@@ -94,12 +100,14 @@
     const cameraManipulator = renderer.getViewport().getManipulator()
     appData.cameraManipulator = cameraManipulator
     const toolManager = new ToolManager(appData)
-    const selectionManager = new SelectionManager(appData, {
+    $selectionManager = new SelectionManager(appData, {
       enableXfoHandles: false,
     })
-    selectionManager.showHandles(true)
 
-    appData.selectionManager = selectionManager
+    appData.selectionManager = $selectionManager
+
+    $selectionManager.showHandles(true)
+
     const selectionTool = new SelectionTool(appData)
     selectionTool.setSelectionFilter(filterItemSelection)
     toolManager.registerTool('SelectionTool', selectionTool)
@@ -114,10 +122,10 @@
 
     selectionColor.a = 0.1
     const subtreeColor = selectionColor.lerp(new Color(1, 1, 1, 0), 0.5)
-    appData.selectionManager.selectionGroup
+    $selectionManager.selectionGroup
       .getParameter('HighlightColor')
       .setValue(selectionColor)
-    appData.selectionManager.selectionGroup
+    $selectionManager.selectionGroup
       .getParameter('SubtreeHighlightColor')
       .setValue(subtreeColor)
 
@@ -137,7 +145,7 @@
       // Detect a right click
       if (event.button == 0 && event.intersectionData) {
         const item = filterItemSelection(event.intersectionData.geomItem)
-        appData.selectionManager.toggleItemSelection(item)
+        $selectionManager.toggleItemSelection(item)
       } else if (event.button == 2 && event.intersectionData) {
         const item = filterItemSelection(event.intersectionData.geomItem)
         openMenu(event, item)
@@ -222,7 +230,7 @@
       asset.getGeometryLibrary().on('loaded', () => {
         renderer.frameAll()
       })
-      assets.addChild(asset)
+      $assets.addChild(asset)
       asset.getParameter('FilePath').setValue(url)
       return asset
     }
@@ -242,9 +250,11 @@
       const session = new Session(userData, SOCKET_URL)
       session.joinRoom(ROOM_ID)
       const sessionSync = new SessionSync(session, appData, userData, {})
+
       appData.userData = userData
       appData.session = session
       appData.sessionSync = sessionSync
+
       APP_DATA.update(() => appData)
     })
     /** COLLAB END */
@@ -254,7 +264,7 @@
 
     client.on('setBackgroundColor', (data) => {
       const color = new Color(data.color)
-      scene.getSettings().getParameter('BackgroundColor').setValue(color)
+      $scene.getSettings().getParameter('BackgroundColor').setValue(color)
 
       if (data._id) {
         client.send(data._id, { done: true })
@@ -263,7 +273,7 @@
 
     client.on('loadCADFile', (data) => {
       if (!data.keep) {
-        assets.removeAllChildren()
+        $assets.removeAllChildren()
       }
 
       const asset = loadAsset(data.zcad)
@@ -274,9 +284,10 @@
         }
       })
     })
+
     client.on('getModelStructure', (data) => {
       if (data._id) {
-        const tree = buildTree(assets)
+        const tree = buildTree($assets)
         client.send(data._id, { modelStructure: tree })
       }
     })
@@ -284,14 +295,14 @@
     client.on('unloadCADFile', (data) => {
       console.log('unloadCADFile', data)
 
-      assets.removeChildByName(data.name)
+      $assets.removeChildByName(data.name)
 
       if (data._id) {
         client.send(data._id, { done: true })
       }
     })
 
-    selectionManager.on('selectionChanged', (event) => {
+    $selectionManager.on('selectionChanged', (event) => {
       const { selection } = event
       const selectionPaths = []
       selection.forEach((item) => selectionPaths.push(item.getPath().slice(2)))

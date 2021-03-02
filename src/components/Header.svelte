@@ -6,6 +6,7 @@
   const { ToolManager } = window.zeaUx
 
   import { auth } from '../helpers/auth'
+
   import { APP_DATA } from '../stores/appData'
 
   let userChipSet
