@@ -1,4 +1,9 @@
-<div class="mx-3 mt-3">
+<script>
+  import SplitPane from '../components/SplitPane.svelte'
+  import Pane from '../components/Pane.svelte'
+</script>
+
+<div class="m-3">
   <h1 class="mb-3 text-2xl">Examples</h1>
 
   <ul class="underline text-blue-500">
