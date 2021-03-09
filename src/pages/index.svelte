@@ -22,12 +22,8 @@
 </script>
 
 {#if shouldShowLayout}
-  <zea-layout orientation="vertical" cell-a-size="50" add-cells="AB" borders>
-    <div slot="A" class="h-full w-full">
-      <Header />
-    </div>
-    <div slot="B" class="h-full w-full">
-      <Renderer />
-    </div>
-  </zea-layout>
+  <div class="flex flex-col h-full">
+    <Header />
+    <Renderer />
+  </div>
 {/if}

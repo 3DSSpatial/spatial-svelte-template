@@ -8,6 +8,7 @@
   import { auth } from '../helpers/auth'
 
   import { APP_DATA } from '../stores/appData'
+  import { ui } from '../stores/ui.js'
 
   let userChipSet
   let userChip
@@ -203,9 +204,19 @@
     await auth.signOut()
     $redirect('/login')
   }
+
+  const handleClickMenuToggle = () => {
+    $ui.shouldShowDrawer = !$ui.shouldShowDrawer
+  }
 </script>
 
-<div class="flex items-center w-full h-full px-2">
+<div class="Header flex items-center px-2 text-gray-200">
+  <span
+    class="material-icons cursor-default mr-2"
+    on:click={handleClickMenuToggle}
+  >
+    menu
+  </span>
   <div class="logo flex items-center h-full mr-4">
     <img src="/images/logo-zea.svg" alt="logo" />
   </div>

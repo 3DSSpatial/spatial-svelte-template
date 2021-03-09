@@ -14,6 +14,7 @@
   import { assets } from '../stores/assets.js'
   import { selectionManager } from '../stores/selectionManager.js'
   import { scene } from '../stores/scene.js'
+  import { ui } from '../stores/ui.js'
 
   import { ChannelMessenger } from '../ChannelMessenger.js'
   import buildTree from '../helpers/buildTree'
@@ -204,11 +205,9 @@
     /** PROGRESSBAR END */
 
     /** FPS DISPLAY START */
-    {
-      const fpsDisplay = document.createElement('fps-display')
-      fpsDisplay.renderer = renderer
-      fpsContainer.appendChild(fpsDisplay)
-    }
+    const fpsDisplay = document.createElement('fps-display')
+    fpsDisplay.renderer = renderer
+    fpsContainer.appendChild(fpsDisplay)
     /** FPS DISPLAY END */
 
     /** CAD START */
@@ -330,28 +329,36 @@
   }
 </script>
 
-<zea-layout add-cells="AB" borders cell-a-size="250" show-resize-handles="A">
-  <div slot="A" class="h-full w-full">
-    <zea-tabs slot="a" orientation="horizontal">
-      <div slot="tab-bar">Assembly</div>
-      <div class="tab-content">
-        <Sidebar />
-      </div>
+<div class="Renderer flex-1">
+  <zea-layout
+    add-cells="AB"
+    borders
+    cell-a-size={$ui.shouldShowDrawer ? 250 : 0}
+    show-resize-handles="A"
+  >
+    <div slot="A" class="h-full w-full">
+      <zea-tabs slot="a" orientation="horizontal">
+        <div slot="tab-bar">Assembly</div>
+        <div class="tab-content">
+          <Sidebar />
+        </div>
 
-      <div slot="tab-bar">Search</div>
-      <div class="tab-content">
-        <SearchTool />
-      </div>
-    </zea-tabs>
-  </div>
-  <div slot="B" class="h-full w-full">
-    <canvas class="h-full w-full" bind:this={canvas} />
-    <div class="relative">
-      <zea-progress-bar bind:this={progressBar} />
+        <div slot="tab-bar">Search</div>
+        <div class="tab-content">
+          <SearchTool />
+        </div>
+      </zea-tabs>
     </div>
-    <div bind:this={fpsContainer} />
+    <div slot="B" class="h-full w-full">
+      <canvas class="h-full w-full" bind:this={canvas} />
+    </div>
+  </zea-layout>
+
+  <div class="fixed" bind:this={fpsContainer} />
+  <div class="fixed">
+    <zea-progress-bar bind:this={progressBar} />
   </div>
-</zea-layout>
+</div>
 
 <Dialog isOpen={isDialogOpen} close={closeDialog} {contextItem} />
 
