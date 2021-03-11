@@ -10,6 +10,8 @@
   import { APP_DATA } from '../stores/appData'
   import { ui } from '../stores/ui.js'
 
+  const urlParams = new URLSearchParams(window.location.search)
+  const embeddedMode = urlParams.has('embedded')
   let userChipSet
   let userChip
   let vrToggleMenuItem
@@ -50,8 +52,10 @@
       session.leaveRoom()
     }
 
-    vrToggleMenuItem.textContent = 'VR Device Not Detected'
-    vrToggleMenuItem.disabled = true
+    if (vrToggleMenuItem) {
+      vrToggleMenuItem.textContent = 'VR Device Not Detected'
+      vrToggleMenuItem.disabled = true
+    }
 
     APP_DATA.subscribe((appData) => {
       if (!appData || renderer) return
@@ -210,99 +214,113 @@
   }
 </script>
 
-<div class="Header flex items-center px-2 text-gray-200">
-  <span
-    class="material-icons cursor-default mr-2"
-    on:click={handleClickMenuToggle}
-  >
-    menu
-  </span>
-  <div class="logo flex items-center h-full mr-4">
-    <img src="/images/logo-zea.svg" alt="logo" />
+{#if !embeddedMode}
+  <div class="Header flex items-center px-2 text-gray-200">
+    <span
+      class="material-icons cursor-default mr-2"
+      on:click={handleClickMenuToggle}
+    >
+      menu
+    </span>
+    <div class="logo flex items-center h-full mr-4">
+      <img src="/images/logo-zea.svg" alt="logo" />
+    </div>
+    <div class="flex-grow">
+      <zea-menu type="dropdown" show-anchor="true">
+        <zea-menu-item>
+          View
+          <zea-menu-subitems>
+            <zea-menu-item
+              class="menu-item"
+              hotkey="f"
+              onclick={handleFrameAll}
+            >
+              Frame All
+            </zea-menu-item>
+          </zea-menu-subitems>
+        </zea-menu-item>
+        <zea-menu-item>
+          Edit
+          <zea-menu-subitems>
+            <zea-menu-item
+              class="menu-item"
+              hotkey="ctrl+Z"
+              onclick={handleUndo}
+            >
+              <zea-icon icon="arrow-undo" size="16" />
+              Undo
+            </zea-menu-item>
+            <zea-menu-item
+              class="menu-item"
+              hotkey="ctrl+Y"
+              onclick={handleRedo}
+            >
+              <zea-icon icon="arrow-redo" size="16" />
+              Redo
+            </zea-menu-item>
+            <zea-menu-item
+              class="menu-item"
+              switch="true"
+              hotkey="s"
+              bind:this={toggleSelectModeMenuItem}
+              onclick={toggleSelectMode}
+            >
+              <zea-icon size="16" />
+              Toggle Selection
+            </zea-menu-item>
+            <zea-menu-item
+              class="menu-item"
+              switch="true"
+              onclick={toggleWASDWalkMode}
+            >
+              <zea-icon size="16" />
+              WASD Walk Mode
+            </zea-menu-item>
+          </zea-menu-subitems>
+        </zea-menu-item>
+        <zea-menu-item>
+          Collab
+          <zea-menu-subitems>
+            <zea-menu-item class="menu-item" hotkey="ctrl+N" onclick={handleDA}>
+              Direct Attention
+            </zea-menu-item>
+          </zea-menu-subitems>
+        </zea-menu-item>
+        <zea-menu-item>
+          VR
+          <zea-menu-subitems>
+            <zea-menu-item
+              class="menu-item"
+              bind:this={vrToggleMenuItem}
+              switch="true"
+              onclick={handleLaunchVR}
+            >
+              <zea-icon icon="recording-outline" size="16" />
+              Launch VR
+            </zea-menu-item>
+            <zea-menu-item
+              switch="true"
+              onclick={handleToggleVRSpatatorMode}
+              bind:this={vrSpectatorMenuItem}
+            >
+              Spectator Mode
+            </zea-menu-item>
+          </zea-menu-subitems>
+        </zea-menu-item>
+      </zea-menu>
+    </div>
+    <div class="panel-container mx-2 user-set-container">
+      <zea-user-chip-set bind:this={userChipSet} showImages />
+    </div>
+    <div class="mr-2">
+      <zea-button on:click={handleSignOut}>Sign out</zea-button>
+    </div>
+    <div class="divider ml-2" />
+    <div class="user-container pl-2">
+      <zea-user-chip bind:this={userChip} profile-card-align="right" />
+    </div>
   </div>
-  <div class="flex-grow">
-    <zea-menu type="dropdown" show-anchor="true">
-      <zea-menu-item>
-        View
-        <zea-menu-subitems>
-          <zea-menu-item class="menu-item" hotkey="f" onclick={handleFrameAll}>
-            Frame All
-          </zea-menu-item>
-        </zea-menu-subitems>
-      </zea-menu-item>
-      <zea-menu-item>
-        Edit
-        <zea-menu-subitems>
-          <zea-menu-item class="menu-item" hotkey="ctrl+Z" onclick={handleUndo}>
-            <zea-icon icon="arrow-undo" size="16" />
-            Undo
-          </zea-menu-item>
-          <zea-menu-item class="menu-item" hotkey="ctrl+Y" onclick={handleRedo}>
-            <zea-icon icon="arrow-redo" size="16" />
-            Redo
-          </zea-menu-item>
-          <zea-menu-item
-            class="menu-item"
-            switch="true"
-            hotkey="s"
-            bind:this={toggleSelectModeMenuItem}
-            onclick={toggleSelectMode}
-          >
-            <zea-icon size="16" />
-            Toggle Selection
-          </zea-menu-item>
-          <zea-menu-item
-            class="menu-item"
-            switch="true"
-            onclick={toggleWASDWalkMode}
-          >
-            <zea-icon size="16" />
-            WASD Walk Mode
-          </zea-menu-item>
-        </zea-menu-subitems>
-      </zea-menu-item>
-      <zea-menu-item>
-        Collab
-        <zea-menu-subitems>
-          <zea-menu-item class="menu-item" hotkey="ctrl+N" onclick={handleDA}>
-            Direct Attention
-          </zea-menu-item>
-        </zea-menu-subitems>
-      </zea-menu-item>
-      <zea-menu-item>
-        VR
-        <zea-menu-subitems>
-          <zea-menu-item
-            class="menu-item"
-            bind:this={vrToggleMenuItem}
-            switch="true"
-            onclick={handleLaunchVR}
-          >
-            <zea-icon icon="recording-outline" size="16" />
-            Launch VR
-          </zea-menu-item>
-          <zea-menu-item
-            switch="true"
-            onclick={handleToggleVRSpatatorMode}
-            bind:this={vrSpectatorMenuItem}
-          >
-            Spectator Mode
-          </zea-menu-item>
-        </zea-menu-subitems>
-      </zea-menu-item>
-    </zea-menu>
-  </div>
-  <div class="panel-container mx-2 user-set-container">
-    <zea-user-chip-set bind:this={userChipSet} showImages />
-  </div>
-  <div class="mr-2">
-    <zea-button on:click={handleSignOut}>Sign out</zea-button>
-  </div>
-  <div class="divider ml-2" />
-  <div class="user-container pl-2">
-    <zea-user-chip bind:this={userChip} profile-card-align="right" />
-  </div>
-</div>
+{/if}
 
 <style>
   .logo {

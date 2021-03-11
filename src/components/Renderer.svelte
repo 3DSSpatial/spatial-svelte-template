@@ -43,6 +43,12 @@
   let canvas
   let fpsContainer
   let progressBar
+  const urlParams = new URLSearchParams(window.location.search)
+  const embeddedMode = urlParams.has('embedded')
+  let client
+  if (embeddedMode) {
+    client = new ChannelMessenger()
+  }
 
   const filterItemSelection = (item) => {
     // Propagate selections deep in the tree up to the part body.
@@ -56,8 +62,6 @@
   }
 
   onMount(() => {
-    const urlParams = new URLSearchParams(window.location.search)
-
     const renderer = new GLRenderer(canvas, {
       debugGeomIds: urlParams.has('debugGeomIds'),
       xrCompatible: false,
@@ -234,72 +238,77 @@
       return asset
     }
 
-    const url = urlParams.has('zcad')
-      ? urlParams.get('zcad')
-      : '/assets/gear_box_final_asm-visu.zcad'
+    if (!embeddedMode) {
+      const url = urlParams.has('zcad')
+        ? urlParams.get('zcad')
+        : '/assets/gear_box_final_asm-visu.zcad'
 
-    loadAsset(url)
+      loadAsset(url)
+    }
     /** CAD END */
 
     /** COLLAB START*/
-    const SOCKET_URL = 'https://websocket-staging.zea.live'
-    const ROOM_ID = url
-    auth.getUserData().then((userData) => {
-      if (!userData) return
-      const session = new Session(userData, SOCKET_URL)
-      session.joinRoom(ROOM_ID)
-      const sessionSync = new SessionSync(session, appData, userData, {})
+    if (!embeddedMode) {
+      const SOCKET_URL = 'https://websocket-staging.zea.live'
+      const ROOM_ID = url
+      auth.getUserData().then((userData) => {
+        if (!userData) return
+        const session = new Session(userData, SOCKET_URL)
+        session.joinRoom(ROOM_ID)
+        const sessionSync = new SessionSync(session, appData, userData, {})
 
-      appData.userData = userData
-      appData.session = session
-      appData.sessionSync = sessionSync
+        appData.userData = userData
+        appData.session = session
+        appData.sessionSync = sessionSync
 
-      APP_DATA.update(() => appData)
-    })
+        APP_DATA.update(() => appData)
+      })
+    }
     /** COLLAB END */
 
     /** EMBED MESSAGING START*/
-    const client = new ChannelMessenger()
+    if (embeddedMode) {
+      client.on('setBackgroundColor', (data) => {
+        const color = new Color(data.color)
+        $scene.getSettings().getParameter('BackgroundColor').setValue(color)
 
-    client.on('setBackgroundColor', (data) => {
-      const color = new Color(data.color)
-      $scene.getSettings().getParameter('BackgroundColor').setValue(color)
-
-      if (data._id) {
-        client.send(data._id, { done: true })
-      }
-    })
-
-    client.on('loadCADFile', (data) => {
-      if (!data.keep) {
-        $assets.removeAllChildren()
-      }
-
-      const asset = loadAsset(data.zcad)
-      asset.once('loaded', () => {
         if (data._id) {
-          const tree = buildTree(asset)
+          client.send(data._id, { done: true })
+        }
+      })
+
+      client.on('loadCADFile', (data) => {
+        console.log('loadCADFile', data)
+        if (!data.keep) {
+          $assets.removeAllChildren()
+        }
+
+        const asset = loadAsset(data.zcad)
+        asset.once('loaded', () => {
+          if (data._id) {
+            const tree = buildTree(asset)
+            client.send(data._id, { modelStructure: tree })
+          }
+        })
+      })
+
+      client.on('getModelStructure', (data) => {
+        if (data._id) {
+          const tree = buildTree($assets)
           client.send(data._id, { modelStructure: tree })
         }
       })
-    })
 
-    client.on('getModelStructure', (data) => {
-      if (data._id) {
-        const tree = buildTree($assets)
-        client.send(data._id, { modelStructure: tree })
-      }
-    })
+      client.on('unloadCADFile', (data) => {
+        console.log('unloadCADFile', data)
 
-    client.on('unloadCADFile', (data) => {
-      console.log('unloadCADFile', data)
+        $assets.removeChildByName(data.name)
 
-      $assets.removeChildByName(data.name)
-
-      if (data._id) {
-        client.send(data._id, { done: true })
-      }
-    })
+        if (data._id) {
+          client.send(data._id, { done: true })
+        }
+      })
+    }
 
     $selectionManager.on('selectionChanged', (event) => {
       const { selection } = event
