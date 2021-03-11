@@ -31,12 +31,19 @@ class ChannelMessenger {
     this.port1 = channel.port1
 
     // Wait for the viewer to load
+
     viewer.addEventListener('load', () => {
       // Listen for messages on port1
       this.port1.onmessage = onMessage
 
-      // Transfer port2 to the viewer
-      viewer.contentWindow.postMessage('init', '*', [channel.port2])
+      // Note: without this timeout, the Svelte app
+      // has not initialized its ChannelMessenger by the time
+      // we send the init message. We may be able to remove this after
+      // Mauro's updates.
+      setTimeout(() => {
+        // Transfer port2 to the viewer
+        viewer.contentWindow.postMessage('init', '*', [channel.port2])
+      }, 50)
     })
 
     // Handle messages received on port1
@@ -90,7 +97,9 @@ class ChannelMessenger {
     const listeners = this.listeners[eventName]
 
     if (listeners.includes(listener)) {
-      throw new Error(`Listener "${listener.name}" already connected to event "${eventName}".`)
+      throw new Error(
+        `Listener "${listener.name}" already connected to event "${eventName}".`
+      )
     }
 
     // TODO: Deprecate alongside #addListener.
@@ -136,7 +145,9 @@ class ChannelMessenger {
     }
 
     if (typeof listener == 'number') {
-      console.warn('Deprecated. Un-register using the original listener instead.')
+      console.warn(
+        'Deprecated. Un-register using the original listener instead.'
+      )
       this.removeListenerById(eventName, listener)
       return
     }
@@ -152,7 +163,9 @@ class ChannelMessenger {
     })
 
     if (ids.length == 0) {
-      throw new Error(`Listener "${listener.name}" is not connected to "${eventName}" event`)
+      throw new Error(
+        `Listener "${listener.name}" is not connected to "${eventName}" event`
+      )
     } else {
       for (const id of ids) {
         listeners[id] = undefined
