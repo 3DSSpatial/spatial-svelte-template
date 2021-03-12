@@ -40,6 +40,7 @@
 
   const { Session, SessionSync } = window.zeaCollab
 
+  let assetUrl
   let canvas
   let fpsContainer
   let progressBar
@@ -239,18 +240,18 @@
     }
 
     if (!embeddedMode) {
-      const url = urlParams.has('zcad')
+      assetUrl = urlParams.has('zcad')
         ? urlParams.get('zcad')
         : '/assets/gear_box_final_asm-visu.zcad'
 
-      loadAsset(url)
+      loadAsset(assetUrl)
     }
     /** CAD END */
 
     /** COLLAB START*/
     if (!embeddedMode) {
       const SOCKET_URL = 'https://websocket-staging.zea.live'
-      const ROOM_ID = url
+      const ROOM_ID = assetUrl
       auth.getUserData().then((userData) => {
         if (!userData) return
         const session = new Session(userData, SOCKET_URL)
