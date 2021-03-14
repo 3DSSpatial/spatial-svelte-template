@@ -22,9 +22,9 @@
 
   const isWithinRange = (size) => size >= minSize && size <= maxSize
 
-  const triggerResize = (evt) => {
+  const triggerResize = (event) => {
     if (isVertical) {
-      const deltaX = initialCoords.clientX - evt.clientX
+      const deltaX = initialCoords.clientX - event.clientX
 
       const newParentWidth = initialParentSize.width - deltaX
 
@@ -37,7 +37,7 @@
       parentEl.style.width = `${newParentWidth}px`
       siblingEl.style.width = `${newSiblingWidth}px`
     } else {
-      const deltaY = initialCoords.clientY - evt.clientY
+      const deltaY = initialCoords.clientY - event.clientY
 
       const newParentHeight = initialParentSize.height - deltaY
 
@@ -52,9 +52,9 @@
     }
   }
 
-  const handleMouseMove = (evt) => {
+  const handleMouseMove = (event) => {
     window.getSelection().removeAllRanges()
-    triggerResize(evt)
+    triggerResize(event)
   }
 
   const handleMouseUp = () => {
@@ -62,7 +62,7 @@
     window.removeEventListener('mousemove', handleMouseMove)
   }
 
-  const handleMouseDown = (evt) => {
+  const handleMouseDown = (event) => {
     if (disableResize) {
       return
     }
@@ -76,8 +76,8 @@
     )
 
     initialCoords = {
-      clientX: evt.clientX,
-      clientY: evt.clientY,
+      clientX: event.clientX,
+      clientY: event.clientY,
     }
 
     initialParentSize = {
@@ -97,7 +97,7 @@
     /*   el.classList.remove('flex-1') */
     /* }) */
 
-    triggerResize(evt)
+    triggerResize(event)
 
     document.body.style.cursor = cursor
 
@@ -114,7 +114,7 @@
   })
 </script>
 
-<div class="Pane flex flex-1 {flexDirection}" bind:this={parentEl}>
+<div bind:this={parentEl} class="Pane flex flex-1 {flexDirection}">
   <div class="PaneContent flex-1">
     <slot />
   </div>

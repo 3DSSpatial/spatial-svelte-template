@@ -366,11 +366,11 @@
       </zea-tabs>
     </div>
     <div slot="B" class="h-full w-full">
-      <canvas class="h-full w-full" bind:this={canvas} />
+      <canvas bind:this={canvas} class="h-full w-full" />
     </div>
   </zea-layout>
 
-  <div class="fixed" bind:this={fpsContainer} />
+  <div bind:this={fpsContainer} class="fixed" />
   <div class="fixed">
     <zea-progress-bar bind:this={progressBar} />
   </div>

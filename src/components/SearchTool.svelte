@@ -52,7 +52,7 @@
 
 <div class="h-full w-full px-3">
   <form on:submit|preventDefault={handleSubmit}>
-    <input type="text" class="w-full" bind:value bind:this={searchInput} />
+    <input bind:this={searchInput} bind:value class="w-full" type="text" />
   </form>
-  <ul id="searchResults" class="py-3" bind:this={searchResults} />
+  <ul bind:this={searchResults} class="py-3" id="searchResults" />
 </div>

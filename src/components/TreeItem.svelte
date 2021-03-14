@@ -59,7 +59,7 @@
     visibleParam.setValue(visible)
   }
 
-  const handleItemClick = (evt) => {
+  const handleItemClick = (event) => {
     if (!selectionManager) {
       item.setSelected(!item.getSelected())
       return
@@ -70,7 +70,7 @@
       return
     }
 
-    selectionManager.toggleItemSelection(item, !evt.ctrlKey)
+    selectionManager.toggleItemSelection(item, !event.ctrlKey)
   }
 
   const initItem = () => {
@@ -118,7 +118,7 @@
 </script>
 
 {#if item}
-  <div class="TreeItem {visible || 'text-gray-500'}" bind:this={el}>
+  <div bind:this={el} class="TreeItem {visible || 'text-gray-500'}">
     <div class="flex items-center">
       {#if hasChildren}
         <button class="px-1" on:click={toggleExpanded}>
