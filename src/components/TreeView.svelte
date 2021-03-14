@@ -3,8 +3,8 @@
 
   export let expanded = true
   export let items
-  export let selectionManager
-  export let undoRedoManager
+  export let selectionManager = null
+  export let undoRedoManager = null
 </script>
 
 <div class="TreeView">

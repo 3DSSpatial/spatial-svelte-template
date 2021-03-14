@@ -4,8 +4,8 @@
   export let expanded = false
   export let highlighted = false
   export let item
-  export let selectionManager
-  export let undoRedoManager
+  export let selectionManager = null
+  export let undoRedoManager = null
   export let visible = false
 
   let el

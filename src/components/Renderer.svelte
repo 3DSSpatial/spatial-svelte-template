@@ -47,6 +47,7 @@
   const urlParams = new URLSearchParams(window.location.search)
   const embeddedMode = urlParams.has('embedded')
   let client
+
   if (embeddedMode) {
     client = new ChannelMessenger()
   }
@@ -220,9 +221,11 @@
 
     const loadAsset = (url) => {
       const asset = new CADAsset()
+
       asset.on('error', (event) => {
         console.warn('Error:', event)
       })
+
       asset.on('loaded', () => {
         const materials = asset.getMaterialLibrary().getMaterials()
         materials.forEach((material) => {
@@ -231,11 +234,14 @@
         })
         renderer.frameAll()
       })
+
       asset.getGeometryLibrary().on('loaded', () => {
         renderer.frameAll()
       })
+
       $assets.addChild(asset)
       asset.getParameter('FilePath').setValue(url)
+
       return asset
     }
 
