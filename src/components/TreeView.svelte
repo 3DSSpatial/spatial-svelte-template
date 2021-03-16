@@ -1,7 +1,6 @@
 <script>
   import TreeItem from './TreeItem.svelte'
 
-  export let expanded = true
   export let items
   export let selectionManager = null
   export let undoRedoManager = null
