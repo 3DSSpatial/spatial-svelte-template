@@ -17,10 +17,13 @@
     username: '',
   }
 
+  const userId = getRandomString()
+
   $: userData = {
+    avatar: `https://i.pravatar.cc/100?u=${userId}`,
     color: Color.random().toHex(),
     firstName: formFields.username,
-    id: getRandomString(),
+    id: userId,
     lastName: '',
     password: formFields.password,
     username: formFields.username,
