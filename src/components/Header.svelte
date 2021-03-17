@@ -227,7 +227,7 @@
 </script>
 
 {#if !embeddedMode}
-  <header class="flex items-center px-2 py-1 text-gray-200">
+  <header class="flex items-center px-2 py-1 text-gray-200 z-50">
     <span
       class="material-icons cursor-default mr-2"
       on:click={handleClickMenuToggle}
@@ -279,6 +279,7 @@
       <MenuBarItem label="Collab" let:isOpen>
         <Menu {isOpen}>
           <MenuItem
+            iconLeft="visibility"
             label="Direct Attention"
             shortcut="Ctrl+N"
             on:click={handleDA}

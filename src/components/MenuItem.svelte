@@ -61,13 +61,12 @@
   on:mouseenter
   on:mouseleave
 >
-  {#if iconLeft}
-    <span class="material-icons md-18 pointer-events-none">{iconLeft}</span>
-  {:else}
-    <span class="material-icons md-18 pointer-events-none text-transparent"
-      >block</span
-    >
-  {/if}
+  <span
+    class="material-icons md-18 pointer-events-none ml-1 {iconLeft ||
+      'text-transparent'}"
+  >
+    {iconLeft || 'block'}
+  </span>
 
   <span class="flex-1 text-left mr-5 ml-3 pointer-events-none">
     {label}
