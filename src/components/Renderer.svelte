@@ -6,7 +6,6 @@
   import Menu from '../components/ContextMenu/Menu.svelte'
   import MenuOption from '../components/ContextMenu/MenuOption.svelte'
   import Dialog from '../components/Dialog.svelte'
-  import SearchTool from '../components/SearchTool.svelte'
   import Sidebar from '../components/Sidebar.svelte'
 
   import { auth } from '../helpers/auth'
@@ -359,17 +358,7 @@
     show-resize-handles="A"
   >
     <div slot="A" class="h-full w-full">
-      <zea-tabs slot="a" orientation="horizontal">
-        <div slot="tab-bar">Assembly</div>
-        <div class="tab-content">
-          <Sidebar />
-        </div>
-
-        <div slot="tab-bar">Search</div>
-        <div class="tab-content">
-          <SearchTool />
-        </div>
-      </zea-tabs>
+      <Sidebar />
     </div>
     <div slot="B" class="h-full w-full">
       <canvas bind:this={canvas} class="h-full w-full" />
