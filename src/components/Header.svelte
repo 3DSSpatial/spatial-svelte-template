@@ -25,6 +25,7 @@
   let vrToggleMenuItemDisabled = true
 
   let cameraManipulator
+  let isSelectionEnabled = false
   let renderer
   let session
   let sessionSync
@@ -47,11 +48,6 @@
           renderer.frameAll()
         }
         break
-      case 's':
-        if (toolManager) {
-          selectionEnabled = !selectionEnabled
-        }
-        break
       case 'z':
         if (event.ctrlKey && undoRedoManager) {
           undoRedoManager.undo()
@@ -64,6 +60,16 @@
         break
     }
   })
+
+  const handleMenuSelectionChange = () => {
+    if (!toolManager) {
+      return
+    }
+
+    isSelectionEnabled
+      ? toolManager.pushTool('SelectionTool')
+      : toolManager.popTool()
+  }
 
   onMount(() => {
     if (session) {
@@ -155,16 +161,7 @@
     undoRedoManager.redo()
   }
 
-  let selectionEnabled = false
   let walkModeEnabled = false
-
-  $: if (toolManager) {
-    if (selectionEnabled) {
-      toolManager.pushTool('SelectionTool')
-    } else {
-      toolManager.popTool()
-    }
-  }
 
   $: if (cameraManipulator) {
     cameraManipulator.enabledWASDWalkMode = walkModeEnabled
@@ -265,13 +262,14 @@
             on:click={handleRedo}
           />
           <MenuItemToggle
+            bind:checked={isSelectionEnabled}
             label="Enable Selection Tool"
+            on:change={handleMenuSelectionChange}
             shortcut="S"
-            bind:value={selectionEnabled}
           />
           <MenuItemToggle
+            bind:checked={walkModeEnabled}
             label="Enable Walk Mode (WASD)"
-            bind:value={walkModeEnabled}
           />
         </Menu>
       </MenuBarItem>
