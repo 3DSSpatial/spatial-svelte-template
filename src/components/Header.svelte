@@ -227,7 +227,7 @@
 </script>
 
 {#if !embeddedMode}
-  <div class="Header flex items-center px-2 py-1 text-gray-200">
+  <header class="flex items-center px-2 py-1 text-gray-200">
     <span
       class="material-icons cursor-default mr-2"
       on:click={handleClickMenuToggle}
@@ -327,5 +327,5 @@
         <zea-button on:click={handleSignOut}>Sign out</zea-button>
       </UserChip>
     {/if}
-  </div>
+  </header>
 {/if}

@@ -350,7 +350,7 @@
   }
 </script>
 
-<div class="Renderer flex-1">
+<main class="Renderer flex-1">
   <zea-layout
     add-cells="AB"
     borders
@@ -364,7 +364,7 @@
       <canvas bind:this={canvas} class="h-full w-full" />
     </div>
   </zea-layout>
-</div>
+</main>
 
 <div bind:this={fpsContainer} />
 <zea-progress-bar bind:this={progressBar} />
