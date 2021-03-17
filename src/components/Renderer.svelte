@@ -364,12 +364,10 @@
       <canvas bind:this={canvas} class="h-full w-full" />
     </div>
   </zea-layout>
-
-  <div bind:this={fpsContainer} class="fixed" />
-  <div class="fixed">
-    <zea-progress-bar bind:this={progressBar} />
-  </div>
 </div>
+
+<div bind:this={fpsContainer} />
+<zea-progress-bar bind:this={progressBar} />
 
 <Dialog isOpen={isDialogOpen} close={closeDialog} {contextItem} />
 
