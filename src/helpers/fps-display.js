@@ -31,7 +31,7 @@ export class FPSDisplay extends HTMLElement {
     setInterval(() => {
       if (fps != frameCounter * 2) {
         fps = frameCounter * 2
-        this.div.textContent = `Fps: ${fps}`
+        this.div.textContent = `FPS: ${fps}`
       }
       frameCounter = 0
     }, 500)

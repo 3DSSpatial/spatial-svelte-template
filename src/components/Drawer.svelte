@@ -43,10 +43,10 @@
 
 <nav
   bind:this={drawerEl}
-  class="absolute bg-background flex h-full shadow opacity-60 hover:opacity-100"
-  class:hidden={!$ui.shouldShowDrawer}
+  class="absolute bg-background flex h-full shadow w-60 opacity-60 hover:opacity-100 transition transform {$ui.shouldShowDrawer ||
+    '-translate-x-full'}"
 >
-  <div class="flex-1 overflow-auto">
+  <div class="DrawerContent flex-1 overflow-hidden">
     <slot />
   </div>
 
