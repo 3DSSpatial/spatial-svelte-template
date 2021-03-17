@@ -1,5 +1,5 @@
 <script>
-  import { onMount, getContext } from 'svelte'
+  import { getContext } from 'svelte'
   import { menuKey } from './menuKey.js'
 
   export let text = ''
@@ -14,6 +14,14 @@
     dispatchClick()
   }
 </script>
+
+<div class="MenuOption text-gray-600" on:click={handleClick}>
+  {#if text}
+    {text}
+  {:else}
+    <slot />
+  {/if}
+</div>
 
 <style>
   div {
@@ -30,11 +38,3 @@
     background: var(--color-background-2);
   }
 </style>
-
-<div class="MenuOption text-gray-600" on:click={handleClick}>
-  {#if text}
-    {text}
-  {:else}
-    <slot />
-  {/if}
-</div>
