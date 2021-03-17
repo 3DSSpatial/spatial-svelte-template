@@ -5,6 +5,15 @@
   const { CameraManipulator } = window.zeaEngine
   const { ToolManager } = window.zeaUx
 
+  import Menu from './Menu.svelte'
+  import MenuItem from './MenuItem.svelte'
+  import MenuItemDropDown from './MenuItemDropDown.svelte'
+  import MenuItemToggle from './MenuItemToggle.svelte'
+  import MenuBar from './MenuBar.svelte'
+  import MenuBarItem from './MenuBarItem.svelte'
+  import UserChip from './UserChip.svelte'
+  import UsersChips from './UsersChips.svelte'
+
   import { auth } from '../helpers/auth'
 
   import { APP_DATA } from '../stores/appData'
@@ -12,37 +21,46 @@
 
   const urlParams = new URLSearchParams(window.location.search)
   const embeddedMode = urlParams.has('embedded')
-  let userChipSet
-  let userChip
-  let vrToggleMenuItem
-  let vrSpectatorMenuItem
-  let toggleSelectModeMenuItem
+  let vrToggleMenuItemLabel = 'Detecting VR...'
+  let vrToggleMenuItemDisabled = true
 
-  let renderer
-  let toolManager
   let cameraManipulator
-  let undoRedoManager
-  let userData
+  let renderer
   let session
   let sessionSync
+  let toolManager
+  let undoRedoManager
+  let userData
 
   document.addEventListener('keydown', (event) => {
-    if (!event.target.contains(renderer.getGLCanvas())) return
-    switch (event.key.toLowerCase()) {
+    const canvasIsTarget = event.target.contains(renderer.getGLCanvas())
+
+    if (!canvasIsTarget) {
+      return
+    }
+
+    const key = event.key.toLowerCase()
+
+    switch (key) {
       case 'f':
-        if (renderer) renderer.frameAll()
+        if (renderer) {
+          renderer.frameAll()
+        }
         break
       case 's':
         if (toolManager) {
-          toggleSelectMode()
-          toggleSelectModeMenuItem.checked = selectionEnabled
+          selectionEnabled = !selectionEnabled
         }
         break
       case 'z':
-        if (event.ctrlKey && undoRedoManager) undoRedoManager.undo()
+        if (event.ctrlKey && undoRedoManager) {
+          undoRedoManager.undo()
+        }
         break
       case 'y':
-        if (event.ctrlKey && undoRedoManager) undoRedoManager.redo()
+        if (event.ctrlKey && undoRedoManager) {
+          undoRedoManager.redo()
+        }
         break
     }
   })
@@ -52,13 +70,12 @@
       session.leaveRoom()
     }
 
-    if (vrToggleMenuItem) {
-      vrToggleMenuItem.textContent = 'VR Device Not Detected'
-      vrToggleMenuItem.disabled = true
-    }
+    vrToggleMenuItemLabel = 'VR Device Not Detected'
 
     APP_DATA.subscribe((appData) => {
-      if (!appData || renderer) return
+      if (!appData || renderer) {
+        return
+      }
 
       renderer = appData.renderer
       toolManager = appData.toolManager
@@ -70,13 +87,14 @@
           .getXRViewport()
           .then((xrViewport) => {
             xrViewport.spectatorMode = false // disable by default.
-            if (vrToggleMenuItem) vrToggleMenuItem.textContent = 'Launch VR'
+            vrToggleMenuItemLabel = 'Launch VR'
+            vrToggleMenuItemDisabled = false
             xrViewport.on('presentingChanged', (event) => {
               const { state } = event
               if (state) {
-                vrToggleMenuItem.textContent = 'Exit VR'
+                vrToggleMenuItemLabel = 'Exit VR'
               } else {
-                vrToggleMenuItem.textContent = 'Launch VR'
+                vrToggleMenuItemLabel = 'Launch VR'
               }
             })
           })
@@ -90,36 +108,32 @@
       if (!appData || session || !appData.session || !appData.sessionSync) {
         return
       }
+
       session = appData.session
       userData = appData.userData
       sessionSync = appData.sessionSync
 
-      userChip.userData = userData
-      userChipSet.session = session
+      // SessionSync interactions.
+      window.addEventListener('zeaUserClicked', (event) => {
+        const userData = sessionSync.userDatas[event.detail.id]
+        if (userData) {
+          const avatar = userData.avatar
+          const viewXfo = avatar.viewXfo
+          const focalDistance = avatar.focalDistance || 1.0
+          const target = viewXfo.tr.add(
+            viewXfo.ori.getZaxis().scale(-focalDistance)
+          )
 
-      {
-        // SessionSync interactions.
-        window.addEventListener('zeaUserClicked', (event) => {
-          const userData = sessionSync.userDatas[event.detail.id]
-          if (userData) {
-            const avatar = userData.avatar
-            const viewXfo = avatar.viewXfo
-            const focalDistance = avatar.focalDistance || 1.0
-            const target = viewXfo.tr.add(
-              viewXfo.ori.getZaxis().scale(-focalDistance)
+          if (cameraManipulator)
+            cameraManipulator.orientPointOfView(
+              viewport.getCamera(),
+              viewXfo.tr,
+              target,
+              1.0,
+              1000
             )
-
-            if (cameraManipulator)
-              cameraManipulator.orientPointOfView(
-                viewport.getCamera(),
-                viewXfo.tr,
-                target,
-                1.0,
-                1000
-              )
-          }
-        })
-      }
+        }
+      })
     })
   })
 
@@ -142,20 +156,18 @@
   }
 
   let selectionEnabled = false
-  const toggleSelectMode = () => {
-    if (!selectionEnabled) {
+  let walkModeEnabled = false
+
+  $: if (toolManager) {
+    if (selectionEnabled) {
       toolManager.pushTool('SelectionTool')
-      selectionEnabled = true
     } else {
       toolManager.popTool()
-      selectionEnabled = false
     }
   }
 
-  let wasdEnabled = false
-  const toggleWASDWalkMode = () => {
-    wasdEnabled = !wasdEnabled
-    cameraManipulator.enabledWASDWalkMode = wasdEnabled
+  $: if (cameraManipulator) {
+    cameraManipulator.enabledWASDWalkMode = walkModeEnabled
   }
 
   // ////////////////////////////////////
@@ -166,14 +178,14 @@
       if (!userData) {
         return
       }
+
       const { renderer, sessionSync } = $APP_DATA
-      {
-        // SessionSync interactions.
-        const camera = renderer.getViewport().getCamera()
-        const xfo = camera.getParameter('GlobalXfo').getValue()
-        const target = camera.getTargetPosition()
-        sessionSync.directAttention(xfo.tr, target, 1, 1000)
-      }
+
+      // SessionSync interactions.
+      const camera = renderer.getViewport().getCamera()
+      const xfo = camera.getParameter('GlobalXfo').getValue()
+      const target = camera.getTargetPosition()
+      sessionSync.directAttention(xfo.tr, target, 1, 1000)
     })
   }
 
@@ -215,138 +227,105 @@
 </script>
 
 {#if !embeddedMode}
-  <div class="Header flex items-center px-2 text-gray-200">
+  <div class="Header flex items-center px-2 py-1 text-gray-200">
     <span
       class="material-icons cursor-default mr-2"
       on:click={handleClickMenuToggle}
+      title="{$ui.shouldShowDrawer ? 'Close' : 'Open'} drawer"
     >
-      menu
+      {$ui.shouldShowDrawer ? 'close' : 'menu'}
     </span>
-    <div class="logo flex items-center h-full mr-4">
-      <img src="/images/logo-zea.svg" alt="logo" />
-    </div>
-    <div class="flex-grow">
-      <zea-menu type="dropdown" show-anchor="true">
-        <zea-menu-item>
-          View
-          <zea-menu-subitems>
-            <zea-menu-item
-              class="menu-item"
-              hotkey="f"
-              onclick={handleFrameAll}
-            >
-              Frame All
-            </zea-menu-item>
-          </zea-menu-subitems>
-        </zea-menu-item>
-        <zea-menu-item>
-          Edit
-          <zea-menu-subitems>
-            <zea-menu-item
-              class="menu-item"
-              hotkey="ctrl+Z"
-              onclick={handleUndo}
-            >
-              <zea-icon icon="arrow-undo" size="16" />
-              Undo
-            </zea-menu-item>
-            <zea-menu-item
-              class="menu-item"
-              hotkey="ctrl+Y"
-              onclick={handleRedo}
-            >
-              <zea-icon icon="arrow-redo" size="16" />
-              Redo
-            </zea-menu-item>
-            <zea-menu-item
-              class="menu-item"
-              switch="true"
-              hotkey="s"
-              bind:this={toggleSelectModeMenuItem}
-              onclick={toggleSelectMode}
-            >
-              <zea-icon size="16" />
-              Toggle Selection
-            </zea-menu-item>
-            <zea-menu-item
-              class="menu-item"
-              switch="true"
-              onclick={toggleWASDWalkMode}
-            >
-              <zea-icon size="16" />
-              WASD Walk Mode
-            </zea-menu-item>
-          </zea-menu-subitems>
-        </zea-menu-item>
-        <zea-menu-item>
-          Collab
-          <zea-menu-subitems>
-            <zea-menu-item class="menu-item" hotkey="ctrl+N" onclick={handleDA}>
-              Direct Attention
-            </zea-menu-item>
-          </zea-menu-subitems>
-        </zea-menu-item>
-        <zea-menu-item>
-          VR
-          <zea-menu-subitems>
-            <zea-menu-item
-              class="menu-item"
-              bind:this={vrToggleMenuItem}
-              switch="true"
-              onclick={handleLaunchVR}
-            >
-              <zea-icon icon="recording-outline" size="16" />
-              Launch VR
-            </zea-menu-item>
-            <zea-menu-item
-              switch="true"
-              onclick={handleToggleVRSpatatorMode}
-              bind:this={vrSpectatorMenuItem}
-            >
-              Spectator Mode
-            </zea-menu-item>
-          </zea-menu-subitems>
-        </zea-menu-item>
-      </zea-menu>
-    </div>
-    <div class="panel-container mx-2 user-set-container">
-      <zea-user-chip-set bind:this={userChipSet} showImages />
-    </div>
-    <div class="mr-2">
-      <zea-button on:click={handleSignOut}>Sign out</zea-button>
-    </div>
-    <div class="divider ml-2" />
-    <div class="user-container pl-2">
-      <zea-user-chip bind:this={userChip} profile-card-align="right" />
-    </div>
+
+    <img class="w-20 mx-3" src="/images/logo-zea.svg" alt="logo" />
+
+    <MenuBar>
+      <MenuBarItem label="View" let:isOpen>
+        <Menu {isOpen}>
+          <MenuItem
+            label="Frame All"
+            iconLeft="crop_free"
+            shortcut="F"
+            on:click={handleFrameAll}
+          />
+        </Menu>
+      </MenuBarItem>
+
+      <MenuBarItem label="Edit" let:isOpen>
+        <Menu {isOpen}>
+          <MenuItem
+            label="Undo"
+            iconLeft="undo"
+            shortcut="Ctrl+Z"
+            on:click={handleUndo}
+          />
+          <MenuItem
+            label="Redo"
+            iconLeft="redo"
+            shortcut="Ctrl+Y"
+            on:click={handleRedo}
+          />
+          <MenuItemToggle
+            label="Enable Selection Tool"
+            shortcut="S"
+            bind:value={selectionEnabled}
+          />
+          <MenuItemToggle
+            label="Enable Walk Mode (WASD)"
+            bind:value={walkModeEnabled}
+          />
+        </Menu>
+      </MenuBarItem>
+
+      <MenuBarItem label="Collab" let:isOpen>
+        <Menu {isOpen}>
+          <MenuItem
+            label="Direct Attention"
+            shortcut="Ctrl+N"
+            on:click={handleDA}
+          />
+        </Menu>
+      </MenuBarItem>
+
+      <MenuBarItem label="VR" let:isOpen>
+        <Menu {isOpen}>
+          <MenuItem
+            disabled={vrToggleMenuItemDisabled}
+            label={vrToggleMenuItemLabel}
+            on:click={handleLaunchVR}
+          />
+          <MenuItem
+            label="Enable Spectator Mode"
+            on:click={handleToggleVRSpatatorMode}
+          />
+        </Menu>
+      </MenuBarItem>
+
+      <MenuBarItem label="More" let:isOpen>
+        <Menu {isOpen}>
+          <MenuItem label="Foo Bar" shortcut="Ctrl+A" />
+          <MenuItem label="Foo Bar" />
+          <MenuItem label="Foo Bar" iconLeft="storage" shortcut="Shift+B" />
+          <MenuItem label="Foo Bar" />
+          <MenuItem label="Foo Bar" shortcut="Alt+C" />
+          <MenuItem label="Foo Bar" />
+          <MenuItemDropDown label="Foo Bar" let:isOpen>
+            <Menu {isOpen}>
+              <MenuItem label="Foo Bar" />
+              <MenuItem label="Foo Bar" />
+            </Menu>
+          </MenuItemDropDown>
+        </Menu>
+      </MenuBarItem>
+    </MenuBar>
+
+    {#if $APP_DATA}
+      <UsersChips session={$APP_DATA.session} />
+    {/if}
+
+    {#if $APP_DATA}
+      <UserChip user={$APP_DATA.userData}>
+        <zea-button on:click={handleSignOut}>Sign out</zea-button>
+      </UserChip>
+    {/if}
   </div>
 {/if}
-
-<style>
-  .logo {
-    width: 5em;
-  }
-
-  .divider {
-    border-right: 2px solid var(--color-grey-1);
-    height: calc(100% - 2px);
-  }
-
-  .user-container {
-    height: 100%;
-    width: 50px;
-    display: flex;
-    align-items: center;
-  }
-
-  .user-set-container {
-    display: flex;
-    align-items: center;
-    width: 250px;
-  }
-
-  .menu-item {
-    display: flex;
-    align-items: center;
-  }
-</style>
