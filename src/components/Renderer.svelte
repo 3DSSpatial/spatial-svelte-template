@@ -2,11 +2,12 @@
   import { onMount } from 'svelte'
 
   import '../helpers/fps-display'
-  import Sidebar from '../components/Sidebar.svelte'
+
   import Menu from '../components/ContextMenu/Menu.svelte'
   import MenuOption from '../components/ContextMenu/MenuOption.svelte'
   import Dialog from '../components/Dialog.svelte'
   import SearchTool from '../components/SearchTool.svelte'
+  import Sidebar from '../components/Sidebar.svelte'
 
   import { auth } from '../helpers/auth'
 
@@ -63,7 +64,7 @@
     return item
   }
 
-  onMount(() => {
+  onMount(async () => {
     const renderer = new GLRenderer(canvas, {
       debugGeomIds: urlParams.has('debugGeomIds'),
       xrCompatible: false,
@@ -258,18 +259,23 @@
     if (!embeddedMode) {
       const SOCKET_URL = 'https://websocket-staging.zea.live'
       const ROOM_ID = assetUrl
-      auth.getUserData().then((userData) => {
-        if (!userData) return
-        const session = new Session(userData, SOCKET_URL)
-        session.joinRoom(ROOM_ID)
-        const sessionSync = new SessionSync(session, appData, userData, {})
 
-        appData.userData = userData
-        appData.session = session
-        appData.sessionSync = sessionSync
+      const userData = await auth.getUserData()
 
-        APP_DATA.update(() => appData)
-      })
+      if (!userData) {
+        return
+      }
+
+      const session = new Session(userData, SOCKET_URL)
+      session.joinRoom(ROOM_ID)
+
+      const sessionSync = new SessionSync(session, appData, userData, {})
+
+      appData.userData = userData
+      appData.session = session
+      appData.sessionSync = sessionSync
+
+      APP_DATA.update(() => appData)
     }
     /** COLLAB END */
 
