@@ -214,7 +214,7 @@ File it on Github: https://github.com/ZeaInc/zea-svelte-template
 Start a discussion: https://github.com/ZeaInc/zea-svelte-template/discussions
 
 # Credits
-This Svelte Template is a preconfigured Svelte app that combines the engine and many of the popular plugins.
+This Svelte Template is a preconfigured Svelte app that combines the engine and many of the popular plugins.  
 This template contains the following software from Zea Inc. Please be mindful of the license attached to each of these software if publishing or redistributing your work.
 
 **Zea Engine**: https://github.com/ZeaInc/zea-engine
