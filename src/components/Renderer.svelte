@@ -7,6 +7,7 @@
   import MenuOption from '../components/ContextMenu/MenuOption.svelte'
   import Dialog from '../components/Dialog.svelte'
   import Drawer from '../components/Drawer.svelte'
+  import ProgressBar from '../components/ProgressBar.svelte'
   import Sidebar from '../components/Sidebar.svelte'
 
   import { auth } from '../helpers/auth'
@@ -43,10 +44,10 @@
   let assetUrl
   let canvas
   let fpsContainer
-  let progressBar
   const urlParams = new URLSearchParams(window.location.search)
   const embeddedMode = urlParams.has('embedded')
   let client
+  let progress
 
   if (embeddedMode) {
     client = new ChannelMessenger()
@@ -180,35 +181,9 @@
     /** UX END */
 
     /** PROGRESSBAR START */
-    if (progressBar) {
-      progressBar.percent = 0
-      progressBar.style.visibility = 'hidden'
-      let visible = false
-      let visibleTimeoutId = 0
-
-      resourceLoader.on('progressIncremented', (event) => {
-        if (progressBar) {
-          if (!visible) {
-            // Display the progress bar if hidden
-            progressBar.style.visibility = 'visible'
-            visible = true
-          } else if (visibleTimeoutId > 0) {
-            // Prevent the progress bar from hiding if a timer is running.
-            clearTimeout(visibleTimeoutId)
-          }
-          const { percent } = event
-          progressBar.percent = percent
-          if (percent >= 100) {
-            // Hide the progress bar after one second.
-            visibleTimeoutId = setTimeout(() => {
-              progressBar.style.visibility = 'hidden'
-              visibleTimeoutId = 0
-              visible = false
-            }, 1000)
-          }
-        }
-      })
-    }
+    resourceLoader.on('progressIncremented', (event) => {
+      progress = event.percent
+    })
     /** PROGRESSBAR END */
 
     /** FPS DISPLAY START */
@@ -358,8 +333,13 @@
   <canvas bind:this={canvas} class="h-full w-full" />
 </main>
 
+{#if progress < 100}
+  <div class="fixed bottom-0 w-full">
+    <ProgressBar {progress} />
+  </div>
+{/if}
+
 <div bind:this={fpsContainer} />
-<zea-progress-bar bind:this={progressBar} />
 
 <Dialog isOpen={isDialogOpen} close={closeDialog} {contextItem} />
 
