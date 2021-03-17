@@ -12,9 +12,7 @@
   <zea-tabs orientation="horizontal">
     <div slot="tab-bar">Assembly</div>
     <div class="tab-content">
-      <zea-scroll-pane>
-        <TreeView items={treeItems} selectionManager={$selectionManager} />
-      </zea-scroll-pane>
+      <TreeView items={treeItems} selectionManager={$selectionManager} />
     </div>
 
     <div slot="tab-bar">Search</div>

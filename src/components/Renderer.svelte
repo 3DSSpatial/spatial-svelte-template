@@ -6,6 +6,7 @@
   import Menu from '../components/ContextMenu/Menu.svelte'
   import MenuOption from '../components/ContextMenu/MenuOption.svelte'
   import Dialog from '../components/Dialog.svelte'
+  import Drawer from '../components/Drawer.svelte'
   import Sidebar from '../components/Sidebar.svelte'
 
   import { auth } from '../helpers/auth'
@@ -14,7 +15,6 @@
   import { assets } from '../stores/assets.js'
   import { selectionManager } from '../stores/selectionManager.js'
   import { scene } from '../stores/scene.js'
-  import { ui } from '../stores/ui.js'
 
   import { ChannelMessenger } from '../ChannelMessenger.js'
   import buildTree from '../helpers/buildTree'
@@ -185,6 +185,7 @@
       progressBar.style.visibility = 'hidden'
       let visible = false
       let visibleTimeoutId = 0
+
       resourceLoader.on('progressIncremented', (event) => {
         if (progressBar) {
           if (!visible) {
@@ -350,20 +351,11 @@
   }
 </script>
 
-<main class="Renderer flex-1">
-  <zea-layout
-    add-cells="AB"
-    borders
-    cell-a-size={$ui.shouldShowDrawer ? 250 : 0}
-    show-resize-handles="A"
-  >
-    <div slot="A" class="h-full w-full">
-      <Sidebar />
-    </div>
-    <div slot="B" class="h-full w-full">
-      <canvas bind:this={canvas} class="h-full w-full" />
-    </div>
-  </zea-layout>
+<main class="Renderer flex-1 relative">
+  <Drawer>
+    <Sidebar />
+  </Drawer>
+  <canvas bind:this={canvas} class="h-full w-full" />
 </main>
 
 <div bind:this={fpsContainer} />
