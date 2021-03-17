@@ -43,7 +43,7 @@
     class="absolute rounded p-2 shadow bg-background right-0 w-max border border-gray-700"
     class:hidden={!shouldShowUserMenu}
   >
-    <div>
+    <div class="mb-2">
       {firstName}
       {lastName}
     </div>

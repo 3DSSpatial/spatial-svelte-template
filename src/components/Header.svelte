@@ -5,6 +5,7 @@
   const { CameraManipulator } = window.zeaEngine
   const { ToolManager } = window.zeaUx
 
+  import Button from './Button.svelte'
   import Menu from './Menu.svelte'
   import MenuItem from './MenuItem.svelte'
   import MenuItemDropDown from './MenuItemDropDown.svelte'
@@ -230,7 +231,7 @@
       on:click={handleClickMenuToggle}
       title="{$ui.shouldShowDrawer ? 'Close' : 'Open'} drawer"
     >
-      {$ui.shouldShowDrawer ? 'close' : 'menu'}
+      {$ui.shouldShowDrawer ? 'menu_open' : 'menu'}
     </span>
 
     <img class="w-20 mx-3" src="/images/logo-zea.svg" alt="logo" />
@@ -323,7 +324,9 @@
 
     {#if $APP_DATA}
       <UserChip user={$APP_DATA.userData}>
-        <zea-button on:click={handleSignOut}>Sign out</zea-button>
+        <div class="text-center">
+          <Button on:click={handleSignOut}>Sign Out</Button>
+        </div>
       </UserChip>
     {/if}
   </header>
