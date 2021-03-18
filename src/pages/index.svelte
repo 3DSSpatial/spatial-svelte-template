@@ -3,7 +3,7 @@
   import { onMount } from 'svelte'
 
   import Header from '../components/Header.svelte'
-  import Renderer from '../components/Renderer.svelte'
+  import Main from '../components/Main.svelte'
 
   import { auth } from '../helpers/auth'
 
@@ -24,6 +24,6 @@
 {#if shouldShowLayout}
   <div class="flex flex-col h-full">
     <Header />
-    <Renderer />
+    <Main />
   </div>
 {/if}

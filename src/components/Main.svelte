@@ -326,7 +326,7 @@
   }
 </script>
 
-<main class="Renderer flex-1 relative">
+<main class="Main flex-1 relative">
   <Drawer>
     <Sidebar />
   </Drawer>
