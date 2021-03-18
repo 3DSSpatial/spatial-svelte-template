@@ -330,7 +330,10 @@
   <Drawer>
     <Sidebar />
   </Drawer>
+
   <canvas bind:this={canvas} class="h-full w-full" />
+
+  <div bind:this={fpsContainer} />
 </main>
 
 {#if progress < 100}
@@ -338,8 +341,6 @@
     <ProgressBar {progress} />
   </div>
 {/if}
-
-<div bind:this={fpsContainer} />
 
 <Dialog isOpen={isDialogOpen} close={closeDialog} {contextItem} />
 
