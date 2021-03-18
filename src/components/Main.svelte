@@ -327,13 +327,13 @@
 </script>
 
 <main class="Main flex-1 relative">
+  <canvas bind:this={canvas} class="absolute h-full w-full" />
+
+  <div bind:this={fpsContainer} />
+
   <Drawer>
     <Sidebar />
   </Drawer>
-
-  <canvas bind:this={canvas} class="h-full w-full" />
-
-  <div bind:this={fpsContainer} />
 </main>
 
 {#if progress < 100}
