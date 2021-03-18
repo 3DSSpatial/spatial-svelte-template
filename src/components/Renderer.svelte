@@ -77,7 +77,7 @@
       const envMap = new EnvMap('envMap')
       envMap
         .getParameter('FilePath')
-        .setValue(`/assets/HDR_029_Sky_Cloudy_Ref.vlenv`)
+        .setValue(`/data/HDR_029_Sky_Cloudy_Ref.vlenv`)
       envMap.getParameter('HeadLightMode').setValue(true)
       $scene.getSettings().getParameter('EnvMap').setValue(envMap)
     }
@@ -224,7 +224,7 @@
     if (!embeddedMode) {
       assetUrl = urlParams.has('zcad')
         ? urlParams.get('zcad')
-        : '/assets/gear_box_final_asm-visu.zcad'
+        : '/data/gear_box_final_asm-visu.zcad'
 
       loadAsset(assetUrl)
     }
