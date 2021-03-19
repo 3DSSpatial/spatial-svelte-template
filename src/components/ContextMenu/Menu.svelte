@@ -1,5 +1,5 @@
 <script>
-  import { onMount, setContext, createEventDispatcher } from 'svelte'
+  import { setContext, createEventDispatcher } from 'svelte'
   import { fade } from 'svelte/transition'
   import { menuKey } from './menuKey.js'
 
@@ -28,6 +28,17 @@
   }
 </script>
 
+<svelte:body on:click={onPageClick} />
+
+<div
+  bind:this={menuEl}
+  class="Menu"
+  style="top: {y}px; left: {x}px;"
+  transition:fade={{ duration: 100 }}
+>
+  <slot />
+</div>
+
 <style>
   div {
     position: absolute;
@@ -42,13 +53,3 @@
     user-select: none;
   }
 </style>
-
-<svelte:body on:click={onPageClick} />
-
-<div
-  class="Menu"
-  transition:fade={{ duration: 100 }}
-  bind:this={menuEl}
-  style="top: {y}px; left: {x}px;">
-  <slot />
-</div>

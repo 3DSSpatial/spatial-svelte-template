@@ -1,6 +1,6 @@
 <script>
   import { redirect } from '@roxi/routify'
-  import { onMount } from 'svelte'
+  import { onMount, tick } from 'svelte'
 
   import { auth } from '../../helpers/auth.js'
   import { getRandomString } from '../../helpers/misc.js'
@@ -17,16 +17,19 @@
     username: '',
   }
 
+  const userId = getRandomString()
+
   $: userData = {
+    avatar: `https://i.pravatar.cc/100?u=${userId}`,
     color: Color.random().toHex(),
     firstName: formFields.username,
-    id: getRandomString(),
+    id: userId,
     lastName: '',
     password: formFields.password,
     username: formFields.username,
   }
 
-  const redirectToRenderer = () => {
+  const redirectToMain = () => {
     const params = new URLSearchParams(window.location.search)
     $redirect('/?' + params.toString())
   }
@@ -36,7 +39,7 @@
       await auth.setUserData(userData)
 
       submitted = true
-      redirectToRenderer()
+      redirectToMain()
     } catch (err) {
       authError = err
     }
@@ -46,11 +49,14 @@
     const isAuthenticated = await auth.isAuthenticated()
 
     if (isAuthenticated) {
-      redirectToRenderer()
+      redirectToMain()
       return
     }
 
     shouldShowLayout = true
+
+    await tick()
+
     usernameEl.focus()
   })
 </script>
@@ -69,25 +75,25 @@
         <div class="rounded-md shadow-sm -space-y-px">
           <div class="mb-2">
             <input
+              autocomplete="off"
               bind:this={usernameEl}
               bind:value={formFields.username}
-              name="username"
-              type="text"
-              autocomplete="off"
-              required
               class="appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-yellow-500 focus:border-yellow-500 focus:z-10 sm:text-sm"
+              name="username"
               placeholder="Username"
+              required
+              type="text"
             />
           </div>
           <div>
             <input
-              bind:value={formFields.password}
-              name="password"
-              type="password"
               autocomplete="off"
-              required
+              bind:value={formFields.password}
               class="appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-yellow-500 focus:border-yellow-500 focus:z-10 sm:text-sm"
+              name="password"
               placeholder="Password"
+              required
+              type="password"
             />
             {#if authError}
               <span class="font-medium tracking-wide text-red-500 text-xs">

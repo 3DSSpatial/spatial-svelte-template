@@ -52,7 +52,7 @@
     "rollup": "rollup -cw",
     "routify": "routify",
     "serve": "spassr --ssr",
-    "to-cleanup": "rm -Rf dist/ node_modules/ yarn.lock",
+    "to-cleanup": "rm -Rf .routify/ dist/ node_modules/ yarn.lock",
     "storybook": "start-storybook -p 6006",
     "build-storybook": "build-storybook"
   },

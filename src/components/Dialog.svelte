@@ -8,6 +8,29 @@
   export let contextItem
 </script>
 
+<DialogOverlay {isOpen} onDismiss={close} class="overlay">
+  <DialogContent class="content">
+    <section class="p-2">
+      <header>Properties</header>
+      <main>
+        <pre
+          class="text-gray-100 my-3 py-3">
+{contextItem.getName()}
+{contextItem.getPath()}
+        </pre>
+      </main>
+      <div class="text-right">
+        <button
+          on:click={close}
+          class="bg-gray-700 border rounded px-2 text-white"
+        >
+          Close
+        </button>
+      </div>
+    </section>
+  </DialogContent>
+</DialogOverlay>
+
 <style>
   :global([data-svelte-dialog-overlay].overlay) {
     z-index: 10;
@@ -25,21 +48,3 @@
     box-shadow: 2px 2px 5px 0px #0002;
   }
 </style>
-
-<DialogOverlay {isOpen} onDismiss={close} class="overlay">
-  <DialogContent class="content">
-    <section>
-      <header>Properties</header>
-      <main>
-        <pre
-          class="text-gray-100 my-3 py-3"> 
-{contextItem.getName()}
-{contextItem.getPath()}
-        </pre>
-      </main>
-      <div class="text-right">
-        <button on:click={close} class="border rounded px-2">Close</button>
-      </div>
-    </section>
-  </DialogContent>
-</DialogOverlay>

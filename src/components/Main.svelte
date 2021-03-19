@@ -2,11 +2,13 @@
   import { onMount } from 'svelte'
 
   import '../helpers/fps-display'
-  import Sidebar from '../components/Sidebar.svelte'
+
   import Menu from '../components/ContextMenu/Menu.svelte'
   import MenuOption from '../components/ContextMenu/MenuOption.svelte'
   import Dialog from '../components/Dialog.svelte'
-  import SearchTool from '../components/SearchTool.svelte'
+  import Drawer from '../components/Drawer.svelte'
+  import ProgressBar from '../components/ProgressBar.svelte'
+  import Sidebar from '../components/Sidebar.svelte'
 
   import { auth } from '../helpers/auth'
 
@@ -14,7 +16,6 @@
   import { assets } from '../stores/assets.js'
   import { selectionManager } from '../stores/selectionManager.js'
   import { scene } from '../stores/scene.js'
-  import { ui } from '../stores/ui.js'
 
   import { ChannelMessenger } from '../ChannelMessenger.js'
   import buildTree from '../helpers/buildTree'
@@ -40,12 +41,14 @@
 
   const { Session, SessionSync } = window.zeaCollab
 
+  let assetUrl
   let canvas
   let fpsContainer
-  let progressBar
   const urlParams = new URLSearchParams(window.location.search)
   const embeddedMode = urlParams.has('embedded')
   let client
+  let progress
+
   if (embeddedMode) {
     client = new ChannelMessenger()
   }
@@ -61,7 +64,7 @@
     return item
   }
 
-  onMount(() => {
+  onMount(async () => {
     const renderer = new GLRenderer(canvas, {
       debugGeomIds: urlParams.has('debugGeomIds'),
       xrCompatible: false,
@@ -74,7 +77,7 @@
       const envMap = new EnvMap('envMap')
       envMap
         .getParameter('FilePath')
-        .setValue(`/assets/HDR_029_Sky_Cloudy_Ref.vlenv`)
+        .setValue(`/data/HDR_029_Sky_Cloudy_Ref.vlenv`)
       envMap.getParameter('HeadLightMode').setValue(true)
       $scene.getSettings().getParameter('EnvMap').setValue(envMap)
     }
@@ -178,34 +181,9 @@
     /** UX END */
 
     /** PROGRESSBAR START */
-    if (progressBar) {
-      progressBar.percent = 0
-      progressBar.style.visibility = 'hidden'
-      let visible = false
-      let visibleTimeoutId = 0
-      resourceLoader.on('progressIncremented', (event) => {
-        if (progressBar) {
-          if (!visible) {
-            // Display the progress bar if hidden
-            progressBar.style.visibility = 'visible'
-            visible = true
-          } else if (visibleTimeoutId > 0) {
-            // Prevent the progress bar from hiding if a timer is running.
-            clearTimeout(visibleTimeoutId)
-          }
-          const { percent } = event
-          progressBar.percent = percent
-          if (percent >= 100) {
-            // Hide the progress bar after one second.
-            visibleTimeoutId = setTimeout(() => {
-              progressBar.style.visibility = 'hidden'
-              visibleTimeoutId = 0
-              visible = false
-            }, 1000)
-          }
-        }
-      })
-    }
+    resourceLoader.on('progressIncremented', (event) => {
+      progress = event.percent
+    })
     /** PROGRESSBAR END */
 
     /** FPS DISPLAY START */
@@ -219,9 +197,11 @@
 
     const loadAsset = (url) => {
       const asset = new CADAsset()
+
       asset.on('error', (event) => {
         console.warn('Error:', event)
       })
+
       asset.on('loaded', () => {
         const materials = asset.getMaterialLibrary().getMaterials()
         materials.forEach((material) => {
@@ -230,39 +210,47 @@
         })
         renderer.frameAll()
       })
+
       asset.getGeometryLibrary().on('loaded', () => {
         renderer.frameAll()
       })
+
       $assets.addChild(asset)
       asset.getParameter('FilePath').setValue(url)
+
       return asset
     }
 
     if (!embeddedMode) {
-      const url = urlParams.has('zcad')
+      assetUrl = urlParams.has('zcad')
         ? urlParams.get('zcad')
-        : '/assets/gear_box_final_asm-visu.zcad'
+        : '/data/gear_box_final_asm-visu.zcad'
 
-      loadAsset(url)
+      loadAsset(assetUrl)
     }
     /** CAD END */
 
     /** COLLAB START*/
     if (!embeddedMode) {
       const SOCKET_URL = 'https://websocket-staging.zea.live'
-      const ROOM_ID = url
-      auth.getUserData().then((userData) => {
-        if (!userData) return
-        const session = new Session(userData, SOCKET_URL)
-        session.joinRoom(ROOM_ID)
-        const sessionSync = new SessionSync(session, appData, userData, {})
+      const ROOM_ID = assetUrl
 
-        appData.userData = userData
-        appData.session = session
-        appData.sessionSync = sessionSync
+      const userData = await auth.getUserData()
 
-        APP_DATA.update(() => appData)
-      })
+      if (!userData) {
+        return
+      }
+
+      const session = new Session(userData, SOCKET_URL)
+      session.joinRoom(ROOM_ID)
+
+      const sessionSync = new SessionSync(session, appData, userData, {})
+
+      appData.userData = userData
+      appData.session = session
+      appData.sessionSync = sessionSync
+
+      APP_DATA.update(() => appData)
     }
     /** COLLAB END */
 
@@ -338,36 +326,21 @@
   }
 </script>
 
-<div class="Renderer flex-1">
-  <zea-layout
-    add-cells="AB"
-    borders
-    cell-a-size={$ui.shouldShowDrawer ? 250 : 0}
-    show-resize-handles="A"
-  >
-    <div slot="A" class="h-full w-full">
-      <zea-tabs slot="a" orientation="horizontal">
-        <div slot="tab-bar">Assembly</div>
-        <div class="tab-content">
-          <Sidebar />
-        </div>
+<main class="Main flex-1 relative">
+  <canvas bind:this={canvas} class="absolute h-full w-full" />
 
-        <div slot="tab-bar">Search</div>
-        <div class="tab-content">
-          <SearchTool />
-        </div>
-      </zea-tabs>
-    </div>
-    <div slot="B" class="h-full w-full">
-      <canvas class="h-full w-full" bind:this={canvas} />
-    </div>
-  </zea-layout>
+  <div bind:this={fpsContainer} />
 
-  <div class="fixed" bind:this={fpsContainer} />
-  <div class="fixed">
-    <zea-progress-bar bind:this={progressBar} />
+  <Drawer>
+    <Sidebar />
+  </Drawer>
+</main>
+
+{#if progress < 100}
+  <div class="fixed bottom-0 w-full">
+    <ProgressBar {progress} />
   </div>
-</div>
+{/if}
 
 <Dialog isOpen={isDialogOpen} close={closeDialog} {contextItem} />
 
