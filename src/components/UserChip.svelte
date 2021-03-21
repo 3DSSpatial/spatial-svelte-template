@@ -19,12 +19,10 @@
   }
 
   $: avatar = user.avatar || user.picture
-  $: firstName = user.firstName || user.given_name || 'N'
-  $: lastName = user.lastName || user.family_name || 'N'
+  $: firstName = user.firstName || user.given_name || ' '
+  $: lastName = user.lastName || user.family_name || ' '
 
-  $: if (firstName && lastName) {
-    initials = `${firstName[0]}${lastName[0]}`
-  }
+  $: initials = `${firstName[0]}${lastName[0]}`
 </script>
 
 <div class="UserChip relative">
