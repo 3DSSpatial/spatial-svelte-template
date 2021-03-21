@@ -6,15 +6,19 @@
   import Menu from '../components/ContextMenu/Menu.svelte'
   import MenuOption from '../components/ContextMenu/MenuOption.svelte'
   import Dialog from '../components/Dialog.svelte'
-  import ParameterNumber from '../components/parameters/ParameterNumber.svelte'
+  import ParameterOwnerWidget from './parameters/ParameterOwnerWidget.svelte'
+
   import Drawer from '../components/Drawer.svelte'
   import ProgressBar from '../components/ProgressBar.svelte'
   import Sidebar from '../components/Sidebar.svelte'
+  import SplitPane from '../components/SplitPane.svelte'
+  import Pane from '../components/Pane.svelte'
 
   import { auth } from '../helpers/auth'
 
   import { APP_DATA } from '../stores/appData'
   import { assets } from '../stores/assets.js'
+  import { ui } from '../stores/ui.js'
   import { selectionManager } from '../stores/selectionManager.js'
   import { scene } from '../stores/scene.js'
 
@@ -298,15 +302,25 @@
           client.send(data._id, { done: true })
         }
       })
+
+      $selectionManager.on('selectionChanged', (event) => {
+        const { selection } = event
+        const selectionPaths = []
+        selection.forEach((item) =>
+          selectionPaths.push(item.getPath().slice(2))
+        )
+        client.send('selectionChanged', { selection: selectionPaths })
+      })
     }
 
-    $selectionManager.on('selectionChanged', (event) => {
-      const { selection } = event
-      const selectionPaths = []
-      selection.forEach((item) => selectionPaths.push(item.getPath().slice(2)))
-      client.send('selectionChanged', { selection: selectionPaths })
-    })
     /** EMBED MESSAGING END */
+
+    /** DYNAMIC SELECTION UI START */
+    $selectionManager.on('leadSelectionChanged', (event) => {
+      parameterOwner = event.treeItem
+      $ui.shouldShowParameterOwnerWidget = parameterOwner
+    })
+    /** DYNAMIC SELECTION UI END */
 
     APP_DATA.set(appData)
   })
@@ -327,19 +341,24 @@
     isDialogOpen = false
   }
 
-  const numberParameter = new NumberParameter('Foo Number', 6, [0, 30], 5)
+  const numberParameter = new NumberParameter('Foo Number', 1, [0, 1], 0.2)
+  const treeItem = new TreeItem()
+  treeItem.addParameter(numberParameter)
+  treeItem.addParameter(new NumberParameter('Big Number', 10, [0, 100], 1))
+
+  $: parameterOwner = treeItem
 </script>
 
 <main class="Main flex-1 relative">
   <canvas bind:this={canvas} class="absolute h-full w-full" />
-
   <div bind:this={fpsContainer} />
-
   <Drawer>
-    <!-- <Sidebar /> -->
-
-    <ParameterNumber parameter={numberParameter} />
+    <Sidebar />
   </Drawer>
+
+  {#if $ui.shouldShowParameterOwnerWidget}
+    <ParameterOwnerWidget {parameterOwner} />
+  {/if}
 </main>
 
 {#if progress < 100}
