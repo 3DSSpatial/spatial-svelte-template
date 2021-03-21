@@ -8,7 +8,7 @@
 
 ## Live Demo
 
-This template has been deployed to Vercel for a live demo.
+This template has been deployed as a live demo for you to check out now.
 
 > Password: zea
 
@@ -75,11 +75,14 @@ npm run dev
 
 ## UI
 
-The template app leverages the Zea UI library for all its User interface components.
+The template app provides a library of Svelte components that can be customized and used to build your own user interfaces.
 
-> http://web-components.zea.live/
-
-The UI library is built using the new 'web components' technology supported in all modern browsers.
+- Drawer: a Side panel that pops out to display additional content.
+- Dialog: Used to show modal content.
+- Tabs: A simple tabs layout component.
+- UserChip: Displays the current user avatar.
+- UserChips: Displays the chips for all the users in the current session.
+- ParameterOwnerWidget: A Dynamic UI for displaying Parameters.
 
 ## UX
 
@@ -222,10 +225,8 @@ This template contains the following software from Zea Inc. Please be mindful of
 
 **Zea CAD**: Proprietary, closed-source
 
-**Zea Collab**: Proprietary, closed-source
+**Zea Collab**: https://github.com/ZeaInc/zea-collab
 
 **Zea Kinematics**: https://github.com/ZeaInc/zea-kinematics
 
 **Zea UX**: https://github.com/ZeaInc/zea-ux
-
-**Zea UI**: Proprietary, closed-source
