@@ -5,7 +5,7 @@
 
   const { AssetItem, Color } = window.zeaEngine
 
-  let searchInput
+  let searchInputEl
   let searchResults
   let value = ''
 
@@ -46,13 +46,18 @@
   }
 
   onMount(() => {
-    searchInput.focus()
+    searchInputEl.focus()
   })
 </script>
 
 <div class="h-full w-full px-3">
   <form on:submit|preventDefault={handleSubmit}>
-    <input bind:this={searchInput} bind:value class="w-full" type="text" />
+    <input
+      bind:this={searchInputEl}
+      bind:value
+      class="rounded w-full text-black px-1"
+      type="search"
+    />
   </form>
   <ul bind:this={searchResults} class="py-3" id="searchResults" />
 </div>

@@ -10,7 +10,7 @@
     <li>
       <a
         class="hover:text-blue-400"
-        href="/login?zcad=/assets/gear_box_final_asm-visu.zcad"
+        href="/login?zcad=/data/gear_box_final_asm-visu.zcad"
       >
         gear_box_final_asm-visu.zcad
       </a>
@@ -18,7 +18,7 @@
     <li>
       <a
         class="hover:text-blue-400"
-        href="/login?zcad=/assets/Hospital/Autodesk_Hospital_HVAC.zcad"
+        href="/login?zcad=/data/Hospital/Autodesk_Hospital_HVAC.zcad"
       >
         Autodesk_Hospital_HVAC.zcad
       </a>
@@ -26,7 +26,7 @@
     <li>
       <a
         class="hover:text-blue-400"
-        href="/login?zcad=/assets/Hospital/Autodesk_Hospital_Structural.zcad"
+        href="/login?zcad=/data/Hospital/Autodesk_Hospital_Structural.zcad"
       >
         Autodesk_Hospital_Structural.zcad
       </a>

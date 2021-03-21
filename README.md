@@ -23,9 +23,9 @@ The default asset provided is the GearBox.
 You can also modify the app to load parts of the hospital.
 ![Hosptial-Structural](docs/images/Hosptial-Structural.jpg)
 
-https://zea-svelte-template.vercel.app/?zcad=/assets/Hospital/Autodesk_Hospital_Structural.zcad
+https://zea-svelte-template.vercel.app/?zcad=/data/Hospital/Autodesk_Hospital_Structural.zcad
 
-https://zea-svelte-template.vercel.app/?zcad=/assets/Hospital/Autodesk_Hospital_HVAC.zcad
+https://zea-svelte-template.vercel.app/?zcad=/data/Hospital/Autodesk_Hospital_HVAC.zcad
 
 ## Prerequisites
 
@@ -135,7 +135,7 @@ asset.on('loaded', () => {
   renderer.frameAll()
 })
 scene.getRoot().addChild(asset)
-asset.getParameter('FilePath').setValue('/assets/HC_SRO4.zcad')
+asset.getParameter('FilePath').setValue('/data/HC_SRO4.zcad')
 ```
 
 The code above loads the sample cad file.
@@ -214,6 +214,7 @@ File it on Github: https://github.com/ZeaInc/zea-svelte-template
 Start a discussion: https://github.com/ZeaInc/zea-svelte-template/discussions
 
 # Credits
+
 This Svelte Template is a preconfigured Svelte app that combines the engine and many of the popular plugins.  
 This template contains the following software from Zea Inc. Please be mindful of the license attached to each of these software if publishing or redistributing your work.
 

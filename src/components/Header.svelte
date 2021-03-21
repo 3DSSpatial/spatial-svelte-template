@@ -5,6 +5,7 @@
   const { CameraManipulator } = window.zeaEngine
   const { ToolManager } = window.zeaUx
 
+  import Button from './Button.svelte'
   import Menu from './Menu.svelte'
   import MenuItem from './MenuItem.svelte'
   import MenuItemDropDown from './MenuItemDropDown.svelte'
@@ -25,6 +26,7 @@
   let vrToggleMenuItemDisabled = true
 
   let cameraManipulator
+  let isSelectionEnabled = false
   let renderer
   let session
   let sessionSync
@@ -47,11 +49,6 @@
           renderer.frameAll()
         }
         break
-      case 's':
-        if (toolManager) {
-          selectionEnabled = !selectionEnabled
-        }
-        break
       case 'z':
         if (event.ctrlKey && undoRedoManager) {
           undoRedoManager.undo()
@@ -64,6 +61,16 @@
         break
     }
   })
+
+  const handleMenuSelectionChange = () => {
+    if (!toolManager) {
+      return
+    }
+
+    isSelectionEnabled
+      ? toolManager.pushTool('SelectionTool')
+      : toolManager.popTool()
+  }
 
   onMount(() => {
     if (session) {
@@ -155,16 +162,7 @@
     undoRedoManager.redo()
   }
 
-  let selectionEnabled = false
   let walkModeEnabled = false
-
-  $: if (toolManager) {
-    if (selectionEnabled) {
-      toolManager.pushTool('SelectionTool')
-    } else {
-      toolManager.popTool()
-    }
-  }
 
   $: if (cameraManipulator) {
     cameraManipulator.enabledWASDWalkMode = walkModeEnabled
@@ -227,13 +225,13 @@
 </script>
 
 {#if !embeddedMode}
-  <div class="Header flex items-center px-2 py-1 text-gray-200">
+  <header class="flex items-center px-2 py-1 text-gray-200 z-50">
     <span
       class="material-icons cursor-default mr-2"
       on:click={handleClickMenuToggle}
       title="{$ui.shouldShowDrawer ? 'Close' : 'Open'} drawer"
     >
-      {$ui.shouldShowDrawer ? 'close' : 'menu'}
+      {$ui.shouldShowDrawer ? 'menu_open' : 'menu'}
     </span>
 
     <img class="w-20 mx-3" src="/images/logo-zea.svg" alt="logo" />
@@ -265,13 +263,14 @@
             on:click={handleRedo}
           />
           <MenuItemToggle
+            bind:checked={isSelectionEnabled}
             label="Enable Selection Tool"
+            on:change={handleMenuSelectionChange}
             shortcut="S"
-            bind:value={selectionEnabled}
           />
           <MenuItemToggle
+            bind:checked={walkModeEnabled}
             label="Enable Walk Mode (WASD)"
-            bind:value={walkModeEnabled}
           />
         </Menu>
       </MenuBarItem>
@@ -279,6 +278,7 @@
       <MenuBarItem label="Collab" let:isOpen>
         <Menu {isOpen}>
           <MenuItem
+            iconLeft="visibility"
             label="Direct Attention"
             shortcut="Ctrl+N"
             on:click={handleDA}
@@ -324,8 +324,10 @@
 
     {#if $APP_DATA}
       <UserChip user={$APP_DATA.userData}>
-        <zea-button on:click={handleSignOut}>Sign out</zea-button>
+        <div class="text-center">
+          <Button on:click={handleSignOut}>Sign Out</Button>
+        </div>
       </UserChip>
     {/if}
-  </div>
+  </header>
 {/if}

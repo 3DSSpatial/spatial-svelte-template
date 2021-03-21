@@ -29,7 +29,7 @@
     username: formFields.username,
   }
 
-  const redirectToRenderer = () => {
+  const redirectToMain = () => {
     const params = new URLSearchParams(window.location.search)
     $redirect('/?' + params.toString())
   }
@@ -39,7 +39,7 @@
       await auth.setUserData(userData)
 
       submitted = true
-      redirectToRenderer()
+      redirectToMain()
     } catch (err) {
       authError = err
     }
@@ -49,7 +49,7 @@
     const isAuthenticated = await auth.isAuthenticated()
 
     if (isAuthenticated) {
-      redirectToRenderer()
+      redirectToMain()
       return
     }
 

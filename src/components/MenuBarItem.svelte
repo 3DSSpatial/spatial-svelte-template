@@ -59,7 +59,7 @@
 <div bind:this={menuBarItemEl} class="MenuBarItem">
   <button
     bind:this={buttonEl}
-    class="cursor-default h-full px-3 hover:bg-gray-700"
+    class="cursor-default h-full px-3 hover:bg-gray-700 transition-colors rounded"
     on:click={handleClick}
     on:mouseenter={handleMouseEnter}
   >
