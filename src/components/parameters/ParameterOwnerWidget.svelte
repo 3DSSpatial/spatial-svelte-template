@@ -4,15 +4,27 @@
   let items = []
 
   import { componentRegistry } from '../../helpers/componentRegistry.js'
+
+  import BooleanParameterWidget from './BooleanParameterWidget.svelte'
+  import NumberParameterWidget from './NumberParameterWidget.svelte'
   import RangedNumberParameterWidget from './RangedNumberParameterWidget.svelte'
   import StringParameterWidget from './StringParameterWidget.svelte'
-  import BooleanParameterWidget from './BooleanParameterWidget.svelte'
+  import ColorParameterWidget from './ColorParameterWidget.svelte'
 
   const {
     BooleanParameter,
     NumberParameter,
     StringParameter,
+    ColorParameter,
   } = window.zeaEngine
+
+  componentRegistry.registerComponent((parameter) => {
+    return parameter instanceof BooleanParameter
+  }, BooleanParameterWidget)
+
+  componentRegistry.registerComponent((parameter) => {
+    return parameter instanceof NumberParameter
+  }, NumberParameterWidget)
 
   componentRegistry.registerComponent((parameter) => {
     return parameter instanceof NumberParameter && parameter.getRange()
@@ -23,12 +35,11 @@
   }, StringParameterWidget)
 
   componentRegistry.registerComponent((parameter) => {
-    return parameter instanceof BooleanParameter
-  }, BooleanParameterWidget)
+    return parameter instanceof ColorParameter
+  }, ColorParameterWidget)
 
   let index = 0
   $: parameterOwner.getParameters().forEach((parameter) => {
-    console.log('parameter:', parameter.getName())
     const component = componentRegistry.selectComponent(parameter)
     if (component) {
       items.push({

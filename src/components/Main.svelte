@@ -36,6 +36,7 @@
     SystemDesc,
     EnvMap,
     NumberParameter,
+    ColorParameter,
   } = window.zeaEngine
   const { GLCADPass, CADAsset } = window.zeaCad
   const {
@@ -341,12 +342,7 @@
     isDialogOpen = false
   }
 
-  const numberParameter = new NumberParameter('Foo Number', 1, [0, 1], 0.2)
-  const treeItem = new TreeItem()
-  treeItem.addParameter(numberParameter)
-  treeItem.addParameter(new NumberParameter('Big Number', 10, [0, 100], 1))
-
-  $: parameterOwner = treeItem
+  $: parameterOwner = null
 </script>
 
 <main class="Main flex-1 relative">

@@ -1,18 +1,20 @@
 <script>
   export let parameter
+
+  let step = parameter.getStep()
   let paramValue = parameter.getValue()
 
-  let changing = false
+  let sliderChanging = false
   const displayValue = () => {
-    if (changing) return
+    if (sliderChanging) return
     paramValue = parameter.getValue()
   }
 
   const handleEditChange = (event) => {
-    paramValue = event.target.value
-    changing = true
+    paramValue = event.target.valueAsNumber
+    sliderChanging = true
     parameter.setValue(paramValue)
-    changing = false
+    sliderChanging = false
   }
 
   parameter.on('valueChanged', (event) => {
@@ -22,6 +24,8 @@
 
 <input
   on:input={handleEditChange}
+  {step}
+  type="number"
   value={paramValue}
   class="text-black rounded p-1"
 />

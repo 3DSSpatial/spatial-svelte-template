@@ -75,5 +75,5 @@
   {step}
   type="number"
   value={paramValue}
-  class="text-black rounded py-1"
+  class="text-black rounded p-1"
 />

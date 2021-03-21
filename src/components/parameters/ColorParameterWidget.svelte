@@ -9,8 +9,8 @@
   }
 
   const handleEditChange = (event) => {
-    paramValue = event.target.value
     changing = true
+    paramValue.setFromHex(event.target.value)
     parameter.setValue(paramValue)
     changing = false
   }
@@ -22,6 +22,7 @@
 
 <input
   on:input={handleEditChange}
-  value={paramValue}
-  class="text-black rounded p-1"
+  type="color"
+  value={paramValue.toHex()}
+  class="text-black rounded h-full"
 />
