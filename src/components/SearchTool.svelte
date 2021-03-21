@@ -13,7 +13,7 @@
   const matchedItemsSet = new Set()
   const matchColor = new Color(1, 0, 0, 0.2)
 
-  if ($scene) {
+  if ($scene && searchResults) {
     while (searchResults.firstChild) {
       searchResults.removeChild(searchResults.lastChild)
     }
