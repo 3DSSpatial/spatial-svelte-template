@@ -381,7 +381,6 @@
       text="Properties"
       on:click={() => {
         if (contextItem) {
-          console.log('CurrentSelected Item :', contextItem.rivianAttributes)
           isDialogOpen = true
           closeMenu()
         }
