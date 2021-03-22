@@ -46,7 +46,7 @@
         $scene.getRoot().traverse((item) => {
           if (item instanceof GridTreeItem) return false
           if (re.test(item.getName())) {
-            const listItem = document.createElement('ul')
+            const listItem = document.createElement('li')
             listItem.classList.add('truncate')
             listItem.textContent = item.getName()
             searchResults.appendChild(listItem)
