@@ -10,10 +10,11 @@
 <div class="TabsBar flex border-b border-gray-600 mb-2">
   {#each tabs as tab}
     <button
-      class="flex-1 leading-9 rounded-t {selectedTab !== tab &&
-        'hover:bg-gray-700'} bg-gray-{selectedTab === tab
-        ? '600'
-        : '800'} {selectedTab === tab && 'text-primary'}"
+      class="flex-1 leading-9 rounded-t"
+      class:bg-gray-600={selectedTab === tab}
+      class:bg-gray-800={selectedTab !== tab}
+      class:hover:bg-gray-700={selectedTab !== tab}
+      class:text-primary={selectedTab === tab}
       on:click={() => {
         handleClick(tab)
       }}
