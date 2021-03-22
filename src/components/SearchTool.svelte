@@ -3,46 +3,79 @@
 
   import { scene } from '../stores/scene.js'
 
-  const { AssetItem, Color } = window.zeaEngine
+  const { Color, Material, GeomItem, GridTreeItem } = window.zeaEngine
 
   let searchInputEl
   let searchResults
   let value = ''
 
   const filteredItemsSet = new Set()
+  const filteredItemMaterial = new Material()
+  filteredItemMaterial.setShaderName('FlatSurfaceShader')
+  filteredItemMaterial
+    .getParameter('BaseColor')
+    .setValue(new Color(0, 0, 1, 0.1))
+
+  const filteredItemMaterials = {}
   const matchedItemsSet = new Set()
   const matchColor = new Color(1, 0, 0, 0.2)
 
-  if ($scene && searchResults) {
-    while (searchResults.firstChild) {
-      searchResults.removeChild(searchResults.lastChild)
-    }
-    filteredItemsSet.forEach((item) => {})
-    filteredItemsSet.clear()
-    matchedItemsSet.forEach((item) => {
-      item.removeHighlight('searchResult', true)
-    })
-    matchedItemsSet.clear()
-
-    if (value.length >= 2) {
-      const re = new RegExp(value, 'i')
-      $scene.getRoot().traverse((item) => {
-        if (re.test(item.getName())) {
-          const listItem = document.createElement('ul')
-          listItem.classList.add('truncate')
-          listItem.textContent = item.getName()
-          searchResults.appendChild(listItem)
-          matchedItemsSet.add(item)
-          item.addHighlight('searchResult', matchColor, true)
-        } else {
-          filteredItemsSet.add(item)
+  const doSearch = () => {
+    if ($scene) {
+      while (searchResults.firstChild) {
+        searchResults.removeChild(searchResults.lastChild)
+      }
+      filteredItemsSet.forEach((item) => {
+        if (item instanceof GeomItem) {
+          // Updating the search.
+          // Put back the original materials
+          if (filteredItemMaterials[item.getId()]) {
+            const materialParam = item.getParameter('Material')
+            materialParam.setValue(filteredItemMaterials[item.getId()])
+          }
         }
       })
+      filteredItemsSet.clear()
+      matchedItemsSet.forEach((item) => {
+        item.removeHighlight('searchResult', true)
+      })
+      matchedItemsSet.clear()
+
+      if (value.length >= 2) {
+        const re = new RegExp(value, 'i')
+        $scene.getRoot().traverse((item) => {
+          if (item instanceof GridTreeItem) return false
+          if (re.test(item.getName())) {
+            const listItem = document.createElement('ul')
+            listItem.classList.add('truncate')
+            listItem.textContent = item.getName()
+            searchResults.appendChild(listItem)
+            matchedItemsSet.add(item)
+            item.addHighlight('searchResult', matchColor, true)
+            return false
+          } else if (item instanceof GeomItem) {
+            filteredItemsSet.add(item)
+          }
+        })
+      }
     }
   }
 
+  $: doSearch(value)
+
   const handleSubmit = () => {
-    console.log('handleSubmit')
+    // Make all the filtered items transparent so we can see the
+    // matched items more clearly.
+    filteredItemsSet.forEach((item) => {
+      if (item instanceof GeomItem) {
+        const materialParam = item.getParameter('Material')
+        filteredItemMaterials[item.getId()] = materialParam.getValue()
+        materialParam.setValue(filteredItemMaterial)
+      }
+    })
+    matchedItemsSet.forEach((item) => {
+      item.removeHighlight('searchResult', true)
+    })
   }
 
   onMount(() => {
