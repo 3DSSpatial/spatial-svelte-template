@@ -15,7 +15,7 @@ This template has been deployed as a live demo for you to check out now.
 You can change the password in your own deployments, or connect to an authentication service.
 See below.
 
-https://zea-svelte-template.vercel.app/
+https://svelte-template.zea.live/
 
 The default asset provided is the GearBox.
 ![GearBox](docs/images/GearBox.jpg)
@@ -23,9 +23,9 @@ The default asset provided is the GearBox.
 You can also modify the app to load parts of the hospital.
 ![Hosptial-Structural](docs/images/Hosptial-Structural.jpg)
 
-https://zea-svelte-template.vercel.app/?zcad=/data/Hospital/Autodesk_Hospital_Structural.zcad
+https://svelte-template.zea.live/?zcad=/data/Hospital/Autodesk_Hospital_Structural.zcad
 
-https://zea-svelte-template.vercel.app/?zcad=/data/Hospital/Autodesk_Hospital_HVAC.zcad
+https://svelte-template.zea.live/?zcad=/data/Hospital/Autodesk_Hospital_HVAC.zcad
 
 ## Prerequisites
 
