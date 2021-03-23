@@ -80,7 +80,7 @@
     $scene = new Scene()
 
     // Assigning an Environment Map enables PBR lighting for niceer shiny surfaces.
-    if (!SystemDesc.isMobileDevice) {
+    if (!SystemDesc.isMobileDevice && SystemDesc.gpuDesc.supportsWebGL2) {
       const envMap = new EnvMap('envMap')
       envMap
         .getParameter('FilePath')
