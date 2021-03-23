@@ -35,8 +35,7 @@
     "svelte": "^3.35.0",
     "svelte-loader": "^3.0.0",
     "svelte-preprocess": "^4.6.9",
-    "tailwindcss": "^2.0.4",
-    "tossr": "^1.4.2"
+    "tailwindcss": "^2.0.4"
   },
   "license": "MIT",
   "scripts": {
@@ -45,7 +44,6 @@
     "build:static": "spank",
     "dev": "run-p routify rollup",
     "dev:nollup": "run-p routify nollup",
-    "dev:ssr": "run-p routify rollup",
     "nollup": "nollup -c",
     "rollup": "rollup -cw",
     "routify": "routify",
@@ -62,10 +60,7 @@
       "dist",
       "assets"
     ],
-    "script": "dist/build/main.js",
-    "ssrOptions": {
-      "inlineDynamicImports": true
-    }
+    "script": "dist/build/main.js"
   },
   "spank": {
     "blacklist": [

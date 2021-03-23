@@ -27,15 +27,11 @@ const serve = () => ({
       entrypoint: `${assetsDir}/__app.html`,
       script: `${buildDir}/main.js`,
     }
+
     spassr({ ...options, port: 5000 })
-    spassr({
-      ...options,
-      ssr: true,
-      port: 5005,
-      ssrOptions: { inlineDynamicImports: true, dev: true },
-    })
   },
 })
+
 const copyToDist = () => ({
   writeBundle() {
     copySync(assetsDir, distDir)

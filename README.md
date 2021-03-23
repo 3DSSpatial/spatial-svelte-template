@@ -4,7 +4,6 @@
 
 - Built on top of [Svelte](https://svelte.dev/), a radical new approach to building user interfaces.
 - Includes the latest stable versions of the Zea tools: [Zea Engine](https://docs.zea.live/zea-engine/), [Zea UI](https://web-components.zea.live/), [Zea UX](https://docs.zea.live/zea-ux/), and [Zea Collab](https://docs.zea.live/zea-collab/).
-- Supports [SSR](https://en.wikipedia.org/wiki/Server-side_scripting).
 
 ## Live Demo
 
@@ -65,11 +64,11 @@ npm run dev
 
 ### npm scripts
 
-| Syntax  | Description                                                      |
-| ------- | ---------------------------------------------------------------- |
-| `build` | Build a bundled app with SSR + pre-rendering and dynamic imports |
-| `dev`   | Development (port 5000)                                          |
-| `serve` | Run after a build to preview. Serves SPA on 5000 and SSR on 5005 |
+| Syntax  | Description                                      |
+| ------- | ------------------------------------------------ |
+| `build` | Build app with pre-rendering and dynamic imports |
+| `dev`   | Development (port 5000)                          |
+| `serve` | Run after a build to preview. Serves SPA on 5000 |
 
 # Features
 
