@@ -4,7 +4,6 @@
 
 - Built on top of [Svelte](https://svelte.dev/), a radical new approach to building user interfaces.
 - Includes the latest stable versions of the Zea tools: [Zea Engine](https://docs.zea.live/zea-engine/), [Zea UI](https://web-components.zea.live/), [Zea UX](https://docs.zea.live/zea-ux/), and [Zea Collab](https://docs.zea.live/zea-collab/).
-- Supports [SSR](https://en.wikipedia.org/wiki/Server-side_scripting).
 
 ## Live Demo
 
@@ -15,7 +14,7 @@ This template has been deployed as a live demo for you to check out now.
 You can change the password in your own deployments, or connect to an authentication service.
 See below.
 
-https://zea-svelte-template.vercel.app/
+https://svelte-template.zea.live/
 
 The default asset provided is the GearBox.
 ![GearBox](docs/images/GearBox.jpg)
@@ -23,9 +22,9 @@ The default asset provided is the GearBox.
 You can also modify the app to load parts of the hospital.
 ![Hosptial-Structural](docs/images/Hosptial-Structural.jpg)
 
-https://zea-svelte-template.vercel.app/?zcad=/data/Hospital/Autodesk_Hospital_Structural.zcad
+https://svelte-template.zea.live/?zcad=/data/Hospital/Autodesk_Hospital_Structural.zcad
 
-https://zea-svelte-template.vercel.app/?zcad=/data/Hospital/Autodesk_Hospital_HVAC.zcad
+https://svelte-template.zea.live/?zcad=/data/Hospital/Autodesk_Hospital_HVAC.zcad
 
 ## Prerequisites
 
@@ -65,11 +64,11 @@ npm run dev
 
 ### npm scripts
 
-| Syntax  | Description                                                      |
-| ------- | ---------------------------------------------------------------- |
-| `build` | Build a bundled app with SSR + pre-rendering and dynamic imports |
-| `dev`   | Development (port 5000)                                          |
-| `serve` | Run after a build to preview. Serves SPA on 5000 and SSR on 5005 |
+| Syntax  | Description                                      |
+| ------- | ------------------------------------------------ |
+| `build` | Build app with pre-rendering and dynamic imports |
+| `dev`   | Development (port 5000)                          |
+| `serve` | Run after a build to preview. Serves SPA on 5000 |
 
 # Features
 
