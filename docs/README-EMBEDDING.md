@@ -2,8 +2,6 @@
 
 ## Embed View
 
-> http://docs.zea.live/zea-svelte-template/embed.html
-
 The Embed view shows how the svelte app would be displayed within the context of another application, embedded as an iFrame. The host application can then control the embedded svelte app via the JSON API and the Channel Messenger classes.
 
 # Getting Started
@@ -11,6 +9,7 @@ The Embed view shows how the svelte app would be displayed within the context of
 To test zea-svelt-template embedded on your system, and run through the following steps.
 
 In the root of the project, run the svelete app as normal using dev.
+
 ```sh
 > npm run dev
 ```
