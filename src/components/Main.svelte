@@ -215,7 +215,6 @@
           const baseColor = material.getParameter('BaseColor')
           if (baseColor) baseColor.setValue(baseColor.getValue().toGamma())
         })
-        renderer.frameAll()
       })
 
       asset.getGeometryLibrary().on('loaded', () => {
