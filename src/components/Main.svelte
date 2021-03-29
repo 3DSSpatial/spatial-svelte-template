@@ -239,7 +239,7 @@
     /** COLLAB START*/
     if (!embeddedMode) {
       const SOCKET_URL = 'https://websocket-staging.zea.live'
-      const ROOM_ID = assetUrl
+      const roomId = assetUrl
 
       const userData = await auth.getUserData()
 
@@ -248,7 +248,7 @@
       }
 
       const session = new Session(userData, SOCKET_URL)
-      session.joinRoom(ROOM_ID)
+      session.joinRoom(roomId)
 
       const sessionSync = new SessionSync(session, appData, userData, {})
 
