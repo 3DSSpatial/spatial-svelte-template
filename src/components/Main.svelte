@@ -22,7 +22,7 @@
   import { selectionManager } from '../stores/selectionManager.js'
   import { scene } from '../stores/scene.js'
 
-  import { ChannelMessenger } from '../ChannelMessenger.js'
+  import { createClient } from '../ChannelMessenger.js'
   import buildTree from '../helpers/buildTree'
 
   const {
@@ -53,12 +53,7 @@
   let fpsContainer
   const urlParams = new URLSearchParams(window.location.search)
   const embeddedMode = urlParams.has('embedded')
-  let client
   let progress
-
-  if (embeddedMode) {
-    client = new ChannelMessenger()
-  }
 
   const filterItemSelection = (item) => {
     // Propagate selections deep in the tree up to the part body.
@@ -262,6 +257,8 @@
 
     /** EMBED MESSAGING START*/
     if (embeddedMode) {
+      const client = createClient()
+
       client.on('setBackgroundColor', (data) => {
         const color = new Color(data.color)
         $scene.getSettings().getParameter('BackgroundColor').setValue(color)
@@ -312,7 +309,6 @@
         client.send('selectionChanged', { selection: selectionPaths })
       })
     }
-
     /** EMBED MESSAGING END */
 
     /** DYNAMIC SELECTION UI START */
