@@ -22,7 +22,7 @@
   $: firstName = user.firstName || user.given_name || ' '
   $: lastName = user.lastName || user.family_name || ' '
 
-  $: initials = `${firstName[0]}${lastName[0]}`
+  $: initials = `${firstName[0].toUpperCase()}${lastName[0].toUpperCase()}`
 </script>
 
 <div class="UserChip relative">
