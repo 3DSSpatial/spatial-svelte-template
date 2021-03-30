@@ -18,7 +18,8 @@ class ChannelMessenger extends EventEmitter {
 
     // Handle messages received on port2
     const onMessage = (e) => {
-      console.log('Message received by IFrame: "' + e.data + '"')
+      console.info('Message received by IFrame:')
+      console.info(e.data)
       if (!Array.isArray(e.data) || e.data.length != 2) {
         throw new Error(`Invalid message: ${e.data}`)
       }
