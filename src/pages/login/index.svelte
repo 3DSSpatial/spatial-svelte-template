@@ -85,6 +85,7 @@
               type="text"
             />
           </div>
+
           <div>
             <input
               autocomplete="off"
@@ -95,13 +96,14 @@
               required
               type="password"
             />
-            {#if authError}
-              <span class="font-medium tracking-wide text-red-500 text-xs">
-                {authError.message}
-              </span>
-            {/if}
           </div>
         </div>
+
+        {#if authError}
+          <span class="font-medium tracking-wide text-red-500 text-xs">
+            {authError.message}
+          </span>
+        {/if}
 
         <div>
           <button
