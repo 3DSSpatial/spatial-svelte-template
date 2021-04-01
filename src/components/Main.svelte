@@ -111,12 +111,13 @@
     appData.cameraManipulator = cameraManipulator
     const toolManager = new ToolManager(appData)
     $selectionManager = new SelectionManager(appData, {
-      enableXfoHandles: false,
+      enableXfoHandles: true,
     })
 
-    appData.selectionManager = $selectionManager
+    // Users can enable the handles usinga menu or hotkey.
+    $selectionManager.showHandles(false)
 
-    $selectionManager.showHandles(true)
+    appData.selectionManager = $selectionManager
 
     const selectionTool = new SelectionTool(appData)
     selectionTool.setSelectionFilter(filterItemSelection)

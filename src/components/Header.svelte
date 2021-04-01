@@ -27,9 +27,11 @@
 
   let cameraManipulator
   let isSelectionEnabled = false
+  let isTransformHandlesEnabled = false
   let renderer
   let session
   let sessionSync
+  let selectionManager
   let toolManager
   let undoRedoManager
   let userData
@@ -72,6 +74,15 @@
       : toolManager.popTool()
   }
 
+  const handleMenuTransformHandlesChange = () => {
+    console.log('showHandles')
+    if (!selectionManager) {
+      return
+    }
+    selectionManager.showHandles(isTransformHandlesEnabled)
+    selectionManager.updateHandleVisibility()
+  }
+
   onMount(() => {
     if (session) {
       session.leaveRoom()
@@ -85,6 +96,7 @@
       }
 
       renderer = appData.renderer
+      selectionManager = appData.selectionManager
       toolManager = appData.toolManager
       cameraManipulator = appData.cameraManipulator
       undoRedoManager = appData.undoRedoManager
@@ -267,6 +279,12 @@
             label="Enable Selection Tool"
             on:change={handleMenuSelectionChange}
             shortcut="S"
+          />
+          <MenuItemToggle
+            bind:checked={isTransformHandlesEnabled}
+            label="Enable Transform Handles"
+            on:change={handleMenuTransformHandlesChange}
+            shortcut="T"
           />
           <MenuItemToggle
             bind:checked={walkModeEnabled}
