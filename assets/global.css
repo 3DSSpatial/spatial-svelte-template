@@ -28,6 +28,8 @@
   color: rgba(255, 255, 255, 0.3);
 }
 
-.hidden {
-  display: none;
+html,
+body,
+#routify-app {
+  height: 100%;
 }

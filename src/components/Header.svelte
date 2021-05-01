@@ -237,7 +237,7 @@
 </script>
 
 {#if !embeddedMode}
-  <header class="flex items-center px-2 py-1 space-x-2 text-gray-200 z-50">
+  <header class="flex gap-2 items-center px-1 sm:px-2 py-1 text-gray-200 z-50">
     <span
       class="material-icons cursor-default"
       on:click={handleClickMenuToggle}
@@ -248,99 +248,82 @@
 
     <img class="h-6" src="/images/logo-zea.svg" alt="logo" />
 
-    <MenuBar>
-      <MenuBarItem label="View" let:isOpen>
-        <Menu {isOpen}>
-          <MenuItem
-            label="Frame All"
-            iconLeft="crop_free"
-            shortcut="F"
-            on:click={handleFrameAll}
-          />
-        </Menu>
-      </MenuBarItem>
+    <div class="hidden sm:block">
+      <MenuBar>
+        <MenuBarItem label="View" let:isOpen>
+          <Menu {isOpen}>
+            <MenuItem
+              label="Frame All"
+              iconLeft="crop_free"
+              shortcut="F"
+              on:click={handleFrameAll}
+            />
+          </Menu>
+        </MenuBarItem>
 
-      <MenuBarItem label="Edit" let:isOpen>
-        <Menu {isOpen}>
-          <MenuItem
-            label="Undo"
-            iconLeft="undo"
-            shortcut="Ctrl+Z"
-            on:click={handleUndo}
-          />
-          <MenuItem
-            label="Redo"
-            iconLeft="redo"
-            shortcut="Ctrl+Y"
-            on:click={handleRedo}
-          />
-          <MenuItemToggle
-            bind:checked={isSelectionEnabled}
-            label="Enable Selection Tool"
-            on:change={handleMenuSelectionChange}
-            shortcut="S"
-          />
-          <MenuItemToggle
-            bind:checked={isTransformHandlesEnabled}
-            label="Enable Transform Handles"
-            on:change={handleMenuTransformHandlesChange}
-            shortcut="T"
-          />
-          <MenuItemToggle
-            bind:checked={walkModeEnabled}
-            label="Enable Walk Mode (WASD)"
-          />
-        </Menu>
-      </MenuBarItem>
+        <MenuBarItem label="Edit" let:isOpen>
+          <Menu {isOpen}>
+            <MenuItem
+              label="Undo"
+              iconLeft="undo"
+              shortcut="Ctrl+Z"
+              on:click={handleUndo}
+            />
+            <MenuItem
+              label="Redo"
+              iconLeft="redo"
+              shortcut="Ctrl+Y"
+              on:click={handleRedo}
+            />
+            <MenuItemToggle
+              bind:checked={isSelectionEnabled}
+              label="Enable Selection Tool"
+              on:change={handleMenuSelectionChange}
+              shortcut="S"
+            />
+            <MenuItemToggle
+              bind:checked={isTransformHandlesEnabled}
+              label="Enable Transform Handles"
+              on:change={handleMenuTransformHandlesChange}
+              shortcut="T"
+            />
+            <MenuItemToggle
+              bind:checked={walkModeEnabled}
+              label="Enable Walk Mode (WASD)"
+            />
+          </Menu>
+        </MenuBarItem>
 
-      <MenuBarItem label="Collab" let:isOpen>
-        <Menu {isOpen}>
-          <MenuItem
-            iconLeft="visibility"
-            label="Direct Attention"
-            shortcut="Ctrl+N"
-            on:click={handleDA}
-          />
-        </Menu>
-      </MenuBarItem>
+        <MenuBarItem label="Collab" let:isOpen>
+          <Menu {isOpen}>
+            <MenuItem
+              iconLeft="visibility"
+              label="Direct Attention"
+              shortcut="Ctrl+N"
+              on:click={handleDA}
+            />
+          </Menu>
+        </MenuBarItem>
 
-      <MenuBarItem label="VR" let:isOpen>
-        <Menu {isOpen}>
-          <MenuItem
-            disabled={vrToggleMenuItemDisabled}
-            label={vrToggleMenuItemLabel}
-            on:click={handleLaunchVR}
-          />
-          <MenuItem
-            label="Enable Spectator Mode"
-            on:click={handleToggleVRSpatatorMode}
-          />
-        </Menu>
-      </MenuBarItem>
-
-      <MenuBarItem label="More" let:isOpen>
-        <Menu {isOpen}>
-          <MenuItem label="Foo Bar" shortcut="Ctrl+A" />
-          <MenuItem label="Foo Bar" />
-          <MenuItem label="Foo Bar" iconLeft="storage" shortcut="Shift+B" />
-          <MenuItem label="Foo Bar" />
-          <MenuItem label="Foo Bar" shortcut="Alt+C" />
-          <MenuItem label="Foo Bar" />
-          <MenuItemDropDown label="Foo Bar" let:isOpen>
-            <Menu {isOpen}>
-              <MenuItem label="Foo Bar" />
-              <MenuItem label="Foo Bar" />
-            </Menu>
-          </MenuItemDropDown>
-        </Menu>
-      </MenuBarItem>
-    </MenuBar>
+        <MenuBarItem label="VR" let:isOpen>
+          <Menu {isOpen}>
+            <MenuItem
+              disabled={vrToggleMenuItemDisabled}
+              label={vrToggleMenuItemLabel}
+              on:click={handleLaunchVR}
+            />
+            <MenuItem
+              label="Enable Spectator Mode"
+              on:click={handleToggleVRSpatatorMode}
+            />
+          </Menu>
+        </MenuBarItem>
+      </MenuBar>
+    </div>
 
     {#if $APP_DATA}
       <UsersChips session={$APP_DATA.session} />
-    {/if}
 
-    {#if $APP_DATA}
       <UserChip user={$APP_DATA.userData}>
         <div class="text-center">
           <Button on:click={handleSignOut}>Sign Out</Button>

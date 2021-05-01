@@ -8,7 +8,7 @@ module.exports = {
   plugins: [],
   purge: {
     content: ['./src/**/*.svelte'],
-    enabled: production,
+    enabled: false,
   },
   theme: {
     extend: {

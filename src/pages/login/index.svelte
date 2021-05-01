@@ -62,7 +62,7 @@
 
 {#if shouldShowLayout}
   <div
-    class="bg-background min-h-screen flex items-center justify-center py-12 px-4 text-foreground sm:px-6 lg:px-8"
+    class="bg-background min-h-full flex items-center justify-center py-12 px-4 text-foreground sm:px-6 lg:px-8"
   >
     <div class="max-w-md w-full space-y-8">
       <h2 class="mt-6 text-center text-3xl font-extrabold">Zea Demo</h2>
