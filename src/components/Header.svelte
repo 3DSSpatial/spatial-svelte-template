@@ -238,13 +238,15 @@
 
 {#if !embeddedMode}
   <header class="flex gap-2 items-center px-1 sm:px-2 py-1 text-gray-200 z-50">
-    <span
-      class="material-icons cursor-default"
+    <button
+      class="cursor-default flex justify-center w-7 h-7"
       on:click={handleClickMenuToggle}
       title="{$ui.shouldShowDrawer ? 'Close' : 'Open'} drawer"
     >
-      {$ui.shouldShowDrawer ? 'menu_open' : 'menu'}
-    </span>
+      <span class="material-icons">
+        {$ui.shouldShowDrawer ? 'menu_open' : 'menu'}
+      </span>
+    </button>
 
     <img class="h-6" src="/images/logo-zea.svg" alt="logo" />
 
