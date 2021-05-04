@@ -143,7 +143,7 @@
     >
       {#if hasChildren}
         <button
-          class="cursor-default hover:bg-gray-700 rounded w-5 h-5"
+          class="cursor-default hover:bg-gray-700 rounded w-8 md:w-6"
           on:click={toggleIsExpanded}
         >
           {#if isExpanded}
@@ -156,7 +156,7 @@
 
       {#if isTreeItem}
         <button
-          class="cursor-default hover:bg-gray-700 rounded w-5 h-5 p-1"
+          class="cursor-default hover:bg-gray-700 rounded p-1 w-8 md:w-6"
           on:click={toggleVisibility}
         >
           {#if visible}
@@ -181,7 +181,9 @@
     </div>
 
     {#if hasChildren && isExpanded}
-      <div class="TreeItem__body pl-2 ml-2 border-dotted border-l">
+      <div
+        class="TreeItem__body ml-4 pl-4 md:ml-3 md:pl-3 border-dotted border-l-2 md:border-l"
+      >
         {#if isTreeItem}
           {#each item.getChildren() as childItem}
             <svelte:self
