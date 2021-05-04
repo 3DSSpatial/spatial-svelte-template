@@ -43,7 +43,7 @@
 
 <nav
   bind:this={drawerEl}
-  class="absolute bg-background flex h-full shadow w-60 opacity-60 hover:opacity-100 top-0 transition transform {$ui.shouldShowDrawer ||
+  class="absolute bg-background flex h-full shadow w-72 opacity-60 hover:opacity-100 top-0 transition transform {$ui.shouldShowDrawer ||
     '-translate-x-full'}"
 >
   <div class="DrawerContent flex-1 overflow-hidden">
