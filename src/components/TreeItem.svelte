@@ -137,7 +137,7 @@
 </script>
 
 {#if item}
-  <div bind:this={el} class="TreeItem text-sm" class:text-gray-500={!visible}>
+  <div bind:this={el} class="TreeItem" class:text-gray-500={!visible}>
     <div
       class="TreeItem__header flex items-center cursor-default hover:bg-gray-800 transition-colors mb-1"
     >
