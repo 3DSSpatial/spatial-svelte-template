@@ -7,6 +7,7 @@
   import MenuOption from '../components/ContextMenu/MenuOption.svelte'
   import Dialog from '../components/Dialog.svelte'
   import ParameterOwnerWidget from './parameters/ParameterOwnerWidget.svelte'
+  import Toolbar from '../components/Toolbar/Toolbar.svelte'
 
   import Drawer from '../components/Drawer.svelte'
   import ProgressBar from '../components/ProgressBar.svelte'
@@ -343,7 +344,13 @@
 
 <main class="Main flex-1 relative">
   <canvas bind:this={canvas} class="absolute h-full w-full" />
+
+  <div class="absolute bottom-10 w-full flex justify-center">
+    <Toolbar />
+  </div>
+
   <div bind:this={fpsContainer} />
+
   <Drawer>
     <Sidebar />
   </Drawer>
