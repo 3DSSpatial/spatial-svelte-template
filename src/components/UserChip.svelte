@@ -26,7 +26,7 @@
 </script>
 
 <div
-  class="UserChip relative transform hover:scale-105 transition-transform transform hover:scale-105"
+  class="UserChip cursor-default relative transform hover:scale-105 transition-transform"
 >
   <div
     class="h-8 w-8 flex items-center justify-center rounded-full truncate text-white bg-cover border border-gray-500"
