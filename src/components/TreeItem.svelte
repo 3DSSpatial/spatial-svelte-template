@@ -137,13 +137,9 @@
 </script>
 
 {#if item}
-  <div
-    bind:this={el}
-    class="TreeItem space-x-0.5 text-sm"
-    class:text-gray-500={!visible}
-  >
+  <div bind:this={el} class="TreeItem text-sm" class:text-gray-500={!visible}>
     <div
-      class="flex items-center cursor-default hover:bg-gray-800 transition-colors"
+      class="TreeItem__header flex items-center cursor-default hover:bg-gray-800 transition-colors mb-1"
     >
       {#if hasChildren}
         <button
@@ -161,7 +157,6 @@
       {#if isTreeItem}
         <button
           class="cursor-default hover:bg-gray-700 rounded w-5 h-5 p-1"
-          class:text-white={visible}
           on:click={toggleVisibility}
         >
           {#if visible}
@@ -173,7 +168,7 @@
       {/if}
 
       <span
-        class="flex-1 border rounded"
+        class="flex-1 border rounded px-1"
         style="background-color: {highlighted
           ? highlightBgColor
           : 'transparent'}; border-color: {highlighted
@@ -186,7 +181,7 @@
     </div>
 
     {#if hasChildren && isExpanded}
-      <div class="pl-3 border-dotted border-l ml-3">
+      <div class="TreeItem__body pl-2 ml-2 border-dotted border-l">
         {#if isTreeItem}
           {#each item.getChildren() as childItem}
             <svelte:self
