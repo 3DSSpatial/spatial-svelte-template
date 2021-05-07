@@ -85,7 +85,7 @@
       $scene.getSettings().getParameter('EnvMap').setValue(envMap)
     }
 
-    $scene.setupGrid(10, 10)
+    // $scene.setupGrid(10, 10)
     $scene
       .getSettings()
       .getParameter('BackgroundColor')
@@ -133,7 +133,7 @@
     const selectionColor = new Color('#F9CE03')
 
     selectionColor.a = 0.1
-    const subtreeColor = selectionColor.lerp(new Color(1, 1, 1, 0), 0.5)
+    const subtreeColor = selectionColor //.lerp(new Color(1, 1, 1, 0), 0.5)
     $selectionManager.selectionGroup
       .getParameter('HighlightColor')
       .setValue(selectionColor)
@@ -171,7 +171,7 @@
       highlightedItem = filterItemSelection(event.intersectionData.geomItem)
       highlightedItem.addHighlight(
         'pointerOverGeom',
-        new Color(0.8, 0.8, 0.8, 0.1),
+        new Color(1, 1, 1, 0.1),
         true
       )
     })
@@ -197,7 +197,7 @@
     /** FPS DISPLAY END */
 
     /** CAD START */
-    renderer.addPass(new GLCADPass())
+    // renderer.addPass(new GLCADPass())
 
     const loadAsset = (url) => {
       const asset = new CADAsset()
@@ -206,11 +206,32 @@
         console.warn('Error:', event)
       })
 
+      $scene
+        .getSettings()
+        .getParameter('BackgroundColor')
+        .setValue(new Color(0.75, 0.75, 0.75, 1))
+      renderer.getViewport().outlineThickness = 1
+      renderer.getViewport().outlineDepthBias = 0.6
       asset.on('loaded', () => {
         const materials = asset.getMaterialLibrary().getMaterials()
         materials.forEach((material) => {
           const baseColor = material.getParameter('BaseColor')
           if (baseColor) baseColor.setValue(baseColor.getValue().toGamma())
+
+          const shaderName = material.getShaderName()
+          if (shaderName == 'LinesShader') {
+            // material.getParameter('StippleScale').setValue(0.02)
+            // material.getParameter('StippleValue').setValue(0)
+            // material.getParameter('OccludedStippleValue').setValue(0.6)
+          } else if (
+            shaderName == 'StandardSurfaceShader' ||
+            shaderName == 'SimpleSurfaceShader'
+          ) {
+            material.setShaderName('FlatSurfaceShader')
+            material
+              .getParameter('BaseColor')
+              .setValue(new Color(0.75, 0.75, 0.75))
+          }
         })
       })
 
