@@ -1,5 +1,5 @@
 <script>
-  import ToolbarButton from './ToolbarButton.svelte'
+  import ToolbarItem from './ToolbarItem.svelte'
 
   export let isHighlighted = false
   export let isOpen = false
@@ -19,10 +19,10 @@
   }
 </script>
 
-<button class="ToolbarButtonPopup relative">
-  <ToolbarButton {isHighlighted} {title} on:click={handleClick}>
+<button class="ToolbarItemPopup relative">
+  <ToolbarItem {isHighlighted} {title} on:click={handleClick}>
     <slot />
-  </ToolbarButton>
+  </ToolbarItem>
 
   <div class:hidden={!isOpen}>
     <slot name="popup" />

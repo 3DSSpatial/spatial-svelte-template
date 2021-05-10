@@ -1,8 +1,8 @@
 <script>
   export let orientation = 'horizontal'
 
-  import ToolbarButton from './ToolbarButton.svelte'
-  import ToolbarButtonPopup from './ToolbarButtonPopup.svelte'
+  import ToolbarItem from './ToolbarItem.svelte'
+  import ToolbarItemPopup from './ToolbarItemPopup.svelte'
 
   import IconFrontView from '../icons/IconFrontView.svelte'
   import IconBackView from '../icons/IconBackView.svelte'
@@ -287,70 +287,70 @@
 </script>
 
 <div class="Toolbar flex gap-1" class:flex-col={orientation === 'vertical'}>
-  <ToolbarButton title="Front" on:click={handleChangeViewFront}>
+  <ToolbarItem title="Front" on:click={handleChangeViewFront}>
     <IconFrontView />
-  </ToolbarButton>
-  <ToolbarButton title="Back" on:click={handleChangeViewBack}>
+  </ToolbarItem>
+  <ToolbarItem title="Back" on:click={handleChangeViewBack}>
     <IconBackView />
-  </ToolbarButton>
-  <ToolbarButton title="Top" on:click={handleChangeViewTop}>
+  </ToolbarItem>
+  <ToolbarItem title="Top" on:click={handleChangeViewTop}>
     <IconTopView />
-  </ToolbarButton>
-  <ToolbarButton title="Bottom" on:click={handleChangeViewBottom}>
+  </ToolbarItem>
+  <ToolbarItem title="Bottom" on:click={handleChangeViewBottom}>
     <IconBottomView />
-  </ToolbarButton>
-  <ToolbarButton title="Left" on:click={handleChangeViewLeft}>
+  </ToolbarItem>
+  <ToolbarItem title="Left" on:click={handleChangeViewLeft}>
     <IconLeftView />
-  </ToolbarButton>
-  <ToolbarButton title="Right" on:click={handleChangeViewRight}>
+  </ToolbarItem>
+  <ToolbarItem title="Right" on:click={handleChangeViewRight}>
     <IconRightView />
-  </ToolbarButton>
-  <ToolbarButton title="Perspective" on:click={handleChangeViewPerspective}>
+  </ToolbarItem>
+  <ToolbarItem title="Perspective" on:click={handleChangeViewPerspective}>
     <IconPerspView />
-  </ToolbarButton>
+  </ToolbarItem>
 
-  <ToolbarButtonPopup
+  <ToolbarItemPopup
     isHighlighted={mode !== RENDER_MODES.PBR}
     title="Renderer modes"
   >
     <IconRenderModeWireframe />
 
     <div class="flex flex-col absolute bottom-full gap-1 mb-1" slot="popup">
-      <ToolbarButton
+      <ToolbarItem
         isHighlighted={mode === RENDER_MODES.WIREFRAME}
         title="Wireframe"
         on:click={handleChangeRenderModeWireframe}
       >
         <IconRenderModeWireframe />
-      </ToolbarButton>
-      <ToolbarButton
+      </ToolbarItem>
+      <ToolbarItem
         isHighlighted={mode === RENDER_MODES.FLAT}
         title="Flat"
         on:click={handleChangeRenderModeFlat}
       >
         <IconRenderModeFlat />
-      </ToolbarButton>
-      <ToolbarButton
+      </ToolbarItem>
+      <ToolbarItem
         isHighlighted={mode === RENDER_MODES.HIDDEN_LINE}
         title="HiddenLine"
         on:click={handleChangeRenderModeHiddenLine}
       >
         <IconRenderModeHiddenLine />
-      </ToolbarButton>
-      <ToolbarButton
+      </ToolbarItem>
+      <ToolbarItem
         isHighlighted={mode === RENDER_MODES.SHADED_AND_EDGES}
         title="ShadedAndEdges"
         on:click={handleChangeRenderModeShadedAndEdges}
       >
         <IconRenderModeShadedAndEdges />
-      </ToolbarButton>
-      <ToolbarButton
+      </ToolbarItem>
+      <ToolbarItem
         isHighlighted={mode === RENDER_MODES.PBR}
         title="PBR"
         on:click={handleChangeRenderModePBR}
       >
         <IconRenderModePBR />
-      </ToolbarButton>
+      </ToolbarItem>
     </div>
-  </ToolbarButtonPopup>
+  </ToolbarItemPopup>
 </div>
