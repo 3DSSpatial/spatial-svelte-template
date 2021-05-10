@@ -44,6 +44,7 @@
     camera.getParameter('GlobalXfo').setValue(xfo)
   }
 
+  /* {{{ View handlers. */
   const handleChangeViewFront = () => {
     const { renderer } = $APP_DATA
     const camera = renderer.getViewport().getCamera()
@@ -88,6 +89,7 @@
     setCameraXfo(camera, dir, new Vec3(0, 0, 1))
     camera.setIsOrthographic(0.0)
   }
+  /* }}} View handlers. */
 
   // ////////////////////////////////////////
   // Render Modes
@@ -100,6 +102,7 @@
     SHADED_AND_EDGES: Symbol(),
     PBR: Symbol(),
   }
+
   // The default materials are standard shiny surfaces.(PBR)
   let mode = RENDER_MODES.PBR
   // Materials are shared among geom items.
@@ -135,8 +138,12 @@
     geomItem.getParameter('Material').setValue(result)
   }
   const handleChangeRenderModeWireframe = () => {
+    if (mode == RENDER_MODES.WIREFRAME) {
+      return
+    }
+    mode = RENDER_MODES.WIREFRAME
+
     const { assets } = $APP_DATA
-    if (mode == RENDER_MODES.WIREFRAME) return
     assets.traverse((item) => {
       if (item instanceof GeomItem) {
         const geom = item.getParameter('Geometry').getValue()
@@ -148,11 +155,14 @@
         })
       }
     })
-    mode = RENDER_MODES.WIREFRAME
   }
   const handleChangeRenderModeFlat = () => {
+    if (mode == RENDER_MODES.FLAT) {
+      return
+    }
+    mode = RENDER_MODES.FLAT
+
     const { assets, scene } = $APP_DATA
-    if (mode == RENDER_MODES.FLAT) return
     const backgroundColor = scene
       .getSettings()
       .getParameter('BackgroundColor')
@@ -184,8 +194,12 @@
     mode = RENDER_MODES.FLAT
   }
   const handleChangeRenderModeHiddenLine = () => {
+    if (mode == RENDER_MODES.HIDDEN_LINE) {
+      return
+    }
+    mode = RENDER_MODES.HIDDEN_LINE
+
     const { assets } = $APP_DATA
-    if (mode == RENDER_MODES.HIDDEN_LINE) return
     assets.traverse((item) => {
       if (item instanceof GeomItem) {
         const geom = item.getParameter('Geometry').getValue()
@@ -217,8 +231,12 @@
     mode = RENDER_MODES.HIDDEN_LINE
   }
   const handleChangeRenderModeShadedAndEdges = () => {
+    if (mode == RENDER_MODES.SHADED_AND_EDGES) {
+      return
+    }
+    mode = RENDER_MODES.SHADED_AND_EDGES
+
     const { assets } = $APP_DATA
-    if (mode == RENDER_MODES.SHADED_AND_EDGES) return
     assets.traverse((item) => {
       if (item instanceof GeomItem) {
         const geom = item.getParameter('Geometry').getValue()
@@ -246,8 +264,12 @@
     mode = RENDER_MODES.SHADED_AND_EDGES
   }
   const handleChangeRenderModePBR = () => {
+    if (mode == RENDER_MODES.PBR) {
+      return
+    }
+    mode = RENDER_MODES.PBR
+
     const { assets } = $APP_DATA
-    if (mode == RENDER_MODES.PBR) return
     assets.traverse((item) => {
       if (item instanceof GeomItem) {
         const geom = item.getParameter('Geometry').getValue()
@@ -287,32 +309,46 @@
     <IconPerspView />
   </ToolbarButton>
 
-  <ToolbarButtonPopup>
+  <ToolbarButtonPopup
+    isHighlighted={mode !== RENDER_MODES.PBR}
+    title="Renderer modes"
+  >
     <IconRenderModeWireframe />
 
     <div class="flex flex-col absolute bottom-full gap-1 mb-1" slot="popup">
       <ToolbarButton
+        isHighlighted={mode === RENDER_MODES.WIREFRAME}
         title="Wireframe"
         on:click={handleChangeRenderModeWireframe}
       >
         <IconRenderModeWireframe />
       </ToolbarButton>
-      <ToolbarButton title="Flat" on:click={handleChangeRenderModeFlat}>
+      <ToolbarButton
+        isHighlighted={mode === RENDER_MODES.FLAT}
+        title="Flat"
+        on:click={handleChangeRenderModeFlat}
+      >
         <IconRenderModeFlat />
       </ToolbarButton>
       <ToolbarButton
+        isHighlighted={mode === RENDER_MODES.HIDDEN_LINE}
         title="HiddenLine"
         on:click={handleChangeRenderModeHiddenLine}
       >
         <IconRenderModeHiddenLine />
       </ToolbarButton>
       <ToolbarButton
+        isHighlighted={mode === RENDER_MODES.SHADED_AND_EDGES}
         title="ShadedAndEdges"
         on:click={handleChangeRenderModeShadedAndEdges}
       >
         <IconRenderModeShadedAndEdges />
       </ToolbarButton>
-      <ToolbarButton title="PBR" on:click={handleChangeRenderModePBR}>
+      <ToolbarButton
+        isHighlighted={mode === RENDER_MODES.PBR}
+        title="PBR"
+        on:click={handleChangeRenderModePBR}
+      >
         <IconRenderModePBR />
       </ToolbarButton>
     </div>

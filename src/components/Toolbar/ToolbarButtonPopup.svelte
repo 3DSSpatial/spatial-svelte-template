@@ -1,6 +1,7 @@
 <script>
   import ToolbarButton from './ToolbarButton.svelte'
 
+  export let isHighlighted = false
   export let isOpen = false
   export let title = ''
 
@@ -19,7 +20,7 @@
 </script>
 
 <button class="ToolbarButtonPopup relative">
-  <ToolbarButton {title} on:click={handleClick}>
+  <ToolbarButton {isHighlighted} {title} on:click={handleClick}>
     <slot />
   </ToolbarButton>
 
