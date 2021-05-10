@@ -1,8 +1,6 @@
 <script>
   export let orientation = 'horizontal'
 
-  import IconEye from '../icons/IconEye.svelte'
-  import IconEyeOff from '../icons/IconEyeOff.svelte'
   import ToolbarButton from './ToolbarButton.svelte'
 
   import IconFrontView from '../icons/IconFrontView.svelte'
