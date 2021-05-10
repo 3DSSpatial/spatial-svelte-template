@@ -2,6 +2,7 @@
   export let orientation = 'horizontal'
 
   import ToolbarButton from './ToolbarButton.svelte'
+  import ToolbarButtonPopup from './ToolbarButtonPopup.svelte'
 
   import IconFrontView from '../icons/IconFrontView.svelte'
   import IconBackView from '../icons/IconBackView.svelte'
@@ -286,22 +287,34 @@
     <IconPerspView />
   </ToolbarButton>
 
-  <ToolbarButton title="Wireframe" on:click={handleChangeRenderModeWireframe}>
+  <ToolbarButtonPopup>
     <IconRenderModeWireframe />
-  </ToolbarButton>
-  <ToolbarButton title="Flat" on:click={handleChangeRenderModeFlat}>
-    <IconRenderModeFlat />
-  </ToolbarButton>
-  <ToolbarButton title="HiddenLine" on:click={handleChangeRenderModeHiddenLine}>
-    <IconRenderModeHiddenLine />
-  </ToolbarButton>
-  <ToolbarButton
-    title="ShadedAndEdges"
-    on:click={handleChangeRenderModeShadedAndEdges}
-  >
-    <IconRenderModeShadedAndEdges />
-  </ToolbarButton>
-  <ToolbarButton title="PBR" on:click={handleChangeRenderModePBR}>
-    <IconRenderModePBR />
-  </ToolbarButton>
+
+    <div class="flex flex-col absolute bottom-full gap-1 mb-1" slot="popup">
+      <ToolbarButton
+        title="Wireframe"
+        on:click={handleChangeRenderModeWireframe}
+      >
+        <IconRenderModeWireframe />
+      </ToolbarButton>
+      <ToolbarButton title="Flat" on:click={handleChangeRenderModeFlat}>
+        <IconRenderModeFlat />
+      </ToolbarButton>
+      <ToolbarButton
+        title="HiddenLine"
+        on:click={handleChangeRenderModeHiddenLine}
+      >
+        <IconRenderModeHiddenLine />
+      </ToolbarButton>
+      <ToolbarButton
+        title="ShadedAndEdges"
+        on:click={handleChangeRenderModeShadedAndEdges}
+      >
+        <IconRenderModeShadedAndEdges />
+      </ToolbarButton>
+      <ToolbarButton title="PBR" on:click={handleChangeRenderModePBR}>
+        <IconRenderModePBR />
+      </ToolbarButton>
+    </div>
+  </ToolbarButtonPopup>
 </div>
