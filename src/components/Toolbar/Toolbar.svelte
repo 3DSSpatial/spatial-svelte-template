@@ -170,16 +170,16 @@
     assets.traverse((item) => {
       if (item instanceof GeomItem) {
         const geom = item.getParameter('Geometry').getValue()
-        if (mode == RENDER_MODES.WIREFRAME) {
-          if (geom instanceof Mesh || geom instanceof MeshProxy) {
-            item.getParameter('Visible').setValue(true)
-          }
+        if (geom instanceof Mesh || geom instanceof MeshProxy) {
+          item.getParameter('Visible').setValue(true)
         }
         createAndAssignMaterial(item, RENDER_MODES.FLAT, (newMaterial) => {
           newMaterial.setName('Flat')
           const shaderName = newMaterial.getShaderName()
           if (shaderName == 'LinesShader') {
-            newMaterial.getParameter('OccludedStippleValue').setValue(1)
+            if (newMaterial.hasParameter('OccludedStippleValue')) {
+              newMaterial.getParameter('OccludedStippleValue').setValue(1)
+            }
           } else {
             newMaterial.setShaderName('FlatSurfaceShader')
 
@@ -203,10 +203,8 @@
     assets.traverse((item) => {
       if (item instanceof GeomItem) {
         const geom = item.getParameter('Geometry').getValue()
-        if (mode == RENDER_MODES.WIREFRAME) {
-          if (geom instanceof Mesh || geom instanceof MeshProxy) {
-            item.getParameter('Visible').setValue(true)
-          }
+        if (geom instanceof Mesh || geom instanceof MeshProxy) {
+          item.getParameter('Visible').setValue(true)
         }
         createAndAssignMaterial(
           item,
@@ -215,9 +213,11 @@
             newMaterial.setName('HiddenLine')
             const shaderName = newMaterial.getShaderName()
             if (shaderName == 'LinesShader') {
-              newMaterial.getParameter('StippleScale').setValue(0.02)
-              newMaterial.getParameter('StippleValue').setValue(0)
-              newMaterial.getParameter('OccludedStippleValue').setValue(0.6)
+              if (newMaterial.hasParameter('OccludedStippleValue')) {
+                newMaterial.getParameter('StippleScale').setValue(0.02)
+                newMaterial.getParameter('StippleValue').setValue(0)
+                newMaterial.getParameter('OccludedStippleValue').setValue(0.6)
+              }
             } else {
               newMaterial.setShaderName('FlatSurfaceShader')
               newMaterial
@@ -234,7 +234,6 @@
     if (mode == RENDER_MODES.SHADED_AND_EDGES) {
       return
     }
-    mode = RENDER_MODES.SHADED_AND_EDGES
 
     const { assets } = $APP_DATA
     assets.traverse((item) => {
@@ -253,7 +252,9 @@
             newMaterial.setName('ShadedAndEdges')
             const shaderName = newMaterial.getShaderName()
             if (shaderName == 'LinesShader') {
-              newMaterial.getParameter('OccludedStippleValue').setValue(1)
+              if (newMaterial.hasParameter('OccludedStippleValue')) {
+                newMaterial.getParameter('OccludedStippleValue').setValue(1)
+              }
             } else {
               newMaterial.setShaderName('SimpleSurfaceShader')
             }
@@ -267,8 +268,6 @@
     if (mode == RENDER_MODES.PBR) {
       return
     }
-    mode = RENDER_MODES.PBR
-
     const { assets } = $APP_DATA
     assets.traverse((item) => {
       if (item instanceof GeomItem) {
