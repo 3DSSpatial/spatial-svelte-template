@@ -12,8 +12,6 @@
   import Drawer from '../components/Drawer.svelte'
   import ProgressBar from '../components/ProgressBar.svelte'
   import Sidebar from '../components/Sidebar.svelte'
-  import SplitPane from '../components/SplitPane.svelte'
-  import Pane from '../components/Pane.svelte'
 
   import { auth } from '../helpers/auth'
 
