@@ -91,6 +91,7 @@
       .getParameter('BackgroundColor')
       .setValue(new Color(0.35, 0.35, 0.35, 1))
     renderer.setScene($scene)
+    renderer.getViewport().outlineThickness = 1.25
 
     const appData = {}
 
@@ -210,27 +211,14 @@
         .getSettings()
         .getParameter('BackgroundColor')
         .setValue(new Color(0.75, 0.75, 0.75, 1))
-      renderer.getViewport().outlineThickness = 1
-      renderer.getViewport().outlineDepthBias = 0.6
       asset.on('loaded', () => {
         const materials = asset.getMaterialLibrary().getMaterials()
         materials.forEach((material) => {
           const baseColor = material.getParameter('BaseColor')
           if (baseColor) baseColor.setValue(baseColor.getValue().toGamma())
-
           const shaderName = material.getShaderName()
-          if (shaderName == 'LinesShader') {
-            // material.getParameter('StippleScale').setValue(0.02)
-            // material.getParameter('StippleValue').setValue(0)
-            // material.getParameter('OccludedStippleValue').setValue(0.6)
-          } else if (
-            shaderName == 'StandardSurfaceShader' ||
-            shaderName == 'SimpleSurfaceShader'
-          ) {
-            material.setShaderName('FlatSurfaceShader')
-            material
-              .getParameter('BaseColor')
-              .setValue(new Color(0.75, 0.75, 0.75))
+          if (shaderName == 'SimpleSurfaceShader') {
+            material.setShaderName('StandardSurfaceShader')
           }
         })
       })
