@@ -205,10 +205,6 @@
         console.warn('Error:', event)
       })
 
-      $scene
-        .getSettings()
-        .getParameter('BackgroundColor')
-        .setValue(new Color(0.75, 0.75, 0.75, 1))
       asset.on('loaded', () => {
         const materials = asset.getMaterialLibrary().getMaterials()
         materials.forEach((material) => {

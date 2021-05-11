@@ -163,10 +163,10 @@
     mode = RENDER_MODES.FLAT
 
     const { assets, scene } = $APP_DATA
-    const backgroundColor = scene
-      .getSettings()
-      .getParameter('BackgroundColor')
-      .getValue()
+    // const backgroundColor = scene
+    // .getSettings()
+    // .getParameter('BackgroundColor')
+    // .getValue()
     assets.traverse((item) => {
       if (item instanceof GeomItem) {
         const geom = item.getParameter('Geometry').getValue()
@@ -186,7 +186,7 @@
             // Note: Assigning the background color makes the surfaces
             // blend in with the background. Another option would be to
             // desaturate the current color.
-            newMaterial.getParameter('BaseColor').setValue(backgroundColor)
+            // newMaterial.getParameter('BaseColor').setValue(backgroundColor)
           }
         })
       }
@@ -220,9 +220,7 @@
               }
             } else {
               newMaterial.setShaderName('FlatSurfaceShader')
-              newMaterial
-                .getParameter('BaseColor')
-                .setValue(new Color(0.75, 0.75, 0.75))
+              // newMaterial.getParameter('BaseColor').setValue(backgroundColor)
             }
           }
         )
