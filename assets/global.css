@@ -37,3 +37,9 @@ body,
 .viewIconColoredFace {
   fill: #f9ce03;
 }
+.viewIconFrontFace {
+  fill: #ceac03;
+}
+.viewIconDarkerFace {
+  fill: #b19301;
+}
