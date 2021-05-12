@@ -83,13 +83,15 @@
       $scene.getSettings().getParameter('EnvMap').setValue(envMap)
     }
 
+    renderer.outlineThickness = 1
+    renderer.outlineColor = new Color(0.2, 0.2, 0.2, 1)
+
     // $scene.setupGrid(10, 10)
     $scene
       .getSettings()
       .getParameter('BackgroundColor')
-      .setValue(new Color(0.35, 0.35, 0.35, 1))
+      .setValue(new Color(0.85, 0.85, 0.85, 1))
     renderer.setScene($scene)
-    renderer.getViewport().outlineThickness = 1.25
 
     const appData = {}
 

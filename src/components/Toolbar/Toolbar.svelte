@@ -162,7 +162,11 @@
     }
     mode = RENDER_MODES.FLAT
 
-    const { assets, scene } = $APP_DATA
+    const { assets, scene, renderer } = $APP_DATA
+
+    renderer.outlineThickness = 1.5
+    renderer.outlineColor = new Color(0.2, 0.2, 0.2, 1)
+
     // const backgroundColor = scene
     // .getSettings()
     // .getParameter('BackgroundColor')
@@ -199,7 +203,11 @@
     }
     mode = RENDER_MODES.HIDDEN_LINE
 
-    const { assets } = $APP_DATA
+    const { assets, renderer } = $APP_DATA
+
+    renderer.outlineThickness = 1.5
+    renderer.outlineColor = new Color(0.2, 0.2, 0.2, 1)
+
     assets.traverse((item) => {
       if (item instanceof GeomItem) {
         const geom = item.getParameter('Geometry').getValue()
@@ -233,7 +241,11 @@
       return
     }
 
-    const { assets } = $APP_DATA
+    const { assets, renderer } = $APP_DATA
+
+    renderer.outlineThickness = 1
+    renderer.outlineColor = new Color(0.2, 0.2, 0.2, 1)
+
     assets.traverse((item) => {
       if (item instanceof GeomItem) {
         const geom = item.getParameter('Geometry').getValue()
@@ -266,7 +278,11 @@
     if (mode == RENDER_MODES.PBR) {
       return
     }
-    const { assets } = $APP_DATA
+    const { assets, renderer } = $APP_DATA
+
+    renderer.outlineThickness = 1
+    renderer.outlineColor = new Color(0.2, 0.2, 0.2, 1)
+
     assets.traverse((item) => {
       if (item instanceof GeomItem) {
         const geom = item.getParameter('Geometry').getValue()
