@@ -1,4 +1,4 @@
-# Embedding the Zea Svelt App in your own Web App
+# Embedding the Zea Svelte App in your own Web App
 
 ## Embed View
 
@@ -6,7 +6,7 @@ The Embed view shows how the svelte app would be displayed within the context of
 
 # Getting Started
 
-To test zea-svelt-template embedded on your system, and run through the following steps.
+To test zea-svelte-template embedded on your system, and run through the following steps.
 
 In the root of the project, run the svelete app as normal using dev.
 
@@ -40,10 +40,10 @@ Then open a browser at the given address.
 Provided is a sample embed.html file that demonstrates how to embed Web Composer into a host application.
 
 ```javascript
-<iframe id="zea-svelt-template" src="./zea-svelt-template/index.html?noframe"></iframe>
+<iframe id="zea-svelte-template" src="./zea-svelte-template/index.html?noframe"></iframe>
 
 <script type="module">
-  const viewer = document.getElementById('zea-svelt-template')
+  const viewer = document.getElementById('zea-svelte-template')
   import { ChannelMessenger } from './ChannelMessenger.js'
 
   const client = new ChannelMessenger(viewer)
@@ -63,11 +63,11 @@ The Svelte App might emit events based on interactions within the viewer or othe
 
 #### Ready
 
-The ready event is sent as soon as the zea-svelt-template frame has loaded, and the ChannelMessenger has established a connection with the page.
+The ready event is sent as soon as the zea-svelte-template frame has loaded, and the ChannelMessenger has established a connection with the page.
 
 ```javascript
 client.on('ready', (data) => {
-  console.log('zea-svelt-template is ready to load data')
+  console.log('zea-svelte-template is ready to load data')
 })
 ```
 
@@ -89,7 +89,7 @@ The commands are structured in the following way.
 
 > Payload: The payload is a json structure containing relevant information needed to process the command.
 
-> Results: Each command returns a promise that resolves to some result returned by the zea-svelt-template
+> Results: Each command returns a promise that resolves to some result returned by the zea-svelte-template
 
 ```javascript
 do('command-name', payload).then((results) => {
