@@ -22,6 +22,7 @@
 
   const urlParams = new URLSearchParams(window.location.search)
   const embeddedMode = urlParams.has('embedded')
+  const collabEnabled = urlParams.has('collab')
   let vrToggleMenuItemLabel = 'Detecting VR...'
   let vrToggleMenuItemDisabled = true
 
@@ -324,7 +325,9 @@
     </div>
 
     {#if $APP_DATA}
-      <UsersChips session={$APP_DATA.session} />
+      {#if collabEnabled}
+        <UsersChips session={$APP_DATA.session} />
+      {/if}
 
       <UserChip user={$APP_DATA.userData}>
         <div class="text-center">

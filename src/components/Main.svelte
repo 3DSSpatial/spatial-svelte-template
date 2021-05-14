@@ -52,6 +52,7 @@
   let fpsContainer
   const urlParams = new URLSearchParams(window.location.search)
   const embeddedMode = urlParams.has('embedded')
+  const collabEnabled = urlParams.has('collab')
   let progress
 
   const filterItemSelection = (item) => {
@@ -240,25 +241,25 @@
 
     /** COLLAB START*/
     if (!embeddedMode) {
-      const SOCKET_URL = 'https://websocket-staging.zea.live'
-      const roomId = assetUrl
-
       const userData = await auth.getUserData()
-
       if (!userData) {
         return
       }
-
-      const session = new Session(userData, SOCKET_URL)
-      session.joinRoom(roomId)
-
-      const sessionSync = new SessionSync(session, appData, userData, {})
-
       appData.userData = userData
-      appData.session = session
-      appData.sessionSync = sessionSync
 
-      APP_DATA.update(() => appData)
+      if (collabEnabled) {
+        const SOCKET_URL = 'https://websocket-staging.zea.live'
+        const roomId = assetUrl
+        const session = new Session(userData, SOCKET_URL)
+        session.joinRoom(roomId)
+
+        const sessionSync = new SessionSync(session, appData, userData, {})
+
+        appData.session = session
+        appData.sessionSync = sessionSync
+
+        APP_DATA.update(() => appData)
+      }
     }
     /** COLLAB END */
 
