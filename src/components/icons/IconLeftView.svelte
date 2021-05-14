@@ -1,10 +1,7 @@
 <script>
-  export let design = ''
-  export let themeColor = '#f9ce03'
 </script>
 
 <svg
-  class={design}
   version="1.1"
   viewBox="0.0 0.0 108.9238845144357 108.94750656167979"
   fill="none"
