@@ -34,8 +34,7 @@
     resourceLoader,
     SystemDesc,
     EnvMap,
-    NumberParameter,
-    ColorParameter,
+    InstanceItem,
   } = window.zeaEngine
   const { CADAsset, CADBody } = window.zeaCad
   const {
@@ -55,13 +54,15 @@
   let progress
 
   const filterItemSelection = (item) => {
-    // Propagate selections deep in the tree up to the part body.
+    // Propagate selections up from the edges and surfaces up to
+    // the part body or the instanced body
     while (
-      item.getName().startsWith('Mesh') ||
-      item.getName().startsWith('Edge') ||
-      item.getName().startsWith('TreeItem')
-    )
+      item &&
+      !(item instanceof CADBody) &&
+      !(item instanceof InstanceItem && item.getSrcTree() instanceof CADBody)
+    ) {
       item = item.getOwner()
+    }
     return item
   }
 
