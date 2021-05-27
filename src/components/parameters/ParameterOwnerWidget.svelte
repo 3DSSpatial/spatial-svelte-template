@@ -60,7 +60,9 @@
   class="ParameterOwnerWidget grid grid-cols-2 absolute w-120 top-0 right-0 overflow-hidden pointer-events-none space-y-2 m-2"
 >
   {#each items as item (item.index)}
-    {item.parameter.getName()}
+    <div class="text-black">
+      {item.parameter.getName()}
+    </div>
     <div class="pointer-events-auto">
       <svelte:component this={item.component} parameter={item.parameter} />
     </div>
