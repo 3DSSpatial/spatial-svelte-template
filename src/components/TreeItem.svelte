@@ -5,6 +5,8 @@
   import IconEyeOff from '../components/icons/IconEyeOff.svelte'
   import IconChevronDown from '../components/icons/IconChevronDown.svelte'
   import IconChevronRight from '../components/icons/IconChevronRight.svelte'
+  const { CADBody } = window.zeaCad
+  const { TreeItem, InstanceItem } = window.zeaEngine
 
   export let isExpanded = false
   export let highlighted = false
@@ -99,7 +101,7 @@
     // using the keyboard.
     item.elemRef = el
 
-    isTreeItem = item instanceof globalThis.zeaEngine.TreeItem
+    isTreeItem = item instanceof TreeItem
 
     updateHighlight()
     updateVisibility()
@@ -122,7 +124,10 @@
 
       // This code is for a special case when items are replaced in the
       // TreeView and we don't load the component again.
-      hasChildren = item.getNumChildren() > 0
+      const isBody = item instanceof CADBody
+      const isInstancedBody =
+        item instanceof InstanceItem && item.getSrcTree() instanceof CADBody
+      hasChildren = item.getNumChildren() > 0 && !isBody && !isInstancedBody
     }
 
     if (unsubHighlightChanged > -1) {
