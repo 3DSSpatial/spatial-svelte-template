@@ -55,10 +55,9 @@ The web app is intended to be deployed on a client companies infrastructure. Thi
 
 ## Commands
 
-The ChannelMessenger enables a host application to setn arbitrary commands to the embed window and recieve data in response. 
+The ChannelMessenger enables a host application to setn arbitrary commands to the embed window and recieve data in response.
 
-
-### events vs send & get commands 
+### events vs send & get commands
 
 Commands fall into 3 categories, 'event', 'send' and 'get'.
 
@@ -69,6 +68,7 @@ Events are recieve data from the embed page and are used to push data from the e
 To implement an event, when the event must be related to the host, simply send the event over the channel messenger.
 
 ##### In the Svelte App code
+
 ```javascript
   // After 20 seconds, we tell the user something..
   setTimout(() => {
@@ -77,20 +77,23 @@ To implement an event, when the event must be related to the host, simply send t
 ```
 
 ##### In the Host App code
+
 In your host application, you listen for this event using the channel messenger. You can then handle the event how you wish.
+
 ```javascript
-  client.on('somethingChanged', (data) => {
-    console.log('selectionChanged:', data)
-  })
+client.on('somethingChanged', (data) => {
+  console.log('selectionChanged:', data)
+})
 ```
 
 Within the Svelte app code, you can add support for your own commands by adding handlers for various command names.
 
 #### Send Commamds
-Used to send a command from the host page to the embed page, but a response is not expected. 
 
+Used to send a command from the host page to the embed page, but a response is not expected.
 
 ##### In the Svelte App code
+
 So implement a 'send' command, simply add code to the Svelte app that listens for your specific message, and implement some logic.
 
 ```javascript
@@ -105,28 +108,31 @@ So implement a 'send' command, simply add code to the Svelte app that listens fo
 ```
 
 ##### In the Host App code
+
 Then in your host application, you can now invoke the command using the channel messenger.
+
 ```javascript
-  client.do('changeSomething', { arg: 'Important Info' })
+client.do('changeSomething', { arg: 'Important Info' })
 ```
 
 The Svelte app will recieve the message and apply the requested changes.
 
-
 #### Get Commamds
+
 Get comamnds are used to request data from the embed page. These commands involve the host app sending a command to the Svelte app, which processes the commands, and responds with data that the host app is waiting for.
 
-*The return _id is used to ensure that for a given message, the return value is passed back into the response callback.*
-get; commands should be responded to using the _id provided in the data package received with the get message.
+_The return \_id is used to ensure that for a given message, the return value is passed back into the response callback._
+get; commands should be responded to using the \_id provided in the data package received with the get message.
 
 ##### In the Svelte App code
 
 In the svelte app implement a method that can be used to respond to the get command.
+
 ```javascript
 client.on('getCustomData', (data) => {
   // The host wants some data from the svelte app. Lets do it.
   ....
-   
+
   if (data._id) {
     const customData = ...
     client.send(data._id, { customData })
@@ -135,17 +141,15 @@ client.on('getCustomData', (data) => {
 ```
 
 ##### In the Host App code
+
 Then in your host application, you can now invoke the command using the channel messenger, and the Promise will resolve to the data provided by the Svelte app.
+
 ```javascript
-client.do('getCustomData', {})
-  .then((data) => {
-    // The data object will include the custom data from the Svelte app.
-    console.log('CustomData', data)
-  })
+client.do('getCustomData', {}).then((data) => {
+  // The data object will include the custom data from the Svelte app.
+  console.log('CustomData', data)
+})
 ```
-
-
-
 
 # JSON API
 
@@ -196,7 +200,7 @@ do('command-name', payload).then((results) => {
 ```javascript
 client
   .do('loadCADFile', {
-    zcad: '../foo.zcad',
+    url: '../foo.zcad',
   })
   .then((data) => {
     console.log('loadCADFile Loaded', data)
