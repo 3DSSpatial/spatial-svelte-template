@@ -16,7 +16,7 @@ const setupLoadBtn = (name, url) => {
   btn.addEventListener('click', () => {
     client
       .do('loadCADFile', {
-        zcad: url,
+        url,
       })
       .then((data) => {
         logger.logJson('modelStructure', data)

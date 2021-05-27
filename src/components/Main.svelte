@@ -198,46 +198,53 @@
     fpsContainer.appendChild(fpsDisplay)
     /** FPS DISPLAY END */
 
-    /** CAD START */
-    // renderer.addPass(new GLCADPass())
-
-    const loadAsset = (url) => {
+    /** LOAD ASSETS START */
+    const loadZCADAsset = (url) => {
       const asset = new CADAsset()
-
-      asset.on('error', (event) => {
-        console.warn('Error:', event)
-      })
-
-      asset.on('loaded', () => {
-        const materials = asset.getMaterialLibrary().getMaterials()
-        materials.forEach((material) => {
-          const baseColor = material.getParameter('BaseColor')
-          if (baseColor) baseColor.setValue(baseColor.getValue().toGamma())
-          const shaderName = material.getShaderName()
-          if (shaderName == 'SimpleSurfaceShader') {
-            material.setShaderName('StandardSurfaceShader')
-          }
-        })
-      })
-
-      asset.getGeometryLibrary().on('loaded', () => {
+      asset.load(url).then(() => {
+        const box = asset.getParameter('BoundingBox').getValue()
+        const xfo = new Xfo()
+        // xfo.ori.setFromAxisAndAngle(new Vec3(1, 0, 0), Math.PI * 0.5)
+        xfo.tr.z = -box.p0.z
+        asset.getParameter('LocalXfo').setValue(xfo)
         renderer.frameAll()
       })
-
       $assets.addChild(asset)
-      asset.getParameter('FilePath').setValue(url)
-
       return asset
     }
 
+    const { GLTFAsset } = gltfLoader
+    const loadGLTFAsset = (url) => {
+      const asset = new GLTFAsset('gltf')
+      asset.load(url).then(() => {
+        const box = asset.getParameter('BoundingBox').getValue()
+        const xfo = new Xfo()
+        // xfo.ori.setFromAxisAndAngle(new Vec3(1, 0, 0), Math.PI * 0.5)
+        xfo.tr.z = -box.p0.z
+        asset.getParameter('LocalXfo').setValue(xfo)
+        renderer.frameAll()
+      })
+      $assets.addChild(asset)
+      return asset
+    }
+
+    const loadAsset = (url) => {
+      if (url.endsWith('zcad')) {
+        return loadZCADAsset(url)
+      } else if (url.endsWith('gltf') || url.endsWith('glb')) {
+        return loadGLTFAsset(url)
+      }
+    }
+
+    let assetUrl
     if (!embeddedMode) {
-      assetUrl = urlParams.has('zcad')
-        ? urlParams.get('zcad')
-        : '/data/gear_box_final_asm-visu.zcad'
+      if (urlParams.has('zcad')) assetUrl = urlParams.get('zcad')
+      else if (urlParams.has('gltf')) assetUrl = urlParams.get('gltf')
+      if (!assetUrl) assetUrl = '/data/Dead_eye_bearing.zcad'
 
       loadAsset(assetUrl)
     }
-    /** CAD END */
+    /** LOAD ASSETS END */
 
     /** COLLAB START*/
     if (!embeddedMode) {
@@ -282,7 +289,7 @@
           $assets.removeAllChildren()
         }
 
-        const asset = loadAsset(data.zcad)
+        const asset = loadAsset(data.url)
         asset.once('loaded', () => {
           if (data._id) {
             const tree = buildTree(asset)
