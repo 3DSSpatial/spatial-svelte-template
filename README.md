@@ -213,7 +213,7 @@ Embed Guide: https://github.com/ZeaInc/zea-svelte-template/blob/main/docs/README
 
 File it on Github: https://github.com/ZeaInc/zea-svelte-template
 
-Start a discussion: https://github.com/ZeaInc/zea-svelte-template/discussions
+Start a discussion: https://community.zea.live/
 
 # Credits
 
