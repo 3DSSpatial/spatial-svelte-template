@@ -34,10 +34,9 @@
     resourceLoader,
     SystemDesc,
     EnvMap,
-    NumberParameter,
-    ColorParameter,
+    InstanceItem,
   } = window.zeaEngine
-  const { GLCADPass, CADAsset } = window.zeaCad
+  const { CADAsset, CADBody } = window.zeaCad
   const {
     SelectionManager,
     UndoRedoManager,
@@ -47,7 +46,6 @@
 
   const { Session, SessionSync } = window.zeaCollab
 
-  let assetUrl
   let canvas
   let fpsContainer
   const urlParams = new URLSearchParams(window.location.search)
@@ -56,21 +54,20 @@
   let progress
 
   const filterItemSelection = (item) => {
-    // Propagate selections deep in the tree up to the part body.
+    // Propagate selections up from the edges and surfaces up to
+    // the part body or the instanced body
     while (
-      item.getName().startsWith('Mesh') ||
-      item.getName().startsWith('Edge') ||
-      item.getName().startsWith('TreeItem')
-    )
+      item &&
+      !(item instanceof CADBody) &&
+      !(item instanceof InstanceItem && item.getSrcTree() instanceof CADBody)
+    ) {
       item = item.getOwner()
+    }
     return item
   }
 
   onMount(async () => {
-    const renderer = new GLRenderer(canvas, {
-      debugGeomIds: urlParams.has('debugGeomIds'),
-      xrCompatible: false,
-    })
+    const renderer = new GLRenderer(canvas)
 
     $scene = new Scene()
 
@@ -133,7 +130,6 @@
 
     // Note: the alpha value determines  the fill of the highlight.
     const selectionColor = new Color('#F9CE03')
-
     selectionColor.a = 0.1
     const subtreeColor = selectionColor //.lerp(new Color(1, 1, 1, 0), 0.5)
     $selectionManager.selectionGroup
@@ -144,8 +140,7 @@
       .setValue(subtreeColor)
 
     // Color the selection rect.
-    const selectionRectColor = selectionColor.clone()
-    selectionRectColor.a = 1
+    const selectionRectColor = new Color(0, 0, 0, 1)
     selectionTool.rectItem
       .getParameter('Material')
       .getValue()
@@ -158,8 +153,23 @@
     renderer.getViewport().on('pointerUp', (event) => {
       // Detect a right click
       if (event.button == 0 && event.intersectionData) {
+        // if the selection tool is active then do nothing, as it will
+        // handle single click selection.s
+        const toolStack = toolManager.toolStack
+        if (toolStack[toolStack.length - 1] == selectionTool) return
+
+        // To provide a simple selection when the SelectionTool is not activated,
+        // we toggle selection on the item that is selcted.
         const item = filterItemSelection(event.intersectionData.geomItem)
-        $selectionManager.toggleItemSelection(item)
+        if (item) {
+          if (!event.shiftKey) {
+            $selectionManager.toggleItemSelection(item, !event.ctrlKey)
+          } else {
+            const items = new Set()
+            items.add(item)
+            $selectionManager.deselectItems(items)
+          }
+        }
       } else if (event.button == 2 && event.intersectionData) {
         const item = filterItemSelection(event.intersectionData.geomItem)
         openMenu(event, item)
@@ -169,17 +179,24 @@
     })
 
     let highlightedItem
-    renderer.getViewport().on('pointerOverGeom', (event) => {
-      highlightedItem = filterItemSelection(event.intersectionData.geomItem)
-      highlightedItem.addHighlight(
-        'pointerOverGeom',
-        new Color(1, 1, 1, 0.1),
-        true
-      )
-    })
-    renderer.getViewport().on('pointerLeaveGeom', (event) => {
-      highlightedItem.removeHighlight('pointerOverGeom', true)
-      highlightedItem = null
+    renderer.getViewport().on('pointerMove', (event) => {
+      if (event.buttons == 0) {
+        if (event.intersectionData) {
+          const item = filterItemSelection(event.intersectionData.geomItem)
+          if (highlightedItem && item != highlightedItem) {
+            highlightedItem.removeHighlight('pointerOverGeom', true)
+          }
+          highlightedItem = item
+          highlightedItem.addHighlight(
+            'pointerOverGeom',
+            new Color(1, 1, 1, 0.1),
+            true
+          )
+        } else if (highlightedItem) {
+          highlightedItem.removeHighlight('pointerOverGeom', true)
+          highlightedItem = null
+        }
+      }
     })
     renderer.getViewport().on('pointerDoublePressed', (event) => {
       console.log(event)

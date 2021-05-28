@@ -328,6 +328,9 @@
       {#if collabEnabled}
         <UsersChips session={$APP_DATA.session} />
       {/if}
+      {#if !collabEnabled}
+        <div class="flex-1" />
+      {/if}
 
       <UserChip user={$APP_DATA.userData}>
         <div class="text-center">

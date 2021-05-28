@@ -164,7 +164,7 @@
 
     const { assets, scene, renderer } = $APP_DATA
 
-    renderer.outlineThickness = 1.5
+    renderer.outlineThickness = 1
     renderer.outlineColor = new Color(0.2, 0.2, 0.2, 1)
 
     // const backgroundColor = scene
@@ -205,7 +205,7 @@
 
     const { assets, renderer } = $APP_DATA
 
-    renderer.outlineThickness = 1.5
+    renderer.outlineThickness = 1
     renderer.outlineColor = new Color(0.2, 0.2, 0.2, 1)
 
     assets.traverse((item) => {
