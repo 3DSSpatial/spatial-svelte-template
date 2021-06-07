@@ -1,6 +1,6 @@
 <script>
   import { beforeUpdate } from 'svelte'
-  import TreeItem from './TreeItem.svelte'
+  import TreeViewItem fr./TreeViewItem.sveltem.svelte'
 
   let treeEl
   export let rootTreeItems
@@ -13,7 +13,6 @@
   export let selectionChangedRegistered = false
 
   const onKeyDown = (event) => {
-    console.log('onKeyDown:', isMouseOver)
     if (!isMouseOver) return
 
     if (!selectionManager) return
@@ -139,7 +138,7 @@
 
 <div bind:this={treeEl} class="TreeView min-w-max noselect">
   {#each rootTreeItems as item, i}
-    <TreeItem
+    <TreeViewItem
       {item}
       {selectionManager}
       {undoRedoManager}

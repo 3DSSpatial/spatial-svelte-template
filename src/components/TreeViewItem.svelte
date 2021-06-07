@@ -34,8 +34,8 @@
       // causes the element to be always at the top of the view.
       el.scrollIntoView({
         behavior: 'auto',
-        block: 'nearest',
-        inline: 'nearest',
+        block: 'center',
+        inline: 'center',
       })
     }
   }
@@ -165,11 +165,6 @@
     initItem()
   })
   afterUpdate(() => {
-    console.log(
-      'afterUpdate',
-      item ? item.getName() : ' <>',
-      childComponents.length
-    )
     if (expandPath) {
       expandSubTree(expandPath)
       expandPath = null
