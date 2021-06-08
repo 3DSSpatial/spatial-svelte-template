@@ -5,6 +5,9 @@
   import { auth } from '../../helpers/auth.js'
   import { getRandomString } from '../../helpers/misc.js'
 
+  const urlParams = new URLSearchParams(window.location.search)
+  const embeddedMode = urlParams.has('embedded')
+  const collabEnabled = urlParams.has('collab')
   let authError
   let shouldShowLayout
   let submitted
@@ -13,9 +16,38 @@
   const formFields = {
     password: '',
     username: '',
+    roomID: urlParams.get('collab'),
   }
 
   const userId = getRandomString()
+
+  const insertParam = (key, value) => {
+    key = encodeURIComponent(key)
+    value = encodeURIComponent(value)
+
+    // kvp looks like ['key1=value1', 'key2=value2', ...]
+    var kvp = document.location.search.substr(1).split('&')
+    let i = 0
+
+    for (; i < kvp.length; i++) {
+      if (kvp[i].startsWith(key)) {
+        const pair = kvp[i].split('=')
+        pair[1] = value
+        kvp[i] = pair.join('=')
+        break
+      }
+    }
+
+    if (i >= kvp.length) {
+      kvp[kvp.length] = [key, value].join('=')
+    }
+
+    // can return this or...
+    const params = kvp.join('&')
+
+    // reload page with new params
+    document.location.search = params
+  }
 
   const redirectToMain = () => {
     const params = new URLSearchParams(window.location.search)
@@ -34,6 +66,8 @@
       username: formFields.username,
     }
 
+    insertParam('collab', formFields.roomID)
+
     try {
       await auth.setUserData(userData)
 
@@ -47,12 +81,17 @@
   onMount(async () => {
     const isAuthenticated = await auth.isAuthenticated()
 
-    if (isAuthenticated) {
+    if (isAuthenticated && (!collabEnabled || urlParams.get('collab'))) {
       redirectToMain()
       return
     }
 
     shouldShowLayout = true
+
+    // If the user is a returning user and need to just enter a room id
+    // prepopulate the Username field here.
+    const userData = await auth.getUserData()
+    if (userData) usernameEl.value = userData.firstName
 
     await tick()
 
@@ -71,7 +110,7 @@
         class="mt-8 space-y-6"
         on:submit|preventDefault|stopPropagation={handleSubmit}
       >
-        <div class="rounded-md shadow-sm -space-y-px">
+        <div class="rounded-md shadow-sm">
           <div class="mb-2">
             <input
               autocomplete="off"
@@ -85,7 +124,7 @@
             />
           </div>
 
-          <div>
+          <div class="mb-2">
             <input
               autocomplete="off"
               bind:value={formFields.password}
@@ -96,6 +135,19 @@
               type="password"
             />
           </div>
+
+          {#if collabEnabled}
+            <div class="mb-2">
+              <input
+                autocomplete="off"
+                bind:value={formFields.roomID}
+                class="appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-yellow-500 focus:border-yellow-500 focus:z-10 sm:text-sm"
+                name="roomID"
+                placeholder="Room ID (optional)"
+                type="text"
+              />
+            </div>
+          {/if}
         </div>
 
         {#if authError}
