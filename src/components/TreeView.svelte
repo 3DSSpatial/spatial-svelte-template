@@ -1,6 +1,6 @@
 <script>
   import { beforeUpdate } from 'svelte'
-  import TreeViewItem fr./TreeViewItem.sveltem.svelte'
+  import TreeViewItem from './TreeViewItem.svelte'
 
   let treeEl
   export let rootTreeItems
