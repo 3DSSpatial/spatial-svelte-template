@@ -178,26 +178,6 @@
       }
     })
 
-    let highlightedItem
-    renderer.getViewport().on('pointerMove', (event) => {
-      if (event.buttons == 0) {
-        if (event.intersectionData) {
-          const item = filterItemSelection(event.intersectionData.geomItem)
-          if (highlightedItem && item != highlightedItem) {
-            highlightedItem.removeHighlight('pointerOverGeom', true)
-          }
-          highlightedItem = item
-          highlightedItem.addHighlight(
-            'pointerOverGeom',
-            new Color(1, 1, 1, 0.1),
-            true
-          )
-        } else if (highlightedItem) {
-          highlightedItem.removeHighlight('pointerOverGeom', true)
-          highlightedItem = null
-        }
-      }
-    })
     renderer.getViewport().on('pointerDoublePressed', (event) => {
       console.log(event)
     })

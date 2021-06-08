@@ -1,5 +1,5 @@
 <script>
-  import { beforeUpdate } from 'svelte'
+  import { afterUpdate, beforeUpdate, onMount } from 'svelte'
 
   import IconEye from '../components/icons/IconEye.svelte'
   import IconEyeOff from '../components/icons/IconEyeOff.svelte'
@@ -8,12 +8,37 @@
   const { CADBody } = window.zeaCad
   const { TreeItem, InstanceItem } = window.zeaEngine
 
-  export let isExpanded = false
-  export let highlighted = false
   export let item
   export let selectionManager = null
   export let undoRedoManager = null
-  export let visible = false
+  let isExpanded = false
+  let highlighted = false
+  let visible = false
+
+  let childComponents = []
+  let expandPath
+  export function expandTree(path) {
+    isExpanded = true
+    if (childComponents.length > 0) {
+      expandSubTree(path)
+    } else {
+      expandPath = path
+    }
+  }
+  function expandSubTree(path) {
+    if (path.length > 1) {
+      const childIndex = item.getChildIndex(path[1])
+      const treeViewItem = childComponents[childIndex]
+      treeViewItem.expandTree(path.slice(1))
+    } else {
+      // causes the element to be always at the top of the view.
+      el.scrollIntoView({
+        behavior: 'auto',
+        block: 'center',
+        inline: 'center',
+      })
+    }
+  }
 
   let el
   let hasChildren = false
@@ -139,6 +164,12 @@
   beforeUpdate(() => {
     initItem()
   })
+  afterUpdate(() => {
+    if (expandPath) {
+      expandSubTree(expandPath)
+      expandPath = null
+    }
+  })
 </script>
 
 {#if item}
@@ -192,11 +223,12 @@
         class="TreeItem__body ml-4 pl-4 md:ml-3 md:pl-3 border-dotted border-l-2 md:border-l"
       >
         {#if isTreeItem}
-          {#each item.getChildren() as childItem}
+          {#each item.getChildren() as childItem, i}
             <svelte:self
               item={childItem}
               {selectionManager}
               {undoRedoManager}
+              bind:this={childComponents[i]}
             />
           {/each}
         {/if}
