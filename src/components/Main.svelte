@@ -266,7 +266,8 @@
 
       if (collabEnabled) {
         const SOCKET_URL = 'https://websocket-staging.zea.live'
-        const roomId = assetUrl
+        // const roomId = assetUrl
+        const roomId = urlParams.get("collab")
         const session = new Session(userData, SOCKET_URL)
         session.joinRoom(roomId)
 

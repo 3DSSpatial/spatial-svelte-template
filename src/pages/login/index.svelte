@@ -17,6 +17,34 @@
 
   const userId = getRandomString()
 
+  const insertParam = (key, value) => {
+    key = encodeURIComponent(key)
+    value = encodeURIComponent(value)
+
+    // kvp looks like ['key1=value1', 'key2=value2', ...]
+    var kvp = document.location.search.substr(1).split('&')
+    let i = 0
+
+    for (; i < kvp.length; i++) {
+      if (kvp[i].startsWith(key + '=')) {
+        let pair = kvp[i].split('=')
+        pair[1] = value
+        kvp[i] = pair.join('=')
+        break
+      }
+    }
+
+    if (i >= kvp.length) {
+      kvp[kvp.length] = [key, value].join('=')
+    }
+
+    // can return this or...
+    let params = kvp.join('&')
+
+    // reload page with new params
+    document.location.search = params
+  }
+
   const redirectToMain = () => {
     const params = new URLSearchParams(window.location.search)
     $redirect('/?' + params.toString())
@@ -33,6 +61,8 @@
       password: formFields.password,
       username: formFields.username,
     }
+
+    insertParam('collab', formFields.roomID)
 
     try {
       await auth.setUserData(userData)
@@ -88,6 +118,17 @@
           <div>
             <input
               autocomplete="off"
+              bind:value={formFields.roomID}
+              class="appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-yellow-500 focus:border-yellow-500 focus:z-10 sm:text-sm"
+              name="roomID"
+              placeholder="Room ID (optional)"
+              type="text"
+            />
+          </div>
+
+          <div>
+            <input
+              autocomplete="off"
               bind:value={formFields.password}
               class="appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-yellow-500 focus:border-yellow-500 focus:z-10 sm:text-sm"
               name="password"
@@ -117,3 +158,4 @@
     </div>
   </div>
 {/if}
+formFields.roomID
