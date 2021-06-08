@@ -14,8 +14,8 @@
   onMount(async () => {
     const isAuthenticated = await auth.isAuthenticated()
 
-    // If a collanbroative session is requested, then we display the login page
-    // so users can enter a roomid, unless a roomid is already given.
+    // If a collaborative session is requested, then we display the login page
+    // so users can enter a roomid, unless a roomid is already given and the user is authenticated.
     if (isAuthenticated && (!collabEnabled || urlParams.get('collab'))) {
       shouldShowLayout = true
     } else {
