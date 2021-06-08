@@ -8,11 +8,15 @@
   import { auth } from '../helpers/auth'
 
   let shouldShowLayout
+  const urlParams = new URLSearchParams(window.location.search)
+  const collabEnabled = urlParams.has('collab')
 
   onMount(async () => {
     const isAuthenticated = await auth.isAuthenticated()
 
-    if (isAuthenticated) {
+    // If a collanbroative session is requested, then we display the login page
+    // so users can enter a roomid, unless a roomid is already given.
+    if (isAuthenticated && (!collabEnabled || urlParams.get('collab'))) {
       shouldShowLayout = true
     } else {
       const params = new URLSearchParams(location.search)

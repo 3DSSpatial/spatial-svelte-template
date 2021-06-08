@@ -25,7 +25,6 @@
   import { createClient } from '../ChannelMessenger.js'
   import buildTree from '../helpers/buildTree'
 
-
   const {
     Color,
     Vec3,
@@ -54,7 +53,7 @@
   const embeddedMode = urlParams.has('embedded')
   const collabEnabled = urlParams.has('collab')
   let progress
-  let files = ""
+  let files = ''
   let fileLoaded = false
 
   const filterItemSelection = (item) => {
@@ -110,7 +109,7 @@
     }
   }
   /** LOAD ASSETS METHODS END */
-  
+
   onMount(async () => {
     renderer = new GLRenderer(canvas)
 
@@ -267,9 +266,9 @@
       if (collabEnabled) {
         const SOCKET_URL = 'https://websocket-staging.zea.live'
         // const roomId = assetUrl
-        const roomId = urlParams.get("collab")
+        const roomId = urlParams.get('collab')
         const session = new Session(userData, SOCKET_URL)
-        session.joinRoom(roomId)
+        if (roomId) session.joinRoom(roomId)
 
         const sessionSync = new SessionSync(session, appData, userData, {})
 
@@ -366,16 +365,15 @@
   /** LOAD ASSETS FROM FILE START */
 
   const handleCadFile = () => {
-    const objectURL = window.URL.createObjectURL(files);
+    const objectURL = window.URL.createObjectURL(files)
 
-    const asset = loadAsset(objectURL, files.name);
+    const asset = loadAsset(objectURL, files.name)
 
-    if(asset) fileLoaded = true;
-
+    if (asset) fileLoaded = true
   }
 
   const handleDrop = () => {
-    console.log("test")
+    console.log('test')
   }
 
   /** LOAD ASSETS FROM FILE END */
@@ -384,10 +382,9 @@
 </script>
 
 <main class="Main flex-1 relative">
-
   <canvas bind:this={canvas} class="absolute h-full w-full" />
   {#if !fileLoaded}
-    <DropZone bind:files={files} on:changeFile={handleCadFile}/>
+    <DropZone bind:files on:changeFile={handleCadFile} />
   {/if}
 
   <div class="absolute bottom-10 w-full flex justify-center">
