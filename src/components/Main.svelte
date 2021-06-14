@@ -36,6 +36,7 @@
     SystemDesc,
     EnvMap,
     InstanceItem,
+    CameraManipulator,
   } = window.zeaEngine
   const { CADAsset, CADBody } = window.zeaCad
   const { SelectionManager, UndoRedoManager, ToolManager, SelectionTool } =
@@ -148,6 +149,9 @@
 
     /** SELECTION START */
     const cameraManipulator = renderer.getViewport().getManipulator()
+    cameraManipulator.setDefaultManipulationMode(
+      CameraManipulator.MANIPULATION_MODES.tumbler
+    )
     appData.cameraManipulator = cameraManipulator
     const toolManager = new ToolManager(appData)
     $selectionManager = new SelectionManager(appData, {
