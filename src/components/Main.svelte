@@ -38,12 +38,8 @@
     InstanceItem,
   } = window.zeaEngine
   const { CADAsset, CADBody } = window.zeaCad
-  const {
-    SelectionManager,
-    UndoRedoManager,
-    ToolManager,
-    SelectionTool,
-  } = window.zeaUx
+  const { SelectionManager, UndoRedoManager, ToolManager, SelectionTool } =
+    window.zeaUx
 
   const { Session, SessionSync } = window.zeaCollab
 
@@ -71,7 +67,7 @@
 
   let renderer
 
-  const loadZCADAsset = (url) => {
+  const loadZCADAsset = (url, filename) => {
     const asset = new CADAsset()
     asset.load(url).then(() => {
       const box = asset.getParameter('BoundingBox').getValue()
@@ -87,9 +83,9 @@
 
   /** LOAD ASSETS METHODS START */
   const { GLTFAsset } = gltfLoader
-  const loadGLTFAsset = (url) => {
+  const loadGLTFAsset = (url, filename) => {
     const asset = new GLTFAsset('gltf')
-    asset.load(url).then(() => {
+    asset.load(url, filename).then(() => {
       const box = asset.getParameter('BoundingBox').getValue()
       const xfo = new Xfo()
       // xfo.ori.setFromAxisAndAngle(new Vec3(1, 0, 0), Math.PI * 0.5)
@@ -103,9 +99,9 @@
 
   const loadAsset = (url, fileName) => {
     if (fileName.endsWith('zcad')) {
-      return loadZCADAsset(url)
+      return loadZCADAsset(url, fileName)
     } else if (fileName.endsWith('gltf') || fileName.endsWith('glb')) {
-      return loadGLTFAsset(url)
+      return loadGLTFAsset(url, fileName)
     }
   }
   /** LOAD ASSETS METHODS END */
