@@ -23,7 +23,7 @@
     }
 </script>
 
-<div id="fileDropZone" class="absolute w-full flex h-screen">
+<div id="fileDropZone" class="fixed w-full flex h-screen">
     <div class="border-2 border-gray-400 py-12 justify-center items-center p-4 m-auto rounded-lg w-3/12 h-1/3 bg-gray-200 bg-opacity-25 hover:bg-blue-200 hover:bg-opacity-25 text-black grid justify-items-center">
         <div class="m-auto">
             <input accept=".zcad, .gltf, .glb" multiple on:drop|preventDefault={handleDrop} on:change={(e) => {handleSelect(e)}} bind:this={files} type="file" class="absolute inset-0 z-50 m-0 p-0 w-full h-full outline-none opacity-0" />
