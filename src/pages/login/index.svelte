@@ -109,7 +109,7 @@
   >
     <div class="max-w-md w-full space-y-8">
       <h2 class="mt-6 text-center text-3xl font-extrabold">Zea Svelte Template</h2>
-      <p class="mt-6 text-center">This is an MIT open sourced template application that can used to build your own custom applications.</p>
+      <p class="mt-6 text-center">This is an MIT open sourced template application that can be used to build your own custom applications.</p>
 
       <form
         class="mt-8 space-y-6"
