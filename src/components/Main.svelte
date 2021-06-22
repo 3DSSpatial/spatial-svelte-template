@@ -50,7 +50,7 @@
   const embeddedMode = urlParams.has('embedded')
   const collabEnabled = urlParams.has('roomId')
   let progress
-  let files = ''
+  let file = ''
   let fileLoaded = false
 
   const filterItemSelection = (item) => {
@@ -101,12 +101,20 @@
     return asset
   }
 
-  const loadAsset = (url, fileName) => {
-    if (fileName.endsWith('zcad')) {
-      return loadZCADAsset(url, fileName)
-    } else if (fileName.endsWith('gltf') || fileName.endsWith('glb')) {
-      return loadGLTFAsset(url, fileName)
+  const loadAsset = (url, filename, publish=true) => {
+    let res
+    if (filename.endsWith('zcad')) {
+      res =  loadZCADAsset(url, filename)
+    } else if (filename.endsWith('gltf') || filename.endsWith('glb')) {
+      res =  loadGLTFAsset(url, filename)
     }
+    
+    if (publish) {
+      const { session } = $APP_DATA
+      if (session) session.pub('loadAsset', { url, filename })
+    }
+    if (res) fileLoaded = true
+    return res
   }
   /** LOAD ASSETS METHODS END */
 
@@ -315,6 +323,11 @@
         appData.session = session
         appData.sessionSync = sessionSync
 
+        
+        appData.session.sub('loadAsset', (data, user) => {
+          loadAsset(data.url, data.filename, false)
+        })
+
         APP_DATA.update(() => appData)
       }
     }
@@ -339,7 +352,7 @@
           $assets.removeAllChildren()
         }
 
-        const asset = loadAsset(data.url)
+        const asset = loadAsset(data.url, data.filename)
         asset.once('loaded', () => {
           if (data._id) {
             const tree = buildTree(asset)
@@ -408,11 +421,13 @@
   /** LOAD ASSETS FROM FILE START */
 
   const handleCadFile = () => {
-    const objectURL = window.URL.createObjectURL(files)
+    const reader = new FileReader();
 
-    const asset = loadAsset(objectURL, files.name)
+    reader.addEventListener("load", function () {
+      loadAsset(reader.result, file.name)
+    }, false);
 
-    if (asset) fileLoaded = true
+    reader.readAsDataURL(file);
   }
 
   const handleDrop = () => {
@@ -427,7 +442,7 @@
 <main class="Main flex-1 relative">
   <canvas bind:this={canvas} class="absolute h-full w-full" />
   {#if !fileLoaded}
-    <DropZone bind:files on:changeFile={handleCadFile} />
+    <DropZone bind:file on:changeFile={handleCadFile} />
   {/if}
 
   <div class="absolute bottom-10 w-full flex justify-center">
