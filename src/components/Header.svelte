@@ -22,7 +22,7 @@
 
   const urlParams = new URLSearchParams(window.location.search)
   const embeddedMode = urlParams.has('embedded')
-  const collabEnabled = urlParams.has('collab')
+  const collabEnabled = urlParams.has('roomId')
   let vrToggleMenuItemLabel = 'Detecting VR...'
   let vrToggleMenuItemDisabled = true
 

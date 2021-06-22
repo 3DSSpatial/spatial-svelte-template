@@ -9,14 +9,14 @@
 
   let shouldShowLayout
   const urlParams = new URLSearchParams(window.location.search)
-  const collabEnabled = urlParams.has('collab')
+  const collabEnabled = true
 
   onMount(async () => {
     const isAuthenticated = await auth.isAuthenticated()
 
     // If a collaborative session is requested, then we display the login page
     // so users can enter a roomid, unless a roomid is already given and the user is authenticated.
-    if (isAuthenticated && (!collabEnabled || urlParams.get('collab'))) {
+    if (isAuthenticated && (!collabEnabled || urlParams.get('roomId'))) {
       shouldShowLayout = true
     } else {
       const params = new URLSearchParams(location.search)

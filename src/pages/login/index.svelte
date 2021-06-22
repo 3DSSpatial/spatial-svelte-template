@@ -7,17 +7,20 @@
 
   const urlParams = new URLSearchParams(window.location.search)
   const embeddedMode = urlParams.has('embedded')
-  const collabEnabled = urlParams.has('collab')
+  const collabEnabled = true
   let authError
   let shouldShowLayout
   let submitted
   let usernameEl
+  const getRandomRoomId = ()=>{
+    return `${getRandomString(3)}-${getRandomString(3)}-${getRandomString(3)}`
+  }
+  let roomId = urlParams.has('roomId') ? urlParams.get('roomId') : getRandomRoomId()
 
   const formFields = {
-    roomID: '',
     password: '',
     username: '',
-    roomID: urlParams.get('collab'),
+    roomId,
   }
 
   const userId = getRandomString()
@@ -57,23 +60,22 @@
 
   const handleSubmit = async () => {
     const { Color } = window.zeaEngine
-
     const userData = {
       color: Color.random().toHex(),
       firstName: formFields.username,
       id: userId,
       lastName: '',
       password: formFields.password,
-      username: formFields.username,
-      // roomID: formFields.roomID
+      username: formFields.username
     }
 
-    insertParam('collab', formFields.roomID)
 
     try {
       await auth.setUserData(userData)
 
       submitted = true
+      //Note: this causes a reload of the page.
+      insertParam('roomId', formFields.roomId)
       redirectToMain()
     } catch (err) {
       authError = err
@@ -83,7 +85,7 @@
   onMount(async () => {
     const isAuthenticated = await auth.isAuthenticated()
 
-    if (isAuthenticated && (!collabEnabled || urlParams.get('collab'))) {
+    if (isAuthenticated && (!collabEnabled || urlParams.get('roomId'))) {
       redirectToMain()
       return
     }
@@ -106,25 +108,16 @@
     class="bg-background min-h-full flex items-center justify-center py-12 px-4 text-foreground sm:px-6 lg:px-8"
   >
     <div class="max-w-md w-full space-y-8">
-      <h2 class="mt-6 text-center text-3xl font-extrabold">Zea Demo</h2>
+      <h2 class="mt-6 text-center text-3xl font-extrabold">Zea Svelte Template</h2>
+      <p class="mt-6 text-center">This is an MIT open sourced template application that can used to build your own custom applications.</p>
 
       <form
         class="mt-8 space-y-6"
         on:submit|preventDefault|stopPropagation={handleSubmit}
       >
-        <div class="rounded-md shadow-sm -space-y-px">
-          <div>
-            <input
-              autocomplete="off"
-              bind:value={formFields.roomID}
-              class="appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-yellow-500 focus:border-yellow-500 focus:z-10 sm:text-sm"
-              name="roomId"
-              placeholder="Room ID"
-              required
-              type="text"
-            />
-          </div>
-         
+        <div class="rounded-md shadow-sm">
+          <p class="mt-6 text-center">Enter a username and the password to start the app.</p>
+          <p class="text-center">Note: the defualt password is 'zea' and can be modified in 'auth.js' or you can integrate an authentication service like Auth0.</p>
           <div class="mb-2">
             <input
               autocomplete="off"
@@ -144,7 +137,7 @@
               bind:value={formFields.password}
               class="appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-yellow-500 focus:border-yellow-500 focus:z-10 sm:text-sm"
               name="password"
-              placeholder="Password"
+              placeholder="Password (zea)"
               required
               type="password"
             />
@@ -152,11 +145,12 @@
 
           {#if collabEnabled}
             <div class="mb-2">
+              <p class="mt-6 text-center">The roomId allows other users to join you in a collaborative session.</p>
               <input
                 autocomplete="off"
-                bind:value={formFields.roomID}
+                bind:value={formFields.roomId}
                 class="appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-yellow-500 focus:border-yellow-500 focus:z-10 sm:text-sm"
-                name="roomID"
+                name="roomId"
                 placeholder="Room ID (optional)"
                 type="text"
               />

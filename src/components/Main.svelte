@@ -48,7 +48,7 @@
   let fpsContainer
   const urlParams = new URLSearchParams(window.location.search)
   const embeddedMode = urlParams.has('embedded')
-  const collabEnabled = urlParams.has('collab')
+  const collabEnabled = urlParams.has('roomId')
   let progress
   let files = ''
   let fileLoaded = false
@@ -70,13 +70,16 @@
 
   const loadZCADAsset = (url, filename) => {
     const asset = new CADAsset()
+    // TODO: frame all can occur in the initial load
+    asset.getGeometryLibrary().once('loaded', () => {
+      renderer.frameAll()
+    })
     asset.load(url).then(() => {
       const box = asset.getParameter('BoundingBox').getValue()
       const xfo = new Xfo()
       // xfo.ori.setFromAxisAndAngle(new Vec3(1, 0, 0), Math.PI * 0.5)
       xfo.tr.z = -box.p0.z
       asset.getParameter('LocalXfo').setValue(xfo)
-      renderer.frameAll()
     })
     $assets.addChild(asset)
     return asset
@@ -115,9 +118,7 @@
     // Assigning an Environment Map enables PBR lighting for niceer shiny surfaces.
     if (!SystemDesc.isMobileDevice && SystemDesc.gpuDesc.supportsWebGL2) {
       const envMap = new EnvMap('envMap')
-      envMap
-        .getParameter('FilePath')
-        .setValue(`/data/HDR_029_Sky_Cloudy_Ref.vlenv`)
+      envMap.getParameter('FilePath').setValue('data/StudioG.zenv')
       envMap.getParameter('HeadLightMode').setValue(true)
       $scene.getSettings().getParameter('EnvMap').setValue(envMap)
     }
@@ -305,7 +306,7 @@
       if (collabEnabled) {
         const SOCKET_URL = 'https://websocket-staging.zea.live'
         // const roomId = assetUrl
-        const roomId = urlParams.get('collab')
+        const roomId = urlParams.get('roomId')
         const session = new Session(userData, SOCKET_URL)
         if (roomId) session.joinRoom(roomId)
 
