@@ -1,4 +1,5 @@
 <script>
+  import { onMount } from 'svelte'
   export let orientation = 'horizontal'
 
   import ToolbarItem from './ToolbarItem.svelte'
@@ -185,13 +186,15 @@
     const result = materials[materialId][mode]
     geomItem.getParameter('Material').setValue(result)
   }
-  const handleChangeRenderModeWireframe = () => {
+
+
+  const handleChangeRenderModeWireframe = (pub=true) => {
     if (mode == RENDER_MODES.WIREFRAME) {
       return
     }
     mode = RENDER_MODES.WIREFRAME
 
-    const { assets } = $APP_DATA
+    const { assets, session } = $APP_DATA
     assets.traverse((item) => {
       if (item instanceof GeomItem) {
         const geom = item.getParameter('Geometry').getValue()
@@ -203,14 +206,16 @@
         })
       }
     })
+    if (pub && session) session.pub('setRenderMode', { mode: 'WIREFRAME' })
   }
-  const handleChangeRenderModeFlat = () => {
+
+  const handleChangeRenderModeFlat = (pub=true) => {
     if (mode == RENDER_MODES.FLAT) {
       return
     }
     mode = RENDER_MODES.FLAT
 
-    const { assets, scene, renderer } = $APP_DATA
+    const { assets, scene, renderer, session } = $APP_DATA
 
     renderer.outlineThickness = 1
     renderer.outlineColor = new Color(0.2, 0.2, 0.2, 1)
@@ -244,14 +249,16 @@
       }
     })
     mode = RENDER_MODES.FLAT
+    if (pub && session) session.pub('setRenderMode', { mode: 'FLAT' })
   }
-  const handleChangeRenderModeHiddenLine = () => {
+
+  const handleChangeRenderModeHiddenLine = (pub=true) => {
     if (mode == RENDER_MODES.HIDDEN_LINE) {
       return
     }
     mode = RENDER_MODES.HIDDEN_LINE
 
-    const { assets, renderer } = $APP_DATA
+    const { assets, renderer, session } = $APP_DATA
 
     renderer.outlineThickness = 1
     renderer.outlineColor = new Color(0.2, 0.2, 0.2, 1)
@@ -276,7 +283,7 @@
               }
             } else {
               newMaterial.setShaderName('FlatSurfaceShader')
-              const color = newMaterial.getParameter('BaseColor').getValue()
+              const color = newMaterial.getParameter('BaseColor').getValue().clone()
               color.a = 0.6
               newMaterial.getParameter('BaseColor').setValue(color)
               // newMaterial.getParameter('BaseColor').setValue(backgroundColor)
@@ -286,13 +293,15 @@
       }
     })
     mode = RENDER_MODES.HIDDEN_LINE
+    if (pub && session) session.pub('setRenderMode', { mode: 'HIDDEN_LINE' })
   }
-  const handleChangeRenderModeShadedAndEdges = () => {
+
+  const handleChangeRenderModeShadedAndEdges = (pub=true) => {
     if (mode == RENDER_MODES.SHADED_AND_EDGES) {
       return
     }
 
-    const { assets, renderer } = $APP_DATA
+    const { assets, renderer, session } = $APP_DATA
 
     renderer.outlineThickness = 1
     renderer.outlineColor = new Color(0.2, 0.2, 0.2, 1)
@@ -324,12 +333,14 @@
       }
     })
     mode = RENDER_MODES.SHADED_AND_EDGES
+    if (pub && session) session.pub('setRenderMode', { mode: 'SHADED_AND_EDGES' })
   }
-  const handleChangeRenderModePBR = () => {
+  
+  const handleChangeRenderModePBR = (pub=true) => {
     if (mode == RENDER_MODES.PBR) {
       return
     }
-    const { assets, renderer } = $APP_DATA
+    const { assets, renderer, session } = $APP_DATA
 
     renderer.outlineThickness = 1
     renderer.outlineColor = new Color(0.2, 0.2, 0.2, 1)
@@ -347,7 +358,39 @@
       }
     })
     mode = RENDER_MODES.PBR
+    if (pub && session) session.pub('setRenderMode', { mode: 'PBR' })
   }
+
+  let bound = false
+  onMount(async () => {
+    APP_DATA.subscribe((appData) => {
+      if (!appData || bound) 
+        return
+      const { session } = appData
+      if (session) {
+        session.sub('setRenderMode', (data) => {
+          switch (data.mode) {
+          case 'WIREFRAME': 
+            handleChangeRenderModeWireframe(false)
+            break
+          case 'FLAT': 
+            handleChangeRenderModeFlat(false)
+            break
+          case 'HIDDEN_LINE': 
+            handleChangeRenderModeHiddenLine(false)
+            break
+          case 'SHADED_AND_EDGES': 
+            handleChangeRenderModeShadedAndEdges(false)
+            break
+          case 'PBR': 
+            handleChangeRenderModePBR(false)
+            break
+          }
+        })
+      }
+      bound = true
+    })
+  })
 </script>
 
 <div class="Toolbar flex gap-1" class:flex-col={orientation === 'vertical'}>
