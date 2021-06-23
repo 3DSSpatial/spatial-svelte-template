@@ -167,18 +167,10 @@
   // geomItem at load time.
   const geomItemToMaterialMapping = {}
   const createAndAssignMaterial = (geomItem, mode, cb) => {
-    const geomItemId = geomItem.getId()
     if (mode != RENDER_MODES.PBR) {
-      const material = geomItem.getParameter('Material').getValue()
-      const materialId = material.getId()
-      if (!geomItemToMaterialMapping[geomItemId]) {
-        geomItemToMaterialMapping[geomItemId] = materialId
-      }
-      if (!materials[materialId]) {
-        materials[materialId] = {}
-        materials[materialId][RENDER_MODES.PBR] = material
-      }
+      cacheMaterial(geomItem)
     }
+    const geomItemId = geomItem.getId()
     const materialId = geomItemToMaterialMapping[geomItemId]
     if (!materials[materialId][mode]) {
       // Clone the PBR material and use it as a basis for the new material.
@@ -188,6 +180,18 @@
     }
     const result = materials[materialId][mode]
     geomItem.getParameter('Material').setValue(result)
+  }
+  const cacheMaterial = (geomItem)=>{
+    const geomItemId = geomItem.getId()
+    const material = geomItem.getParameter('Material').getValue()
+    const materialId = material.getId()
+    if (!geomItemToMaterialMapping[geomItemId]) {
+      geomItemToMaterialMapping[geomItemId] = materialId
+    }
+    if (!materials[materialId]) {
+      materials[materialId] = {}
+      materials[materialId][RENDER_MODES.PBR] = material
+    }
   }
 
 
@@ -231,6 +235,7 @@
       if (item instanceof GeomItem) {
         const geom = item.getParameter('Geometry').getValue()
         if (geom instanceof Mesh || geom instanceof MeshProxy) {
+          cacheMaterial(item)
           item.getParameter('Visible').setValue(true)
           item.getParameter('Material').setValue(whiteMaterial)
         }
