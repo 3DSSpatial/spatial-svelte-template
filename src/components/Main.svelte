@@ -85,13 +85,8 @@
 
   /** LOAD ASSETS METHODS START */
   const loadGLTFAsset = (url, filename) => {
-    const asset = new GLTFAsset('gltf')
+    const asset = new GLTFAsset()
     asset.load(url, filename).then(() => {
-      const box = asset.getParameter('BoundingBox').getValue()
-      const xfo = new Xfo()
-      // xfo.ori.setFromAxisAndAngle(new Vec3(1, 0, 0), Math.PI * 0.5)
-      xfo.tr.z = -box.p0.z
-      asset.getParameter('LocalXfo').setValue(xfo)
       renderer.frameAll()
     })
     $assets.addChild(asset)
