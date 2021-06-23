@@ -46,11 +46,10 @@
       kvp[kvp.length] = [key, value].join('=')
     }
 
-    // can return this or...
-    const params = kvp.join('&')
+    const params = kvp.length > 1 ? kvp.join('&') : kvp[0]
 
     // reload page with new params
-    document.location.search = params
+    $redirect('/?' + params)
   }
 
   const redirectToMain = () => {
@@ -76,7 +75,6 @@
       submitted = true
       //Note: this causes a reload of the page.
       insertParam('roomId', formFields.roomId)
-      redirectToMain()
     } catch (err) {
       authError = err
     }
