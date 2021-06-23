@@ -14,6 +14,7 @@
   import IconPerspView from '../icons/IconPerspView.svelte'
   import IconRenderModeWireframe from '../icons/IconRenderModeWireframe.svelte'
   import IconRenderModeFlat from '../icons/IconRenderModeFlat.svelte'
+  import IconRenderModeFlatWhite from '../icons/IconRenderModeFlatWhite.svelte'
   import IconRenderModeShaded from '../icons/IconRenderModeShaded.svelte'
   import IconRenderModeShadedAndEdges from '../icons/IconRenderModeShadedAndEdges.svelte'
   import IconRenderModePBR from '../icons/IconRenderModePBR.svelte'
@@ -33,6 +34,7 @@
     Color,
     Quat,
     MathFunctions,
+    Material,
   } = window.zeaEngine
 
   const setCameraXfo = (camera, dir, up, duration = 400) => {
@@ -146,6 +148,7 @@
   const RENDER_MODES = {
     WIREFRAME: Symbol(),
     FLAT: Symbol(),
+    FLAT_WHITE: Symbol(),
     HIDDEN_LINE: Symbol(),
     SHADED: Symbol(),
     SHADED_AND_EDGES: Symbol(),
@@ -208,7 +211,34 @@
     })
     if (pub && session) session.pub('setRenderMode', { mode: 'WIREFRAME' })
   }
+  const handleChangeRenderModeFlatWhite = (pub=true) => {
+    if (mode == RENDER_MODES.FLAT_WHITE) {
+      return
+    }
+    mode = RENDER_MODES.FLAT_WHITE
+    const { assets, scene, renderer, session } = $APP_DATA
+    renderer.outlineThickness = 1
+    renderer.outlineColor = new Color(0.2, 0.2, 0.2, 1)
+    const backgroundColor = scene
+      .getSettings()
+      .getParameter('BackgroundColor')
+      .getValue()
+    const whiteMaterial = new Material()
+    whiteMaterial.setShaderName('FlatSurfaceShader')
+    whiteMaterial.getParameter('BaseColor').setValue(backgroundColor)
 
+    assets.traverse((item) => {
+      if (item instanceof GeomItem) {
+        const geom = item.getParameter('Geometry').getValue()
+        if (geom instanceof Mesh || geom instanceof MeshProxy) {
+          item.getParameter('Visible').setValue(true)
+          item.getParameter('Material').setValue(whiteMaterial)
+        }
+      }
+    })
+    mode = RENDER_MODES.FLAT_WHITE
+    if (pub && session) session.pub('setRenderMode', { mode: 'FLAT_WHITE' })
+  }
   const handleChangeRenderModeFlat = (pub=true) => {
     if (mode == RENDER_MODES.FLAT) {
       return
@@ -376,6 +406,9 @@
           case 'FLAT': 
             handleChangeRenderModeFlat(false)
             break
+          case 'FLAT_WHITE': 
+            handleChangeRenderModeFlatWhite(false)
+            break
           case 'HIDDEN_LINE': 
             handleChangeRenderModeHiddenLine(false)
             break
@@ -436,6 +469,13 @@
         on:click={handleChangeRenderModeFlat}
       >
         <IconRenderModeFlat />
+      </ToolbarItem>
+      <ToolbarItem
+        isHighlighted={mode === RENDER_MODES.FLAT_WHITE}
+        title="FlatWhite"
+        on:click={handleChangeRenderModeFlatWhite}
+      >
+        <IconRenderModeFlatWhite />
       </ToolbarItem>
       <ToolbarItem
         isHighlighted={mode === RENDER_MODES.HIDDEN_LINE}
