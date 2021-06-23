@@ -43,6 +43,7 @@
     window.zeaUx
 
   const { Session, SessionSync } = window.zeaCollab
+  const { GLTFAsset } = gltfLoader
 
   let canvas
   let fpsContainer
@@ -52,6 +53,8 @@
   let progress
   let file = ''
   let fileLoaded = false
+  const appData = {}
+  let renderer
 
   const filterItemSelection = (item) => {
     // Propagate selections up from the edges and surfaces up to
@@ -66,27 +69,21 @@
     return item
   }
 
-  let renderer
-
+  /** LOAD ASSETS METHODS START */
   const loadZCADAsset = (url, filename) => {
     const asset = new CADAsset()
-    // TODO: frame all can occur in the initial load
+    // TODO (engine-v3.10.0): frame all can occur in the initial load once the camera framing
+    // is updated. 
     asset.getGeometryLibrary().once('loaded', () => {
       renderer.frameAll()
     })
     asset.load(url).then(() => {
-      const box = asset.getParameter('BoundingBox').getValue()
-      const xfo = new Xfo()
-      // xfo.ori.setFromAxisAndAngle(new Vec3(1, 0, 0), Math.PI * 0.5)
-      xfo.tr.z = -box.p0.z
-      asset.getParameter('LocalXfo').setValue(xfo)
     })
     $assets.addChild(asset)
     return asset
   }
 
   /** LOAD ASSETS METHODS START */
-  const { GLTFAsset } = gltfLoader
   const loadGLTFAsset = (url, filename) => {
     const asset = new GLTFAsset('gltf')
     asset.load(url, filename).then(() => {
@@ -101,7 +98,7 @@
     return asset
   }
 
-  const loadAsset = (url, filename, publish=true) => {
+  const loadAsset = (url, filename) => {
     let res
     if (filename.endsWith('zcad')) {
       res =  loadZCADAsset(url, filename)
@@ -109,10 +106,6 @@
       res =  loadGLTFAsset(url, filename)
     }
     
-    if (publish) {
-      const { session } = $APP_DATA
-      if (session) session.pub('loadAsset', { url, filename })
-    }
     if (res) fileLoaded = true
     return res
   }
@@ -141,7 +134,7 @@
       .setValue(new Color(0.85, 0.85, 0.85, 1))
     renderer.setScene($scene)
 
-    const appData = {}
+    
 
     appData.renderer = renderer
     appData.scene = $scene
@@ -318,14 +311,19 @@
         const session = new Session(userData, SOCKET_URL)
         if (roomId) session.joinRoom(roomId)
 
-        const sessionSync = new SessionSync(session, appData, userData, {})
+        const sessionSync = new SessionSync(session, appData, userData, {
+          /* Avatars scale based on the distance to the target */
+          scaleAvatarWithFocalDistance: true,
+          /* The overal size multiplier of the avatar. */
+          avatarScale: 2.0
+        })
 
         appData.session = session
         appData.sessionSync = sessionSync
 
         
         appData.session.sub('loadAsset', (data, user) => {
-          loadAsset(data.url, data.filename, false)
+          loadAsset(data.url, data.filename)
         })
 
         APP_DATA.update(() => appData)
@@ -425,6 +423,11 @@
 
     reader.addEventListener("load", function () {
       loadAsset(reader.result, file.name)
+      
+      // If a collabroative session is running, pass the data
+      // to the other session users to load.
+      const { session } = appData
+      if (session) session.pub('loadAsset', { url, filename })
     }, false);
 
     reader.readAsDataURL(file);
