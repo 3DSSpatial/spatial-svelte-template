@@ -29,7 +29,7 @@
             <input accept=".zcad, .gltf, .glb" multiple on:drop|preventDefault={handleDrop} on:change={(e) => {handleSelect(e)}} bind:this={files} type="file" class="absolute inset-0 z-50 m-0 p-0 w-full h-full outline-none opacity-0" />
             <div class="flex flex-col space-y-2 items-center justify-center">
                 <i class="fas fa-cloud-upload-alt fa-3x text-currentColor"></i>
-                <p class="text-gray-700 text-center">Drag your files here or click in this area.</p>    
+                <p class="text-gray-700 text-center">Drag your gltf or zcad files here or click in this area.</p>    
             </div>
         </div>
     </div>
