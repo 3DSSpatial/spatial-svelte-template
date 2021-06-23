@@ -272,10 +272,13 @@
               if (newMaterial.hasParameter('OccludedStippleValue')) {
                 newMaterial.getParameter('StippleScale').setValue(0.02)
                 newMaterial.getParameter('StippleValue').setValue(0)
-                newMaterial.getParameter('OccludedStippleValue').setValue(0.6)
+                newMaterial.getParameter('OccludedStippleValue').setValue(1)
               }
             } else {
               newMaterial.setShaderName('FlatSurfaceShader')
+              const color = newMaterial.getParameter('BaseColor').getValue()
+              color.a = 0.6
+              newMaterial.getParameter('BaseColor').setValue(color)
               // newMaterial.getParameter('BaseColor').setValue(backgroundColor)
             }
           }
