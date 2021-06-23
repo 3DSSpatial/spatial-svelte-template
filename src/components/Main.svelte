@@ -51,7 +51,7 @@
   const embeddedMode = urlParams.has('embedded')
   const collabEnabled = urlParams.has('roomId')
   let progress
-  let file = ''
+  let files = ''
   let fileLoaded = false
   const appData = {}
   let renderer
@@ -417,7 +417,9 @@
     const reader = new FileReader();
 
     reader.addEventListener("load", function () {
-      loadAsset(reader.result, file.name)
+      const url = reader.result
+      const filename = files.name
+      loadAsset(url, filename)
       
       // If a collabroative session is running, pass the data
       // to the other session users to load.
@@ -425,7 +427,7 @@
       if (session) session.pub('loadAsset', { url, filename })
     }, false);
 
-    reader.readAsDataURL(file);
+    reader.readAsDataURL(files);
   }
 
   const handleDrop = () => {
@@ -440,7 +442,7 @@
 <main class="Main flex-1 relative">
   <canvas bind:this={canvas} class="absolute h-full w-full" />
   {#if !fileLoaded}
-    <DropZone bind:file on:changeFile={handleCadFile} />
+    <DropZone bind:files on:changeFile={handleCadFile} />
   {/if}
 
   <div class="absolute bottom-10 w-full flex justify-center">
