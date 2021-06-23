@@ -43,6 +43,7 @@
     window.zeaUx
 
   const { Session, SessionSync } = window.zeaCollab
+  const { GLTFAsset } = gltfLoader
 
   let canvas
   let fpsContainer
@@ -52,6 +53,8 @@
   let progress
   let files = ''
   let fileLoaded = false
+  const appData = {}
+  let renderer
 
   const filterItemSelection = (item) => {
     // Propagate selections up from the edges and surfaces up to
@@ -66,47 +69,40 @@
     return item
   }
 
-  let renderer
-
+  /** LOAD ASSETS METHODS START */
   const loadZCADAsset = (url, filename) => {
     const asset = new CADAsset()
-    // TODO: frame all can occur in the initial load
+    // TODO (engine-v3.10.0): frame all can occur in the initial load once the camera framing
+    // is updated. 
     asset.getGeometryLibrary().once('loaded', () => {
       renderer.frameAll()
     })
     asset.load(url).then(() => {
-      const box = asset.getParameter('BoundingBox').getValue()
-      const xfo = new Xfo()
-      // xfo.ori.setFromAxisAndAngle(new Vec3(1, 0, 0), Math.PI * 0.5)
-      xfo.tr.z = -box.p0.z
-      asset.getParameter('LocalXfo').setValue(xfo)
     })
     $assets.addChild(asset)
     return asset
   }
 
   /** LOAD ASSETS METHODS START */
-  const { GLTFAsset } = gltfLoader
   const loadGLTFAsset = (url, filename) => {
-    const asset = new GLTFAsset('gltf')
+    const asset = new GLTFAsset()
     asset.load(url, filename).then(() => {
-      const box = asset.getParameter('BoundingBox').getValue()
-      const xfo = new Xfo()
-      // xfo.ori.setFromAxisAndAngle(new Vec3(1, 0, 0), Math.PI * 0.5)
-      xfo.tr.z = -box.p0.z
-      asset.getParameter('LocalXfo').setValue(xfo)
       renderer.frameAll()
     })
     $assets.addChild(asset)
     return asset
   }
 
-  const loadAsset = (url, fileName) => {
-    if (fileName.endsWith('zcad')) {
-      return loadZCADAsset(url, fileName)
-    } else if (fileName.endsWith('gltf') || fileName.endsWith('glb')) {
-      return loadGLTFAsset(url, fileName)
+  const loadAsset = (url, filename) => {
+    let res
+    if (filename.endsWith('zcad')) {
+      res =  loadZCADAsset(url, filename)
+    } else if (filename.endsWith('gltf') || filename.endsWith('glb')) {
+      res =  loadGLTFAsset(url, filename)
     }
+    
+    if (res) fileLoaded = true
+    return res
   }
   /** LOAD ASSETS METHODS END */
 
@@ -133,7 +129,7 @@
       .setValue(new Color(0.85, 0.85, 0.85, 1))
     renderer.setScene($scene)
 
-    const appData = {}
+    
 
     appData.renderer = renderer
     appData.scene = $scene
@@ -310,10 +306,20 @@
         const session = new Session(userData, SOCKET_URL)
         if (roomId) session.joinRoom(roomId)
 
-        const sessionSync = new SessionSync(session, appData, userData, {})
+        const sessionSync = new SessionSync(session, appData, userData, {
+          /* Avatars scale based on the distance to the target */
+          scaleAvatarWithFocalDistance: true,
+          /* The overal size multiplier of the avatar. */
+          avatarScale: 2.0
+        })
 
         appData.session = session
         appData.sessionSync = sessionSync
+
+        
+        appData.session.sub('loadAsset', (data, user) => {
+          loadAsset(data.url, data.filename)
+        })
 
         APP_DATA.update(() => appData)
       }
@@ -339,7 +345,7 @@
           $assets.removeAllChildren()
         }
 
-        const asset = loadAsset(data.url)
+        const asset = loadAsset(data.url, data.filename)
         asset.once('loaded', () => {
           if (data._id) {
             const tree = buildTree(asset)
@@ -408,11 +414,20 @@
   /** LOAD ASSETS FROM FILE START */
 
   const handleCadFile = () => {
-    const objectURL = window.URL.createObjectURL(files)
+    const reader = new FileReader();
 
-    const asset = loadAsset(objectURL, files.name)
+    reader.addEventListener("load", function () {
+      const url = reader.result
+      const filename = files.name
+      loadAsset(url, filename)
+      
+      // If a collabroative session is running, pass the data
+      // to the other session users to load.
+      const { session } = appData
+      if (session) session.pub('loadAsset', { url, filename })
+    }, false);
 
-    if (asset) fileLoaded = true
+    reader.readAsDataURL(files);
   }
 
   const handleDrop = () => {

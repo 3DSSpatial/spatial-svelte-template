@@ -2,7 +2,7 @@
   import { redirect } from '@roxi/routify'
   import { onMount } from 'svelte'
 
-  const { CameraManipulator } = window.zeaEngine
+  const { Quat, Vec3, CameraManipulator } = window.zeaEngine
   const { ToolManager } = window.zeaUx
 
   import Button from './Button.svelte'
@@ -27,6 +27,8 @@
   let vrToggleMenuItemDisabled = true
 
   let cameraManipulator
+  let isTumblerEnabled = true
+  let isTurnTableEnabled = false
   let isSelectionEnabled = false
   let isTransformHandlesEnabled = false
   let renderer
@@ -64,6 +66,34 @@
         break
     }
   })
+
+  const handleTumblerEnabled = () => {
+    cameraManipulator.setDefaultManipulationMode(
+      CameraManipulator.MANIPULATION_MODES.tumbler
+    )
+    isTumblerEnabled = true
+    isTurnTableEnabled = false
+  }
+  const handleTurnTableEnabled = () => {
+    cameraManipulator.setDefaultManipulationMode(
+      CameraManipulator.MANIPULATION_MODES.turntable
+    )
+    // The Tumbler mode prevents the camera from rolling upside down, so we correct it here.
+    const cameraXfo = renderer.getViewport().getCamera().getParameter('GlobalXfo').getValue()
+    const zaxis = cameraXfo.ori.getZaxis()
+    let t = 0
+    const id = setInterval(() => {
+      t += 0.1
+      const quat = new Quat()
+      const xfo = cameraXfo.clone()
+      quat.setFromDirectionAndUpvector(zaxis, new Vec3(0,0,1))
+      xfo.ori = cameraXfo.ori.lerp(quat, Math.min(t, 1.0))
+      renderer.getViewport().getCamera().getParameter('GlobalXfo').setValue(xfo)
+      if (t >= 1.0) clearInterval(id)
+    }, 20)
+    isTurnTableEnabled = true
+    isTumblerEnabled = false
+  }
 
   const handleMenuSelectionChange = () => {
     if (!toolManager) {
@@ -261,6 +291,16 @@
               shortcut="F"
               on:click={handleFrameAll}
             />
+            <MenuItemToggle
+              label="Camera Mode: TurnTable"
+              bind:checked={isTurnTableEnabled}
+              on:change={handleTurnTableEnabled}
+            />
+            <MenuItemToggle
+              label="Camera Mode: Tumbler"
+              bind:checked={isTumblerEnabled}
+              on:change={handleTumblerEnabled}
+            />
           </Menu>
         </MenuBarItem>
 
@@ -297,27 +337,12 @@
           </Menu>
         </MenuBarItem>
 
-        <MenuBarItem label="Collab" let:isOpen>
-          <Menu {isOpen}>
-            <MenuItem
-              iconLeft="visibility"
-              label="Direct Attention"
-              shortcut="Ctrl+N"
-              on:click={handleDA}
-            />
-          </Menu>
-        </MenuBarItem>
-
         <MenuBarItem label="VR" let:isOpen>
           <Menu {isOpen}>
             <MenuItem
               disabled={vrToggleMenuItemDisabled}
               label={vrToggleMenuItemLabel}
               on:click={handleLaunchVR}
-            />
-            <MenuItem
-              label="Enable Spectator Mode"
-              on:click={handleToggleVRSpatatorMode}
             />
           </Menu>
         </MenuBarItem>
