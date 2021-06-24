@@ -14,9 +14,14 @@ This template has been deployed as a live demo for you to check out now.
 You can change the password in your own deployments, or connect to an authentication service.
 See below.
 
-https://svelte-template.zea.live/
 
-The default asset provided is the GearBox.
+
+https://svelte-template.zea.live/login?zcad=data/gear_box_final_asm.zcad
+
+https://svelte-template.zea.live/login?zcad=data/Fidget-Spinner-2.zcad
+
+https://svelte-template.zea.live/login?zcad=data/HC_SRO4.zcad
+
 ![GearBox](docs/images/GearBox.jpg)
 
 You can also modify the app to load parts of the hospital.
