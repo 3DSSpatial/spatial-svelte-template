@@ -82,7 +82,6 @@
     return asset
   }
 
-  /** LOAD ASSETS METHODS START */
   const loadGLTFAsset = (url, filename) => {
     const asset = new GLTFAsset()
     asset.load(url, filename).then(() => {
