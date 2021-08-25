@@ -3,16 +3,20 @@
   import { onMount } from 'svelte'
 
   import Header from '../components/Header.svelte'
-  import Renderer from '../components/Renderer.svelte'
+  import Main from '../components/Main.svelte'
 
   import { auth } from '../helpers/auth'
 
   let shouldShowLayout
+  const urlParams = new URLSearchParams(window.location.search)
+  const collabEnabled = true
 
   onMount(async () => {
     const isAuthenticated = await auth.isAuthenticated()
 
-    if (isAuthenticated) {
+    // If a collaborative session is requested, then we display the login page
+    // so users can enter a roomid, unless a roomid is already given and the user is authenticated.
+    if (isAuthenticated && (!collabEnabled || urlParams.get('roomId'))) {
       shouldShowLayout = true
     } else {
       const params = new URLSearchParams(location.search)
@@ -24,6 +28,6 @@
 {#if shouldShowLayout}
   <div class="flex flex-col h-full">
     <Header />
-    <Renderer />
+    <Main />
   </div>
 {/if}

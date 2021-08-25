@@ -16,16 +16,19 @@ const setupLoadBtn = (name, url) => {
   btn.addEventListener('click', () => {
     client
       .do('loadCADFile', {
-        zcad: url,
+        url,
       })
       .then((data) => {
         logger.logJson('modelStructure', data)
       })
   })
 }
-setupLoadBtn('Gearbox', `/assets/gear_box_final_asm-visu.zcad`)
-setupLoadBtn('Hospital_Structural', '/assets/Hospital/Autodesk_Hospital_Structural.zcad')
-setupLoadBtn('Hospital_HVAC', '/assets/Hospital/Autodesk_Hospital_HVAC.zcad')
+setupLoadBtn('Gearbox', `/data/gear_box_final_asm-visu.zcad`)
+setupLoadBtn(
+  'Hospital_Structural',
+  '/data/Hospital/Autodesk_Hospital_Structural.zcad'
+)
+setupLoadBtn('Hospital_HVAC', '/data/Hospital/Autodesk_Hospital_HVAC.zcad')
 
 /* Background color */
 const colorPicker = document.getElementById('background-color')

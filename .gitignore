@@ -4,7 +4,5 @@ scripts/
 .DS_Store
 .history
 src/tmp/
-.routify
-.netlify
+.routify/
 assets/build/
-.vercel

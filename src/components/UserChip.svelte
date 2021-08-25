@@ -19,15 +19,15 @@
   }
 
   $: avatar = user.avatar || user.picture
-  $: firstName = user.firstName || user.given_name || 'N'
-  $: lastName = user.lastName || user.family_name || 'N'
+  $: firstName = user.firstName || user.given_name || ' '
+  $: lastName = user.lastName || user.family_name || ' '
 
-  $: if (firstName && lastName) {
-    initials = `${firstName[0]}${lastName[0]}`
-  }
+  $: initials = `${firstName[0].toUpperCase()}${lastName[0].toUpperCase()}`
 </script>
 
-<div class="UserChip relative">
+<div
+  class="UserChip cursor-default relative transform hover:scale-105 transition-transform"
+>
   <div
     class="h-8 w-8 flex items-center justify-center rounded-full truncate text-white bg-cover border border-gray-500"
     on:click={handleUserChipClick}

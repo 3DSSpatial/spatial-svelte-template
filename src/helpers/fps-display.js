@@ -11,7 +11,7 @@ export class FPSDisplay extends HTMLElement {
     styleTag.appendChild(
       document.createTextNode(`
       .fps-display {
-        position: fixed;
+        position: absolute;
         bottom: 10px;
         right: 10px;
         color: #000000;

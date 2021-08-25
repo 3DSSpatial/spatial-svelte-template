@@ -4,28 +4,32 @@
 
 - Built on top of [Svelte](https://svelte.dev/), a radical new approach to building user interfaces.
 - Includes the latest stable versions of the Zea tools: [Zea Engine](https://docs.zea.live/zea-engine/), [Zea UI](https://web-components.zea.live/), [Zea UX](https://docs.zea.live/zea-ux/), and [Zea Collab](https://docs.zea.live/zea-collab/).
-- Supports [SSR](https://en.wikipedia.org/wiki/Server-side_scripting).
 
 ## Live Demo
 
-This template has been deployed to Vercel for a live demo.
+This template has been deployed as a live demo for you to check out now.
 
 > Password: zea
 
 You can change the password in your own deployments, or connect to an authentication service.
 See below.
 
-https://zea-svelte-template.vercel.app/
 
-The default asset provided is the GearBox.
+
+https://svelte-template.zea.live/?zcad=data/gear_box_final_asm.zcad
+
+https://svelte-template.zea.live/?zcad=data/Fidget-Spinner-2.zcad
+
+https://svelte-template.zea.live/?zcad=data/HC_SRO4.zcad
+
 ![GearBox](docs/images/GearBox.jpg)
 
 You can also modify the app to load parts of the hospital.
 ![Hosptial-Structural](docs/images/Hosptial-Structural.jpg)
 
-https://zea-svelte-template.vercel.app/?zcad=/assets/Hospital/Autodesk_Hospital_Structural.zcad
+https://svelte-template.zea.live/?zcad=/data/Hospital/Autodesk_Hospital_Structural.zcad
 
-https://zea-svelte-template.vercel.app/?zcad=/assets/Hospital/Autodesk_Hospital_HVAC.zcad
+https://svelte-template.zea.live/?zcad=/data/Hospital/Autodesk_Hospital_HVAC.zcad
 
 ## Prerequisites
 
@@ -65,21 +69,24 @@ npm run dev
 
 ### npm scripts
 
-| Syntax  | Description                                                      |
-| ------- | ---------------------------------------------------------------- |
-| `build` | Build a bundled app with SSR + pre-rendering and dynamic imports |
-| `dev`   | Development (port 5000)                                          |
-| `serve` | Run after a build to preview. Serves SPA on 5000 and SSR on 5005 |
+| Syntax  | Description                                      |
+| ------- | ------------------------------------------------ |
+| `build` | Build app with pre-rendering and dynamic imports |
+| `dev`   | Development (port 5000)                          |
+| `serve` | Run after a build to preview. Serves SPA on 5000 |
 
 # Features
 
 ## UI
 
-The template app leverages the Zea UI library for all its User interface components.
+The template app provides a library of Svelte components that can be customized and used to build your own user interfaces.
 
-> http://web-components.zea.live/
-
-The UI library is built using the new 'web components' technology supported in all modern browsers.
+- Drawer: a Side panel that pops out to display additional content.
+- Dialog: Used to show modal content.
+- Tabs: A simple tabs layout component.
+- UserChip: Displays the current user avatar.
+- UserChips: Displays the chips for all the users in the current session.
+- ParameterOwnerWidget: A Dynamic UI for displaying Parameters.
 
 ## UX
 
@@ -89,7 +96,8 @@ The template leverages the Zea UX library to provide Undo, Redo and tools such a
 
 ## User Identification and Authentication
 
-This template app comes with a simple user identification and authentication system. Users enter their name and an optional password to gain access to the app.
+This template app comes with a simple user identification and authentication system. Users enter their name and a password to gain access to the app.
+This authentication system cen be replaced with a robust solution like Auth0 or removed completely for public demos.
 
 ```javascript
 onMount(async () => {
@@ -106,22 +114,18 @@ The Authentication can be disabled by commenting out the $redirect('/login') lin
 
 ## Collaboration
 
-If a user is identified, then the app integrates the powerful collaboration framework refrred to as 'Collab.
+This Template comes with Collab integrated as an example of how to build collaborative applications. 
+Changes such as item selection and item visibility are synchronized to other users. 
 
 > https://docs.zea.live/zea-collab/
 
 ```javascript
-const SOCKET_URL = 'https://websocket-staging.zea.live'
-const ROOM_ID = 'zea-template-collab'
+   const roomId = urlParams.get('roomId')
+   const session = new Session(userData, SOCKET_URL)
+   if (roomId) session.joinRoom(roomId)
 ```
 
-> Note: the roomID is what defines whether users of a given app are visible to each other. Always customize this value to avoid collisions with other apps.
-
-```javascript
-const session = new Session(userData, SOCKET_URL)
-session.joinRoom(ROOM_ID)
-const sessionSync = new SessionSync(session, appData, userData, {})
-```
+> Note: the roomId is what defines whether users of a given app are visible to each other. Apps can use any value as a room id, or ask fro an explicit value as we do in this sample.
 
 ## CAD
 
@@ -130,15 +134,26 @@ the Zea CAD library comes pre-integrated and a sample zcad file is loaded.
 > https://docs.zea.live/zea-cad/
 
 ```javascript
-const asset = new CADAsset()
-asset.on('loaded', () => {
-  renderer.frameAll()
-})
-scene.getRoot().addChild(asset)
-asset.getParameter('FilePath').setValue('/assets/HC_SRO4.zcad')
+   const asset = new CADAsset()
+   asset.load(url).then(() => {
+   renderer.frameAll()
+   })
 ```
 
-The code above loads the sample cad file.
+Note: The zcad file format is a proprietary CAD file format. Zea Cloud can be used to produce zcad files, or the CLI tools available on request.
+
+## glTF
+
+The gltf-loader plugin is integrated, providing support for loading GLTF files into this app.
+
+```javascript
+   const asset = new GLTFAsset('gltf')
+   asset.load(url, filename).then(() => {
+   renderer.frameAll()
+   })
+```
+
+
 
 # Installing your own plugins
 
@@ -214,3 +229,19 @@ File it on Github: https://github.com/3DSSpatial/spatial-svelte-template
 Start a discussion: https://github.com/3DSSpatial/spatial-svelte-template/discussions
 
 Or reach out to your Technical Account Manager at Spatial Corp.
+
+# Credits
+
+This Svelte Template is a preconfigured Svelte app that combines the engine and many of the popular plugins.  
+This template contains the following software from Zea Inc. Please be mindful of the license attached to each of these software if publishing or redistributing your work.
+
+**Zea Engine**: https://github.com/ZeaInc/zea-engine
+
+**Zea CAD**: Proprietary, closed-source
+
+**Zea Collab**: https://github.com/ZeaInc/zea-collab
+
+**Zea Kinematics**: https://github.com/ZeaInc/zea-kinematics
+
+**Zea UX**: https://github.com/ZeaInc/zea-ux
+

@@ -2,7 +2,7 @@
   import { redirect } from '@roxi/routify'
   import { onMount } from 'svelte'
 
-  const { CameraManipulator } = window.zeaEngine
+  const { Quat, Vec3, CameraManipulator } = window.zeaEngine
   const { ToolManager } = window.zeaUx
 
   import Button from './Button.svelte'
@@ -22,14 +22,19 @@
 
   const urlParams = new URLSearchParams(window.location.search)
   const embeddedMode = urlParams.has('embedded')
+  const collabEnabled = urlParams.has('roomId')
   let vrToggleMenuItemLabel = 'Detecting VR...'
   let vrToggleMenuItemDisabled = true
 
   let cameraManipulator
+  let isTumblerEnabled = true
+  let isTurnTableEnabled = false
   let isSelectionEnabled = false
+  let isTransformHandlesEnabled = false
   let renderer
   let session
   let sessionSync
+  let selectionManager
   let toolManager
   let undoRedoManager
   let userData
@@ -62,6 +67,34 @@
     }
   })
 
+  const handleTumblerEnabled = () => {
+    cameraManipulator.setDefaultManipulationMode(
+      CameraManipulator.MANIPULATION_MODES.tumbler
+    )
+    isTumblerEnabled = true
+    isTurnTableEnabled = false
+  }
+  const handleTurnTableEnabled = () => {
+    cameraManipulator.setDefaultManipulationMode(
+      CameraManipulator.MANIPULATION_MODES.turntable
+    )
+    // The Tumbler mode prevents the camera from rolling upside down, so we correct it here.
+    const cameraXfo = renderer.getViewport().getCamera().getParameter('GlobalXfo').getValue()
+    const zaxis = cameraXfo.ori.getZaxis()
+    let t = 0
+    const id = setInterval(() => {
+      t += 0.1
+      const quat = new Quat()
+      const xfo = cameraXfo.clone()
+      quat.setFromDirectionAndUpvector(zaxis, new Vec3(0,0,1))
+      xfo.ori = cameraXfo.ori.lerp(quat, Math.min(t, 1.0))
+      renderer.getViewport().getCamera().getParameter('GlobalXfo').setValue(xfo)
+      if (t >= 1.0) clearInterval(id)
+    }, 20)
+    isTurnTableEnabled = true
+    isTumblerEnabled = false
+  }
+
   const handleMenuSelectionChange = () => {
     if (!toolManager) {
       return
@@ -70,6 +103,15 @@
     isSelectionEnabled
       ? toolManager.pushTool('SelectionTool')
       : toolManager.popTool()
+  }
+
+  const handleMenuTransformHandlesChange = () => {
+    console.log('showHandles')
+    if (!selectionManager) {
+      return
+    }
+    selectionManager.showHandles(isTransformHandlesEnabled)
+    selectionManager.updateHandleVisibility()
   }
 
   onMount(() => {
@@ -85,6 +127,7 @@
       }
 
       renderer = appData.renderer
+      selectionManager = appData.selectionManager
       toolManager = appData.toolManager
       cameraManipulator = appData.cameraManipulator
       undoRedoManager = appData.undoRedoManager
@@ -225,105 +268,95 @@
 </script>
 
 {#if !embeddedMode}
-  <header class="flex items-center px-2 py-1 text-gray-200 z-50">
-    <span
-      class="material-icons cursor-default mr-2"
+  <header class="flex gap-2 items-center px-1 sm:px-2 py-1 text-gray-200 z-50">
+    <button
+      class="cursor-default flex justify-center w-7 h-7"
       on:click={handleClickMenuToggle}
       title="{$ui.shouldShowDrawer ? 'Close' : 'Open'} drawer"
     >
-      {$ui.shouldShowDrawer ? 'menu_open' : 'menu'}
-    </span>
+      <span class="material-icons">
+        {$ui.shouldShowDrawer ? 'menu_open' : 'menu'}
+      </span>
+    </button>
 
     <img class="w-20 mx-3" src="/images/SpatialLogo_White NO TAGLINE.webp" alt="logo" />
 
-    <MenuBar>
-      <MenuBarItem label="View" let:isOpen>
-        <Menu {isOpen}>
-          <MenuItem
-            label="Frame All"
-            iconLeft="crop_free"
-            shortcut="F"
-            on:click={handleFrameAll}
-          />
-        </Menu>
-      </MenuBarItem>
+    <div class="hidden sm:block">
+      <MenuBar>
+        <MenuBarItem label="View" let:isOpen>
+          <Menu {isOpen}>
+            <MenuItem
+              label="Frame All"
+              iconLeft="crop_free"
+              shortcut="F"
+              on:click={handleFrameAll}
+            />
+            <MenuItemToggle
+              label="Camera Mode: TurnTable"
+              bind:checked={isTurnTableEnabled}
+              on:change={handleTurnTableEnabled}
+            />
+            <MenuItemToggle
+              label="Camera Mode: Tumbler"
+              bind:checked={isTumblerEnabled}
+              on:change={handleTumblerEnabled}
+            />
+          </Menu>
+        </MenuBarItem>
 
+        <MenuBarItem label="Edit" let:isOpen>
+          <Menu {isOpen}>
+            <MenuItem
+              label="Undo"
+              iconLeft="undo"
+              shortcut="Ctrl+Z"
+              on:click={handleUndo}
+            />
+            <MenuItem
+              label="Redo"
+              iconLeft="redo"
+              shortcut="Ctrl+Y"
+              on:click={handleRedo}
+            />
+            <MenuItemToggle
+              bind:checked={isSelectionEnabled}
+              label="Enable Selection Tool"
+              on:change={handleMenuSelectionChange}
+              shortcut="S"
+            />
+            <MenuItemToggle
+              bind:checked={isTransformHandlesEnabled}
+              label="Enable Transform Handles"
+              on:change={handleMenuTransformHandlesChange}
+              shortcut="T"
+            />
+            <MenuItemToggle
+              bind:checked={walkModeEnabled}
+              label="Enable Walk Mode (WASD)"
+            />
+          </Menu>
+        </MenuBarItem>
 
-      <MenuBarItem label="Edit" let:isOpen>
-        <Menu {isOpen}>
-          <MenuItem
-            label="Undo"
-            iconLeft="undo"
-            shortcut="Ctrl+Z"
-            on:click={handleUndo}
-          />
-          <MenuItem
-            label="Redo"
-            iconLeft="redo"
-            shortcut="Ctrl+Y"
-            on:click={handleRedo}
-          />
-          <MenuItemToggle
-            bind:checked={isSelectionEnabled}
-            label="Enable Selection Tool"
-            on:change={handleMenuSelectionChange}
-            shortcut="S"
-          />
-          <MenuItemToggle
-            bind:checked={walkModeEnabled}
-            label="Enable Walk Mode (WASD)"
-          />
-        </Menu>
-      </MenuBarItem>
-
-      <MenuBarItem label="Collab" let:isOpen>
-        <Menu {isOpen}>
-          <MenuItem
-            iconLeft="visibility"
-            label="Direct Attention"
-            shortcut="Ctrl+N"
-            on:click={handleDA}
-          />
-        </Menu>
-      </MenuBarItem>
-
-      <MenuBarItem label="VR" let:isOpen>
-        <Menu {isOpen}>
-          <MenuItem
-            disabled={vrToggleMenuItemDisabled}
-            label={vrToggleMenuItemLabel}
-            on:click={handleLaunchVR}
-          />
-          <MenuItem
-            label="Enable Spectator Mode"
-            on:click={handleToggleVRSpatatorMode}
-          />
-        </Menu>
-      </MenuBarItem>
-
-      <MenuBarItem label="More" let:isOpen>
-        <Menu {isOpen}>
-          <MenuItem label="Foo Bar" shortcut="Ctrl+A" />
-          <MenuItem label="Foo Bar" />
-          <MenuItem label="Foo Bar" iconLeft="storage" shortcut="Shift+B" />
-          <MenuItem label="Foo Bar" />
-          <MenuItem label="Foo Bar" shortcut="Alt+C" />
-          <MenuItem label="Foo Bar" />
-          <MenuItemDropDown label="Foo Bar" let:isOpen>
-            <Menu {isOpen}>
-              <MenuItem label="Foo Bar" />
-              <MenuItem label="Foo Bar" />
-            </Menu>
-          </MenuItemDropDown>
-        </Menu>
-      </MenuBarItem>
-    </MenuBar>
+        <MenuBarItem label="VR" let:isOpen>
+          <Menu {isOpen}>
+            <MenuItem
+              disabled={vrToggleMenuItemDisabled}
+              label={vrToggleMenuItemLabel}
+              on:click={handleLaunchVR}
+            />
+          </Menu>
+        </MenuBarItem>
+      </MenuBar>
+    </div>
 
     {#if $APP_DATA}
-      <UsersChips session={$APP_DATA.session} />
-    {/if}
+      {#if collabEnabled}
+        <UsersChips session={$APP_DATA.session} />
+      {/if}
+      {#if !collabEnabled}
+        <div class="flex-1" />
+      {/if}
 
-    {#if $APP_DATA}
       <UserChip user={$APP_DATA.userData}>
         <div class="text-center">
           <Button on:click={handleSignOut}>Sign Out</Button>

@@ -1,3 +1,3 @@
-<div class="MenuBar flex h-full">
+<div class="MenuBar flex overflow-x-auto">
   <slot />
 </div>
