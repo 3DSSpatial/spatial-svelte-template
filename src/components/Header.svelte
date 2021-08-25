@@ -279,7 +279,7 @@
       </span>
     </button>
 
-    <img class="h-6" src="/images/logo-zea.svg" alt="logo" />
+    <img class="w-20 mx-3" src="/images/SpatialLogo_White NO TAGLINE.webp" alt="logo" />
 
     <div class="hidden sm:block">
       <MenuBar>

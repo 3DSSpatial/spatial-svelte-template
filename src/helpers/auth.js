@@ -8,12 +8,10 @@ import sha256 from 'sha256'
 
 // To disable authentication, set `shouldAuthenticate` to false.
 const shouldAuthenticate = true
-
-// Mocked password: "zea"
+// Mocked password: "spatial"
 // Rembember to generate a new one for your demo, here:
 // https://xorbin.com/tools/sha256-hash-calculator
-const HASHED_PASSWORD =
-  '2d37e395cc590b4e127317494566f1aaf881f0ac1b5ff7d4180506fd682d68ea'
+const HASHED_PASSWORD = 'b9e998b692bd644267de027a412e2cb7335a7e648f752f5995ce5ef427e6dbd2'
 
 class Auth {
   async isAuthenticated() {

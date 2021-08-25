@@ -1,4 +1,4 @@
-# Zea Svelte Template
+# Spatial Svelte Template
 
 ## Features
 
@@ -42,7 +42,7 @@ Our recommended way to clone this template is by using [degit](https://github.co
 1. Run this command on your terminal:
 
 ```bash
-npx degit zeainc/zea-svelte-template#main my-awesome-app
+npx degit 3DSSpatial/spatial-svelte-template#main my-awesome-app
 ```
 
 2. The above command will create the `my-awesome-app` directory for you. Go into it:
@@ -224,9 +224,11 @@ Embed Guide: https://github.com/ZeaInc/zea-svelte-template/blob/main/docs/README
 
 ## Issues?
 
-File it on Github: https://github.com/ZeaInc/zea-svelte-template
+File it on Github: https://github.com/3DSSpatial/spatial-svelte-template
 
-Start a discussion: https://community.zea.live/
+Start a discussion: https://github.com/3DSSpatial/spatial-svelte-template/discussions
+
+Or reach out to your Technical Account Manager at Spatial Corp.
 
 # Credits
 
@@ -242,3 +244,4 @@ This template contains the following software from Zea Inc. Please be mindful of
 **Zea Kinematics**: https://github.com/ZeaInc/zea-kinematics
 
 **Zea UX**: https://github.com/ZeaInc/zea-ux
+
