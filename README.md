@@ -9,7 +9,7 @@
 
 This template has been deployed as a live demo for you to check out now.
 
-> Password: zea
+> Password: spatial
 
 You can change the password in your own deployments, or connect to an authentication service.
 See below.
@@ -63,7 +63,7 @@ npm install
 npm run dev
 ```
 
-5. Use your browser to go to: http://localhost:5000/
+5. Use your browser to go to: http://localhost:5000/ (Use a private or incognito browser window to avoid any unexpected behavior caused by the browser's cache.)
 
 6. Build something awesome.
 
