@@ -2,6 +2,8 @@ import svelte from 'rollup-plugin-svelte-hot'
 import Hmr from 'rollup-plugin-hot'
 import resolve from '@rollup/plugin-node-resolve'
 import commonjs from '@rollup/plugin-commonjs'
+import typescript from '@rollup/plugin-typescript'
+import json from '@rollup/plugin-json'
 import livereload from 'rollup-plugin-livereload'
 import { terser } from 'rollup-plugin-terser'
 import { copySync, removeSync } from 'fs-extra'
@@ -40,7 +42,7 @@ const copyToDist = () => ({
 
 export default {
   preserveEntrySignatures: false,
-  input: [`src/main.js`],
+  input: ['src/main.js'],
   output: {
     sourcemap: true,
     format: 'esm',
@@ -65,9 +67,13 @@ export default {
     // resolve matching modules from current working directory
     resolve({
       browser: true,
-      dedupe: (importee) => !!importee.match(/svelte(\/|$)/),
+      dedupe: (importee) => !!importee.match(/svelte(\/|$)/) || !!importee.match(/@zeainc(\/|$)/),
     }),
     commonjs(),
+    typescript({
+      sourceMap: true,
+      inlineSources: !production,
+    }),
 
     production && terser(),
     !production && !isNollup && serve(),
@@ -81,6 +87,8 @@ export default {
       }),
     },
     production && copyToDist(),
+
+    json(),
   ],
   watch: {
     clearScreen: false,

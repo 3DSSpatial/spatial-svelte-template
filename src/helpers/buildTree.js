@@ -1,38 +1,38 @@
+import { TreeItem, InstanceItem, Registry } from '@zeainc/zea-engine'
+import { CADBody, CADPart, XRef } from '@zeainc/zea-cad'
+
 const buildTree = (treeItem) => {
-  const { TreeItem, AssetItem } = window.zeaEngine
+  const __t = (treeItem, depth, parentpath) => {
+    const path = [...parentpath, treeItem.getName()]
+    const json = {
+      name: treeItem.getName(),
+    }
 
-  const __c = (treeItem, json, depth) => {
-    const children = treeItem.getChildren()
+    const metaDataValues = ['Revision', 'Rev', 'InstanceName']
+    metaDataValues.forEach((name) => {
+      if (treeItem.hasParameter(name)) {
+        json[name] = treeItem.getParameter(name).getValue()
+      }
+    })
 
-    for (const childItem of children) {
-      if (childItem) {
-        const childJson = __t(childItem, depth + 1)
-        if (childJson == false) continue
+    // Stop traversing at the part level
+    if (treeItem instanceof CADPart) {
+      return json
+    }
 
-        if (!json.children) json.children = []
-        json.children.push(childJson)
+    if (treeItem.getNumChildren() > 0) {
+      const children = treeItem.getChildren()
+      json.children = []
+      for (const childItem of children) {
+        if (childItem) {
+          json.children.push(__t(childItem, depth + 1, path))
+        }
       }
     }
-  }
-
-  const __t = (treeItem, depth) => {
-    const name = treeItem.getName()
-    // filter out nodes at the leaves of the tree.
-    if (
-      name.startsWith('Mesh') ||
-      name.startsWith('Edge') ||
-      name.startsWith('TreeItem')
-    ) {
-      return false
-    }
-    const json = {
-      name,
-    }
-    if (treeItem instanceof TreeItem) __c(treeItem, json, depth)
     return json
   }
 
-  return __t(treeItem, null, 1)
+  return __t(treeItem, 1, [])
 }
 
 export default buildTree

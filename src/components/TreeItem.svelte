@@ -1,49 +1,17 @@
 <script>
-  import { afterUpdate, beforeUpdate, onMount } from 'svelte'
+  import { beforeUpdate } from 'svelte'
 
   import IconEye from '../components/icons/IconEye.svelte'
   import IconEyeOff from '../components/icons/IconEyeOff.svelte'
   import IconChevronDown from '../components/icons/IconChevronDown.svelte'
   import IconChevronRight from '../components/icons/IconChevronRight.svelte'
 
-  import { TreeItem, InstanceItem, Color } from '@zeainc/zea-engine'
-  import { CADBody } from '@zeainc/zea-cad'
-  import { ParameterValueChange } from '@zeainc/zea-ux'
-
+  export let isExpanded = false
+  export let highlighted = false
   export let item
   export let selectionManager = null
   export let undoRedoManager = null
-  let isExpanded = false
-  let highlighted = false
-  let visible = false
-
-  let childComponents = []
-  let expandPath
-  export function expandTree(path) {
-    if (path[path.length - 1] == item) {
-      return
-    }
-    isExpanded = true
-    if (childComponents.length > 0) {
-      expandSubTree(path)
-    } else {
-      expandPath = path
-    }
-  }
-  function expandSubTree(path) {
-    if (path.length > 1) {
-      const childIndex = item.getChildIndex(path[1])
-      const treeViewItem = childComponents[childIndex]
-      treeViewItem.expandTree(path.slice(1))
-    } else {
-      // causes the element to be always at the top of the view.
-      el.scrollIntoView({
-        behavior: 'auto',
-        block: 'center',
-        inline: 'center',
-      })
-    }
-  }
+  export let visible = false
 
   let el
   let hasChildren = false
@@ -60,8 +28,13 @@
       highlighted = item.isHighlighted()
 
       if (highlighted && 'getHighlight' in item) {
+        const { Color } = globalThis.zeaEngine
+
         const itemHighlightColor = item.getHighlight()
-        const bgColor = itemHighlightColor.lerp(new Color(0.75, 0.75, 0.75, 0), 0.5)
+        const bgColor = itemHighlightColor.lerp(
+          new Color(0.75, 0.75, 0.75, 0),
+          0.5
+        )
 
         highlightColor = itemHighlightColor.toHex()
         highlightBgColor = `${bgColor.toHex()}60`
@@ -84,6 +57,7 @@
     visible = !visibleParam.getValue()
 
     if (undoRedoManager) {
+      const { ParameterValueChange } = globalThis.zeaUx
       const change = new ParameterValueChange(visibleParam, visible)
       undoRedoManager.addChange(change)
       return
@@ -115,11 +89,17 @@
       return
     }
 
+    if (!globalThis.zeaEngine) {
+      throw new Error(
+        '`zeaEngine` is missing from the `globalThis` property. This component requires it.'
+      )
+    }
+
     // This reference to the element is added so the component can navigate
     // using the keyboard.
     item.elemRef = el
 
-    isTreeItem = item instanceof TreeItem
+    isTreeItem = item instanceof globalThis.zeaEngine.TreeItem
 
     updateHighlight()
     updateVisibility()
@@ -142,9 +122,7 @@
 
       // This code is for a special case when items are replaced in the
       // TreeView and we don't load the component again.
-      const isBody = item instanceof CADBody
-      const isInstancedBody = item instanceof InstanceItem && item.getSrcTree() instanceof CADBody
-      hasChildren = item.getNumChildren() > 0 && !isBody && !isInstancedBody
+      hasChildren = item.getNumChildren() > 0
     }
 
     if (unsubHighlightChanged > -1) {
@@ -156,31 +134,36 @@
   beforeUpdate(() => {
     initItem()
   })
-  afterUpdate(() => {
-    if (expandPath) {
-      expandSubTree(expandPath)
-      expandPath = null
-    }
-  })
 </script>
 
 {#if item}
-  <div bind:this={el} class="TreeItem" class:text-gray-500={!visible}>
-    <div class="TreeItem__header flex items-center cursor-default hover:bg-gray-800 transition-colors mb-1">
+  <div
+    bind:this={el}
+    class="TreeItem space-x-0.5 text-sm"
+    class:text-gray-500={!visible}
+  >
+    <div
+      class="flex items-center cursor-default hover:bg-gray-800 transition-colors"
+    >
       {#if hasChildren}
-        <button class="cursor-default hover:bg-gray-700 rounded w-8 md:w-6" on:click={toggleIsExpanded}>
+        <button
+          class="cursor-default hover:bg-gray-700 rounded w-5 h-5"
+          on:click={toggleIsExpanded}
+        >
           {#if isExpanded}
             <IconChevronDown />
           {:else}
             <IconChevronRight />
           {/if}
         </button>
-      {:else}
-        <div class="w-8 md:w-6" />
       {/if}
 
       {#if isTreeItem}
-        <button class="cursor-default hover:bg-gray-700 rounded p-1 w-8 md:w-6" on:click={toggleVisibility}>
+        <button
+          class="cursor-default hover:bg-gray-700 rounded w-5 h-5 p-1"
+          class:text-white={visible}
+          on:click={toggleVisibility}
+        >
           {#if visible}
             <IconEye />
           {:else}
@@ -190,8 +173,10 @@
       {/if}
 
       <span
-        class="flex-1 border rounded px-1"
-        style="background-color: {highlighted ? highlightBgColor : 'transparent'}; border-color: {highlighted
+        class="flex-1 border rounded"
+        style="background-color: {highlighted
+          ? highlightBgColor
+          : 'transparent'}; border-color: {highlighted
           ? highlightColor
           : 'transparent'};"
         on:click={handleItemClick}
@@ -201,10 +186,14 @@
     </div>
 
     {#if hasChildren && isExpanded}
-      <div class="TreeItem__body ml-4 pl-4 md:ml-3 md:pl-3 border-dotted border-l-2 md:border-l">
+      <div class="pl-3 border-dotted border-l ml-3">
         {#if isTreeItem}
-          {#each item.getChildren() as childItem, i}
-            <svelte:self item={childItem} {selectionManager} {undoRedoManager} bind:this={childComponents[i]} />
+          {#each item.getChildren() as childItem}
+            <svelte:self
+              item={childItem}
+              {selectionManager}
+              {undoRedoManager}
+            />
           {/each}
         {/if}
       </div>
