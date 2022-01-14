@@ -29,7 +29,6 @@
   import {
     Color,
     Vec3,
-    Xfo,
     TreeItem,
     GLRenderer,
     Scene,
@@ -38,7 +37,6 @@
     EnvMap,
     InstanceItem,
     CameraManipulator,
-    AssetLoadContext,
   } from '@zeainc/zea-engine'
   import { CADAsset, CADBody, CADPart } from '@zeainc/zea-cad'
   import { SelectionManager, UndoRedoManager, ToolManager, SelectionTool } from '@zeainc/zea-ux'
