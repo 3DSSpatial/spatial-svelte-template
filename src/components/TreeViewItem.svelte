@@ -6,8 +6,7 @@
   import IconChevronDown from '../components/icons/IconChevronDown.svelte'
   import IconChevronRight from '../components/icons/IconChevronRight.svelte'
 
-  import { TreeItem, InstanceItem, Color } from '@zeainc/zea-engine'
-  import { CADBody } from '@zeainc/zea-cad'
+  import { TreeItem, InstanceItem, Color, CADBody } from '@zeainc/zea-engine'
   import { ParameterValueChange } from '@zeainc/zea-ux'
 
   export let item

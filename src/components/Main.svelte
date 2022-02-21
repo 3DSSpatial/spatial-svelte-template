@@ -37,8 +37,10 @@
     EnvMap,
     InstanceItem,
     CameraManipulator,
+    CADAsset,
+    CADBody,
+    CADPart,
   } from '@zeainc/zea-engine'
-  import { CADAsset, CADBody, CADPart } from '@zeainc/zea-cad'
   import { SelectionManager, UndoRedoManager, ToolManager, SelectionTool } from '@zeainc/zea-ux'
   import { Session, SessionSync } from '@zeainc/zea-collab'
 
