@@ -1,5 +1,4 @@
-const { Color, Vec3, Xfo, Mat4, TreeItem, resourceLoader } = window.zeaEngine
-const { CADAsset } = window.zeaCad
+import { Color, Vec3, Xfo, Mat4, TreeItem, resourceLoader, CADAsset } from '@zeainc/zea-engine'
 
 function checkStatus(response) {
   if (!response.ok) {

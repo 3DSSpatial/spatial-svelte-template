@@ -21,13 +21,15 @@
     users = users.filter((e) => e.id !== user.id)
   }
 
-  session.sub('user-joined', (user) => {
-    addUser(user)
-  })
+  if (session) {
+    session.sub('user-joined', (user) => {
+      addUser(user)
+    })
 
-  session.sub('user-left', (user) => {
-    removeUser(user)
-  })
+    session.sub('user-left', (user) => {
+      removeUser(user)
+    })
+  }
 </script>
 
 <div class="UsersChips flex flex-1">

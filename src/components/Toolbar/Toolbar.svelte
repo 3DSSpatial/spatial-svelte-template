@@ -12,6 +12,12 @@
   import IconLeftView from '../icons/IconLeftView.svelte'
   import IconRightView from '../icons/IconRightView.svelte'
   import IconPerspView from '../icons/IconPerspView.svelte'
+
+  // import IconMeasureDistance from '../icons/IconMeasureDistance.svelte'
+  // import IconMeasureAngle from '../icons/IconMeasureAngle.svelte'
+  // import IconMeasureCenterDistance from '../icons/IconMeasureCenterDistance.svelte'
+  // import IconMeasureRadius from '../icons/IconMeasureRadius.svelte'
+
   import IconRenderModeWireframe from '../icons/IconRenderModeWireframe.svelte'
   import IconRenderModeFlat from '../icons/IconRenderModeFlat.svelte'
   import IconRenderModeFlatWhite from '../icons/IconRenderModeFlatWhite.svelte'
@@ -21,21 +27,10 @@
   import IconRenderModeHiddenLine from '../icons/IconRenderModeHiddenLine.svelte'
 
   import { APP_DATA } from '../../stores/appData'
+  import { RENDER_MODES, changeRenderMode } from '../../helpers/renderModes'
+  import { MEASURE_TOOLS, toggleMeasureTool } from '../../helpers/measureTools'
 
-  const {
-    Vec3,
-    Xfo,
-    Mat3,
-    GeomItem,
-    Mesh,
-    MeshProxy,
-    Lines,
-    LinesProxy,
-    Color,
-    Quat,
-    MathFunctions,
-    Material,
-  } = window.zeaEngine
+  import { Vec3, Xfo, Mat3, Quat, MathFunctions } from '@zeainc/zea-engine'
 
   const setCameraXfo = (camera, dir, up, duration = 400) => {
     const { renderer } = $APP_DATA
@@ -143,292 +138,49 @@
   /* }}} View handlers. */
 
   // ////////////////////////////////////////
-  // Render Modes
-
-  const RENDER_MODES = {
-    WIREFRAME: Symbol(),
-    FLAT: Symbol(),
-    FLAT_WHITE: Symbol(),
-    HIDDEN_LINE: Symbol(),
-    SHADED: Symbol(),
-    SHADED_AND_EDGES: Symbol(),
-    PBR: Symbol(),
+  // Measure Tools
+  let measureTool = MEASURE_TOOLS.NONE
+  const handleChangeToolMEASURE_DISTANCE = () => {
+    measureTool = toggleMeasureTool(MEASURE_TOOLS.MEASURE_DISTANCE)
+  }
+  const handleChangeToolMEASURE_RADIUS = () => {
+    measureTool = toggleMeasureTool(MEASURE_TOOLS.MEASURE_RADIUS)
+  }
+  const handleChangeToolMEASURE_CENTER_DISTANCE = () => {
+    measureTool = toggleMeasureTool(MEASURE_TOOLS.MEASURE_CENTER_DISTANCE)
+  }
+  const handleChangeToolMEASURE_ANGLE = () => {
+    measureTool = toggleMeasureTool(MEASURE_TOOLS.MEASURE_ANGLE)
   }
 
+  // ////////////////////////////////////////
+  // Render Modes
   // The default materials are standard shiny surfaces.(PBR)
   let mode = RENDER_MODES.PBR
-  // Materials are shared among geom items.
-  // We keep track of the material the geom item was using after load.
-  // and for each unique material, make a clone and modify it for
-  // each render mode.
-  const materials = {}
-
-  // The mapping that remembers what material was assigned to the
-  // geomItem at load time.
-  const geomItemToMaterialMapping = {}
-  const createAndAssignMaterial = (geomItem, mode, cb) => {
-    if (mode != RENDER_MODES.PBR) {
-      cacheMaterial(geomItem)
-    }
-    const geomItemId = geomItem.getId()
-    const materialId = geomItemToMaterialMapping[geomItemId]
-    if (!materials[materialId][mode]) {
-      // Clone the PBR material and use it as a basis for the new material.
-      const newMaterial = materials[materialId][RENDER_MODES.PBR].clone()
-      if (cb) cb(newMaterial)
-      materials[materialId][mode] = newMaterial
-    }
-    const result = materials[materialId][mode]
-    geomItem.getParameter('Material').setValue(result)
-  }
-  const cacheMaterial = (geomItem)=>{
-    const geomItemId = geomItem.getId()
-    const material = geomItem.getParameter('Material').getValue()
-    const materialId = material.getId()
-    if (!geomItemToMaterialMapping[geomItemId]) {
-      geomItemToMaterialMapping[geomItemId] = materialId
-    }
-    if (!materials[materialId]) {
-      materials[materialId] = {}
-      materials[materialId][RENDER_MODES.PBR] = material
-    }
-  }
-
-
-  const handleChangeRenderModeWireframe = (pub=true) => {
-    if (mode == RENDER_MODES.WIREFRAME) {
-      return
-    }
+  const handleChangeRenderModeWireframe = () => {
+    changeRenderMode(RENDER_MODES.WIREFRAME)
     mode = RENDER_MODES.WIREFRAME
-
-    const { assets, session } = $APP_DATA
-    assets.traverse((item) => {
-      if (item instanceof GeomItem) {
-        const geom = item.getParameter('Geometry').getValue()
-        if (geom instanceof Mesh || geom instanceof MeshProxy) {
-          item.getParameter('Visible').setValue(false)
-        }
-        createAndAssignMaterial(item, RENDER_MODES.WIREFRAME, (newMaterial) => {
-          newMaterial.setName('Wireframe')
-        })
-      }
-    })
-    if (pub && session) session.pub('setRenderMode', { mode: 'WIREFRAME' })
   }
-  const handleChangeRenderModeFlatWhite = (pub=true) => {
-    if (mode == RENDER_MODES.FLAT_WHITE) {
-      return
-    }
-    mode = RENDER_MODES.FLAT_WHITE
-    const { assets, scene, renderer, session } = $APP_DATA
-    renderer.outlineThickness = 1
-    renderer.outlineColor = new Color(0.2, 0.2, 0.2, 1)
-    const backgroundColor = scene
-      .getSettings()
-      .getParameter('BackgroundColor')
-      .getValue()
-    const whiteMaterial = new Material()
-    whiteMaterial.setShaderName('FlatSurfaceShader')
-    whiteMaterial.getParameter('BaseColor').setValue(backgroundColor)
-
-    assets.traverse((item) => {
-      if (item instanceof GeomItem) {
-        const geom = item.getParameter('Geometry').getValue()
-        if (geom instanceof Mesh || geom instanceof MeshProxy) {
-          cacheMaterial(item)
-          item.getParameter('Visible').setValue(true)
-          item.getParameter('Material').setValue(whiteMaterial)
-        }
-      }
-    })
-    mode = RENDER_MODES.FLAT_WHITE
-    if (pub && session) session.pub('setRenderMode', { mode: 'FLAT_WHITE' })
-  }
-  const handleChangeRenderModeFlat = (pub=true) => {
-    if (mode == RENDER_MODES.FLAT) {
-      return
-    }
+  const handleChangeRenderModeFlat = () => {
+    changeRenderMode(RENDER_MODES.FLAT)
     mode = RENDER_MODES.FLAT
-
-    const { assets, scene, renderer, session } = $APP_DATA
-
-    renderer.outlineThickness = 1
-    renderer.outlineColor = new Color(0.2, 0.2, 0.2, 1)
-
-    // const backgroundColor = scene
-    // .getSettings()
-    // .getParameter('BackgroundColor')
-    // .getValue()
-    assets.traverse((item) => {
-      if (item instanceof GeomItem) {
-        const geom = item.getParameter('Geometry').getValue()
-        if (geom instanceof Mesh || geom instanceof MeshProxy) {
-          item.getParameter('Visible').setValue(true)
-        }
-        createAndAssignMaterial(item, RENDER_MODES.FLAT, (newMaterial) => {
-          newMaterial.setName('Flat')
-          const shaderName = newMaterial.getShaderName()
-          if (shaderName == 'LinesShader') {
-            if (newMaterial.hasParameter('OccludedStippleValue')) {
-              newMaterial.getParameter('OccludedStippleValue').setValue(1)
-            }
-          } else {
-            newMaterial.setShaderName('FlatSurfaceShader')
-
-            // Note: Assigning the background color makes the surfaces
-            // blend in with the background. Another option would be to
-            // desaturate the current color.
-            // newMaterial.getParameter('BaseColor').setValue(backgroundColor)
-          }
-        })
-      }
-    })
-    mode = RENDER_MODES.FLAT
-    if (pub && session) session.pub('setRenderMode', { mode: 'FLAT' })
   }
-
-  const handleChangeRenderModeHiddenLine = (pub=true) => {
-    if (mode == RENDER_MODES.HIDDEN_LINE) {
-      return
-    }
-    mode = RENDER_MODES.HIDDEN_LINE
-
-    const { assets, renderer, session } = $APP_DATA
-
-    renderer.outlineThickness = 1
-    renderer.outlineColor = new Color(0.2, 0.2, 0.2, 1)
-
-    assets.traverse((item) => {
-      if (item instanceof GeomItem) {
-        const geom = item.getParameter('Geometry').getValue()
-        if (geom instanceof Mesh || geom instanceof MeshProxy) {
-          item.getParameter('Visible').setValue(true)
-        }
-        createAndAssignMaterial(
-          item,
-          RENDER_MODES.HIDDEN_LINE,
-          (newMaterial) => {
-            newMaterial.setName('HiddenLine')
-            const shaderName = newMaterial.getShaderName()
-            if (shaderName == 'LinesShader') {
-              if (newMaterial.hasParameter('OccludedStippleValue')) {
-                newMaterial.getParameter('StippleScale').setValue(0.02)
-                newMaterial.getParameter('StippleValue').setValue(0)
-                newMaterial.getParameter('OccludedStippleValue').setValue(1)
-              }
-            } else {
-              newMaterial.setShaderName('FlatSurfaceShader')
-              const color = newMaterial.getParameter('BaseColor').getValue().clone()
-              color.a = 0.6
-              newMaterial.getParameter('BaseColor').setValue(color)
-              // newMaterial.getParameter('BaseColor').setValue(backgroundColor)
-            }
-          }
-        )
-      }
-    })
-    mode = RENDER_MODES.HIDDEN_LINE
-    if (pub && session) session.pub('setRenderMode', { mode: 'HIDDEN_LINE' })
+  const handleChangeRenderModeFlatWhite = () => {
+    changeRenderMode(RENDER_MODES.FLAT_WHITE)
+    mode = RENDER_MODES.FLAT_WHITE
   }
-
-  const handleChangeRenderModeShadedAndEdges = (pub=true) => {
-    if (mode == RENDER_MODES.SHADED_AND_EDGES) {
-      return
-    }
-
-    const { assets, renderer, session } = $APP_DATA
-
-    renderer.outlineThickness = 1
-    renderer.outlineColor = new Color(0.2, 0.2, 0.2, 1)
-
-    assets.traverse((item) => {
-      if (item instanceof GeomItem) {
-        const geom = item.getParameter('Geometry').getValue()
-        if (geom instanceof Mesh || geom instanceof MeshProxy) {
-          item.getParameter('Visible').setValue(true)
-        }
-        if (geom instanceof Lines || geom instanceof LinesProxy) {
-          item.getParameter('Visible').setValue(true)
-        }
-        createAndAssignMaterial(
-          item,
-          RENDER_MODES.SHADED_AND_EDGES,
-          (newMaterial) => {
-            newMaterial.setName('ShadedAndEdges')
-            const shaderName = newMaterial.getShaderName()
-            if (shaderName == 'LinesShader') {
-              if (newMaterial.hasParameter('OccludedStippleValue')) {
-                newMaterial.getParameter('OccludedStippleValue').setValue(1)
-              }
-            } else {
-              newMaterial.setShaderName('SimpleSurfaceShader')
-            }
-          }
-        )
-      }
-    })
+  const handleChangeRenderModeHiddenLine = () => {
+    changeRenderMode(RENDER_MODES.HIDDEN_LINE)
+    mode = RENDER_MODES.HIDDEN_LINE
+  }
+  const handleChangeRenderModeShadedAndEdges = () => {
+    changeRenderMode(RENDER_MODES.SHADED_AND_EDGES)
     mode = RENDER_MODES.SHADED_AND_EDGES
-    if (pub && session) session.pub('setRenderMode', { mode: 'SHADED_AND_EDGES' })
   }
-  
-  const handleChangeRenderModePBR = (pub=true) => {
-    if (mode == RENDER_MODES.PBR) {
-      return
-    }
-    const { assets, renderer, session } = $APP_DATA
-
-    renderer.outlineThickness = 1
-    renderer.outlineColor = new Color(0.2, 0.2, 0.2, 1)
-
-    assets.traverse((item) => {
-      if (item instanceof GeomItem) {
-        const geom = item.getParameter('Geometry').getValue()
-        if (geom instanceof Mesh || geom instanceof MeshProxy) {
-          item.getParameter('Visible').setValue(true)
-        }
-        if (geom instanceof Lines || geom instanceof LinesProxy) {
-          item.getParameter('Visible').setValue(true)
-        }
-        createAndAssignMaterial(item, RENDER_MODES.PBR)
-      }
-    })
+  const handleChangeRenderModePBR = () => {
+    changeRenderMode(RENDER_MODES.PBR)
     mode = RENDER_MODES.PBR
-    if (pub && session) session.pub('setRenderMode', { mode: 'PBR' })
   }
-
-  let bound = false
-  onMount(async () => {
-    APP_DATA.subscribe((appData) => {
-      if (!appData || bound) 
-        return
-      const { session } = appData
-      if (session) {
-        session.sub('setRenderMode', (data) => {
-          switch (data.mode) {
-          case 'WIREFRAME': 
-            handleChangeRenderModeWireframe(false)
-            break
-          case 'FLAT': 
-            handleChangeRenderModeFlat(false)
-            break
-          case 'FLAT_WHITE': 
-            handleChangeRenderModeFlatWhite(false)
-            break
-          case 'HIDDEN_LINE': 
-            handleChangeRenderModeHiddenLine(false)
-            break
-          case 'SHADED_AND_EDGES': 
-            handleChangeRenderModeShadedAndEdges(false)
-            break
-          case 'PBR': 
-            handleChangeRenderModePBR(false)
-            break
-          }
-        })
-      }
-      bound = true
-    })
-  })
 </script>
 
 <div class="Toolbar flex gap-1" class:flex-col={orientation === 'vertical'}>
@@ -454,10 +206,40 @@
     <IconPerspView />
   </ToolbarItem>
 
-  <ToolbarItemPopup
-    isHighlighted={mode !== RENDER_MODES.PBR}
-    title="Renderer modes"
-  >
+  <!-- <ToolbarItemPopup isHighlighted={measureTool !== MEASURE_TOOLS.NONE} title="Measure Tools">
+    <IconMeasureDistance />
+    <div class="flex flex-col absolute bottom-full gap-1 mb-1" slot="popup">
+      <ToolbarItem
+        isHighlighted={measureTool === MEASURE_TOOLS.MEASURE_DISTANCE}
+        title="MEASURE_DISTANCE"
+        on:click={handleChangeToolMEASURE_DISTANCE}
+      >
+        <IconMeasureDistance />
+      </ToolbarItem>
+      <ToolbarItem
+        isHighlighted={measureTool === MEASURE_TOOLS.MEASURE_RADIUS}
+        title="MEASURE_RADIUS"
+        on:click={handleChangeToolMEASURE_RADIUS}
+      >
+        <IconMeasureRadius />
+      </ToolbarItem>
+      <ToolbarItem
+        isHighlighted={measureTool === MEASURE_TOOLS.MEASURE_CENTER_DISTANCE}
+        title="MEASURE_CENTER_DISTANCE"
+        on:click={handleChangeToolMEASURE_CENTER_DISTANCE}
+      >
+        <IconMeasureCenterDistance />
+      </ToolbarItem>
+      <ToolbarItem
+        isHighlighted={measureTool === MEASURE_TOOLS.MEASURE_ANGLE}
+        title="MEASURE_ANGLE"
+        on:click={handleChangeToolMEASURE_ANGLE}
+      >
+        <IconMeasureAngle />
+      </ToolbarItem>
+    </div>
+  </ToolbarItemPopup> -->
+  <ToolbarItemPopup isHighlighted={mode !== RENDER_MODES.PBR} title="Renderer modes">
     <IconRenderModeWireframe />
 
     <div class="flex flex-col absolute bottom-full gap-1 mb-1" slot="popup">
@@ -468,11 +250,7 @@
       >
         <IconRenderModeWireframe />
       </ToolbarItem>
-      <ToolbarItem
-        isHighlighted={mode === RENDER_MODES.FLAT}
-        title="Flat"
-        on:click={handleChangeRenderModeFlat}
-      >
+      <ToolbarItem isHighlighted={mode === RENDER_MODES.FLAT} title="Flat" on:click={handleChangeRenderModeFlat}>
         <IconRenderModeFlat />
       </ToolbarItem>
       <ToolbarItem
@@ -496,11 +274,7 @@
       >
         <IconRenderModeShadedAndEdges />
       </ToolbarItem>
-      <ToolbarItem
-        isHighlighted={mode === RENDER_MODES.PBR}
-        title="PBR"
-        on:click={handleChangeRenderModePBR}
-      >
+      <ToolbarItem isHighlighted={mode === RENDER_MODES.PBR} title="PBR" on:click={handleChangeRenderModePBR}>
         <IconRenderModePBR />
       </ToolbarItem>
     </div>

@@ -24,11 +24,11 @@
 
   import { createClient } from '../ChannelMessenger.js'
   import buildTree from '../helpers/buildTree'
+  import { RENDER_MODES, changeRenderMode } from '../helpers/renderModes'
 
-  const {
+  import {
     Color,
     Vec3,
-    Xfo,
     TreeItem,
     GLRenderer,
     Scene,
@@ -37,13 +37,14 @@
     EnvMap,
     InstanceItem,
     CameraManipulator,
-  } = window.zeaEngine
-  const { CADAsset, CADBody } = window.zeaCad
-  const { SelectionManager, UndoRedoManager, ToolManager, SelectionTool } =
-    window.zeaUx
+    CADAsset,
+    CADBody,
+    CADPart,
+  } from '@zeainc/zea-engine'
+  import { SelectionManager, UndoRedoManager, ToolManager, SelectionTool } from '@zeainc/zea-ux'
+  import { Session, SessionSync } from '@zeainc/zea-collab'
 
-  const { Session, SessionSync } = window.zeaCollab
-  const { GLTFAsset } = gltfLoader
+  import { GLTFAsset } from '@zeainc/gltf-loader'
 
   let canvas
   let fpsContainer
@@ -59,6 +60,9 @@
   const filterItemSelection = (item) => {
     // Propagate selections up from the edges and surfaces up to
     // the part body or the instanced body
+    // Note: in some use cases, like a parts catalog, we want to
+    // propagate selection up to the part level.
+    // while in a PLM scenario, we want to pick bodies.
     while (
       item &&
       !(item instanceof CADBody) &&
@@ -114,20 +118,23 @@
     // Assigning an Environment Map enables PBR lighting for niceer shiny surfaces.
     if (!SystemDesc.isMobileDevice && SystemDesc.gpuDesc.supportsWebGL2) {
       const envMap = new EnvMap('envMap')
-      envMap.getParameter('FilePath').setValue('data/StudioG.zenv')
-      envMap.getParameter('HeadLightMode').setValue(true)
-      $scene.getSettings().getParameter('EnvMap').setValue(envMap)
+      envMap.load('data/StudioG.zenv')
+      envMap.headlightModeParam.value = true
+      $scene.envMapParam.value = envMap
     }
 
     renderer.outlineThickness = 1
     renderer.outlineColor = new Color(0.2, 0.2, 0.2, 1)
 
-    // $scene.setupGrid(10, 10)
-    $scene
-      .getSettings()
-      .getParameter('BackgroundColor')
-      .setValue(new Color(0.85, 0.85, 0.85, 1))
+    $scene.setupGrid(10, 10)
+    // renderer.getViewport().backgroundColorParam.value = new Color(0.85, 0.85, 0.85, 1)
     renderer.setScene($scene)
+
+    // console.log(renderer.getViewport().getCamera().globalXfoParam.value.toString())
+    // console.log(renderer.getViewport().getCamera().getTargetPosition().toString())
+    renderer.getViewport().getCamera().setPositionAndTarget(new Vec3(5, 5, 1.75), new Vec3(0, 0, 1))
+
+    const appData = {}
 
     appData.renderer = renderer
     appData.scene = $scene
@@ -144,9 +151,7 @@
 
     /** SELECTION START */
     const cameraManipulator = renderer.getViewport().getManipulator()
-    cameraManipulator.setDefaultManipulationMode(
-      CameraManipulator.MANIPULATION_MODES.tumbler
-    )
+    cameraManipulator.setDefaultManipulationMode(CameraManipulator.MANIPULATION_MODES.tumbler)
     appData.cameraManipulator = cameraManipulator
     const toolManager = new ToolManager(appData)
     $selectionManager = new SelectionManager(appData, {
@@ -171,20 +176,12 @@
     const selectionColor = new Color('#F9CE03')
     selectionColor.a = 0.1
     const subtreeColor = selectionColor //.lerp(new Color(1, 1, 1, 0), 0.5)
-    $selectionManager.selectionGroup
-      .getParameter('HighlightColor')
-      .setValue(selectionColor)
-    $selectionManager.selectionGroup
-      .getParameter('SubtreeHighlightColor')
-      .setValue(subtreeColor)
+    $selectionManager.selectionGroup.getParameter('HighlightColor').setValue(selectionColor)
+    $selectionManager.selectionGroup.getParameter('SubtreeHighlightColor').setValue(subtreeColor)
 
     // Color the selection rect.
     const selectionRectColor = new Color(0, 0, 0, 1)
-    selectionTool.rectItem
-      .getParameter('Material')
-      .getValue()
-      .getParameter('BaseColor')
-      .setValue(selectionRectColor)
+    selectionTool.rectItem.getParameter('Material').getValue().getParameter('BaseColor').setValue(selectionRectColor)
 
     /** SELECTION END */
 
@@ -220,11 +217,7 @@
       if (longTouchTimer) {
         endLogTouchTimer(longTouchTimer)
       }
-      if (
-        event.pointerType == 'touch' &&
-        event.intersectionData &&
-        isMenuVisible
-      ) {
+      if (event.pointerType == 'touch' && event.intersectionData && isMenuVisible) {
         // The menu was opened by the long touch. Prevent any other actions from occuring.
         event.stopPropagation()
       }
@@ -292,12 +285,9 @@
     /** COLLAB START*/
     if (!embeddedMode) {
       const userData = await auth.getUserData()
-      if (!userData) {
-        return
-      }
       appData.userData = userData
 
-      if (collabEnabled) {
+      if (collabEnabled && userData) {
         const SOCKET_URL = 'https://websocket-staging.zea.live'
         // const roomId = assetUrl
         const roomId = urlParams.get('roomId')
@@ -327,28 +317,54 @@
     if (embeddedMode) {
       const client = createClient()
 
+      let rootAsset
+
       client.on('setBackgroundColor', (data) => {
         const color = new Color(data.color)
         $scene.getSettings().getParameter('BackgroundColor').setValue(color)
+      })
 
-        if (data._id) {
-          client.send(data._id, { done: true })
-        }
+      client.on('setHighlightColor', (data) => {
+        const color = new Color(data.color)
+        // Note: the alpha value determines  the fill of the highlight.
+        color.a = 0.1
+        $selectionManager.selectionGroup.getParameter('HighlightColor').setValue(color)
+        $selectionManager.selectionGroup.getParameter('SubtreeHighlightColor').setValue(color)
+      })
+
+      client.on('setRenderMode', (data) => {
+        changeRenderMode(RENDER_MODES[data.mode])
+      })
+
+      client.on('setCameraManipulationMode', (data) => {
+        const mode = data.mode.toLowerCase()
+        cameraManipulator.setDefaultManipulationMode(CameraManipulator.MANIPULATION_MODES[mode])
       })
 
       client.on('loadCADFile', (data) => {
         console.log('loadCADFile', data)
-        if (!data.keep) {
+        if (!data.addToCurrentScene) {
           $assets.removeAllChildren()
         }
 
-        const asset = loadAsset(data.url, data.filename)
+        const asset = loadZCADAsset(data.url, data.resources)
+        if (!data.convertZtoY) {
+          // Rotate the model so 'up' is the correct direction
+          const xfo = asset.getParameter('LocalXfo').getValue()
+          xfo.ori.setFromAxisAndAngle(new Vec3(1, 0, 0), Math.PI * 0.5)
+
+          // const box = asset.getParameter('BoundingBox').getValue()
+          // xfo.tr.z = -box.p0.z
+          asset.getParameter('LocalXfo').setValue(xfo)
+        }
         asset.once('loaded', () => {
+          console.log('loadCADFile', data._id)
           if (data._id) {
             const tree = buildTree(asset)
             client.send(data._id, { modelStructure: tree })
           }
         })
+        rootAsset = asset
       })
 
       client.on('getModelStructure', (data) => {
@@ -356,6 +372,29 @@
           const tree = buildTree($assets)
           client.send(data._id, { modelStructure: tree })
         }
+      })
+
+      let recievingSelectionnChange = false
+      client.on('selectItems', (data) => {
+        recievingSelectionnChange = true
+        const items = []
+        data.paths.forEach((path) => {
+          const treeItem = rootAsset.resolvePath(path)
+          if (treeItem) items.push(treeItem)
+        })
+        $selectionManager.selectItems(items, false)
+        recievingSelectionnChange = false
+      })
+      client.on('deselectItems', (data) => {
+        recievingSelectionnChange = true
+        console.log('deselectItems', data.paths)
+        const items = []
+        data.paths.forEach((path) => {
+          const treeItem = rootAsset.resolvePath(path)
+          if (treeItem) items.push(treeItem)
+        })
+        $selectionManager.deselectItems(items)
+        recievingSelectionnChange = false
       })
 
       client.on('unloadCADFile', (data) => {
@@ -368,13 +407,44 @@
         }
       })
 
+      const findCADPart = (item) => {
+        // Propagate selections up from the edges and surfaces up to the CADPart
+        while (item && !(item instanceof CADPart)) {
+          item = item.getOwner()
+        }
+        return item
+      }
+
       $selectionManager.on('selectionChanged', (event) => {
-        const { selection } = event
+        if (recievingSelectionnChange) return
+        const { selection, prevSelection } = event
         const selectionPaths = []
-        selection.forEach((item) =>
-          selectionPaths.push(item.getPath().slice(2))
-        )
-        client.send('selectionChanged', { selection: selectionPaths })
+        selection.forEach((item) => {
+          if (!prevSelection.has(item)) {
+            const part = findCADPart(item)
+            if (part) {
+              // remove the 'root', 'AssetName' part of the path.
+              const path = part.getPath().slice(2)
+              selectionPaths.push(path)
+            }
+          }
+        })
+        const deselectionPaths = []
+        prevSelection.forEach((item) => {
+          if (!selection.has(item)) {
+            const part = findCADPart(item)
+            if (part) {
+              // remove the 'root', 'AssetName' part of the path.
+              const path = part.getPath().slice(2)
+              deselectionPaths.push(path)
+            }
+          }
+        })
+        console.log(selectionPaths, deselectionPaths)
+        client.send('selectionChanged', {
+          selection: selectionPaths,
+          deselection: deselectionPaths,
+        })
       })
     }
     /** EMBED MESSAGING END */
@@ -436,29 +506,26 @@
   }
 
   /** LOAD ASSETS FROM FILE END */
-
   $: parameterOwner = null
 </script>
 
-<main class="Main flex-1 relative">
-  <canvas bind:this={canvas} class="absolute h-full w-full" />
-  {#if !fileLoaded}
-    <DropZone bind:files on:changeFile={handleCadFile} />
-  {/if}
-
-  <div class="absolute bottom-10 w-full flex justify-center">
-    <Toolbar />
+<main class="Main flex flex-col flex-1">
+  <div class="flex-1 relative">
+    <canvas bind:this={canvas} class="absolute h-full w-full" />
+    <div bind:this={fpsContainer} />
+    <Drawer>
+      <Sidebar />
+    </Drawer>
+    {#if $ui.shouldShowParameterOwnerWidget}
+      <ParameterOwnerWidget {parameterOwner} />
+    {/if}
+    <div class="absolute bottom-10 w-full flex justify-center">
+      <Toolbar />
+    </div>
+    {#if !fileLoaded}
+      <DropZone bind:files on:changeFile={handleCadFile} {fileLoaded} />
+    {/if}
   </div>
-
-  <div bind:this={fpsContainer} />
-
-  <Drawer>
-    <Sidebar />
-  </Drawer>
-
-  {#if $ui.shouldShowParameterOwnerWidget}
-    <ParameterOwnerWidget {parameterOwner} />
-  {/if}
 </main>
 
 {#if progress < 100}
@@ -488,9 +555,3 @@
     />
   </Menu>
 {/if}
-
-<style>
-  canvas {
-    touch-action: none;
-  }
-</style>

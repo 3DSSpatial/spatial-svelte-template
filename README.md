@@ -14,8 +14,6 @@ This template has been deployed as a live demo for you to check out now.
 You can change the password in your own deployments, or connect to an authentication service.
 See below.
 
-
-
 https://svelte-template.zea.live/?zcad=data/gear_box_final_asm.zcad
 
 https://svelte-template.zea.live/?zcad=data/Fidget-Spinner-2.zcad
@@ -114,15 +112,15 @@ The Authentication can be disabled by commenting out the $redirect('/login') lin
 
 ## Collaboration
 
-This Template comes with Collab integrated as an example of how to build collaborative applications. 
-Changes such as item selection and item visibility are synchronized to other users. 
+This Template comes with Collab integrated as an example of how to build collaborative applications.
+Changes such as item selection and item visibility are synchronized to other users.
 
 > https://docs.zea.live/zea-collab/
 
 ```javascript
-   const roomId = urlParams.get('roomId')
-   const session = new Session(userData, SOCKET_URL)
-   if (roomId) session.joinRoom(roomId)
+const roomId = urlParams.get('roomId')
+const session = new Session(userData, SOCKET_URL)
+if (roomId) session.joinRoom(roomId)
 ```
 
 > Note: the roomId is what defines whether users of a given app are visible to each other. Apps can use any value as a room id, or ask fro an explicit value as we do in this sample.
@@ -134,10 +132,10 @@ the Zea CAD library comes pre-integrated and a sample zcad file is loaded.
 > https://docs.zea.live/zea-cad/
 
 ```javascript
-   const asset = new CADAsset()
-   asset.load(url).then(() => {
-   renderer.frameAll()
-   })
+const asset = new CADAsset()
+asset.load(url).then(() => {
+  renderer.frameAll()
+})
 ```
 
 Note: The zcad file format is a proprietary CAD file format. Zea Cloud can be used to produce zcad files, or the CLI tools available on request.
@@ -147,13 +145,11 @@ Note: The zcad file format is a proprietary CAD file format. Zea Cloud can be us
 The gltf-loader plugin is integrated, providing support for loading GLTF files into this app.
 
 ```javascript
-   const asset = new GLTFAsset('gltf')
-   asset.load(url, filename).then(() => {
-   renderer.frameAll()
-   })
+const asset = new GLTFAsset('gltf')
+asset.load(url, filename).then(() => {
+  renderer.frameAll()
+})
 ```
-
-
 
 # Installing your own plugins
 
